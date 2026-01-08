@@ -303,7 +303,7 @@ export class PhoneManagementSystem {
       this.recordCommandExecution(command, args.slice(1), true, duration);
 
     } catch (error) {
-      const duration = Date.now() - Date.now();
+      const duration = Date.now() - commandStartTime;
       this.recordCommandExecution(command, args.slice(1), false, duration);
 
       this.logger.error(`Command failed: ${command}`, {

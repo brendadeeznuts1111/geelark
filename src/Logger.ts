@@ -219,6 +219,10 @@ export class Logger {
     await this.log(LogType.SECURITY_EVENT, LogLevel.CRITICAL, message, data);
   }
 
+  async debug(message: string, data?: any): Promise<void> {
+    await this.log(LogType.PERFORMANCE_METRIC, LogLevel.DEBUG, message, data);
+  }
+
   // Query methods
   getLogs(type?: LogType, level?: LogLevel, limit?: number): LogEntry[] {
     let filtered = this.logs;
