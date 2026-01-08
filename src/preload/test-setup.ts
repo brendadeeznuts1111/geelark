@@ -5,7 +5,7 @@
  * Configured in bun.toml: [test] preload = "./src/preload/test-setup.ts"
  */
 
-import { beforeAll, afterEach, afterAll } from "bun:test";
+import { afterAll, afterEach, beforeAll } from "bun:test";
 
 // Track test state
 const testState = {
@@ -16,7 +16,7 @@ const testState = {
 };
 
 // Global test utilities
-globalThis.testUtils = {
+(globalThis as any).testUtils = {
   getTestState: () => ({ ...testState }),
 
   resetTestState: () => {

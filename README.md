@@ -7,61 +7,92 @@ A powerful developer toolkit built with Bun, featuring comprehensive codebase in
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 [![CLI](https://img.shields.io/badge/CLI-2.0-purple)](docs/api/CLI_REFERENCE.md)
 
+## Table of Contents
+
+- [Features](#features)
+- [Quick Start](#quick-start)
+- [CLI Commands](#cli-commands)
+- [Build Configurations](#build-configurations)
+- [Project Structure](#project-structure)
+- [Configuration](#configuration)
+- [Feature Flags](#feature-flags)
+- [Dashboard System](#dashboard-system)
+- [Testing](#testing)
+- [Development](#development)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
-### Codebase Analysis
-- **Multi-Language Support**: TypeScript, JavaScript, JSX, TOML, YAML, WASM
+### 📊 Codebase Analysis
+- **Multi-Language Support**: TypeScript, JavaScript, JSX, TSX, TOML, YAML, WASM
 - **Dependency Analysis**: Package.json validation and security scanning
 - **Performance Metrics**: Build optimization and transpilation analysis
 - **Git Insights**: Repository statistics and contributor analysis
+- **CLOC**: Lines of code counting with language breakdown
 
-### Networking & Security
+### 🌐 Networking & Security
 - **HTTP/HTTPS Servers**: Built-in server creation with TLS support via `Bun.serve()`
-- **Security Headers**: CORS, CSP, HSTS, and security best practices
-- **WebSocket Support**: Real-time communication with WebSocket handlers
+- **Security Headers**: CORS, CSP, HSTS, X-Frame-Options, and more
+- **WebSocket Support**: Real-time communication with pub/sub patterns
 - **Network Diagnostics**: IPv4/IPv6 connectivity and DNS resolution
+- **TLS/HTTPS**: Certificate handling with `Bun.file()` for efficient loading
 
-### Bun Runtime Features
-- **TypeScript Configuration**: Advanced tsconfig.json management with JSX support
-- **Build Optimization**: Dead code elimination and tree shaking
+### ⚡ Bun Runtime Features
+- **TypeScript Configuration**: Advanced tsconfig.json with JSX and decorators
+- **Build Optimization**: Dead code elimination with `bun:bundle feature()`
 - **React JSX Support**: Automatic JSX transformation with react-jsx runtime
-- **Custom Loaders**: TOML, YAML, and WASM file handling
+- **Custom Loaders**: TOML, YAML, WASM file type handling
 - **Feature Flags**: Compile-time and runtime feature elimination
-
-### Configuration Management
-- **bunfig.toml**: Complete Bun configuration with test, install, and HTTP settings
-- **Bun Context**: Runtime environment detection via `Bun.main`, `Bun.env`
-- **Config Loading**: Efficient file loading with `Bun.file()` API
+- **Bun Context**: Runtime detection via `Bun.main`, `Bun.env`, `Bun.file()`
 - **Preload Scripts**: Global setup and test environment configuration
 
-### Dashboard System
-- **Unicode-Aware Display**: Emojis, flags, and special characters
+### 📁 Configuration Management
+- **bunfig.toml**: Complete Bun configuration (test, install, HTTP, TLS, loaders)
+- **Scoped Registries**: Private package registry support with authentication
+- **Config Loading**: Efficient file loading with `Bun.file()` and `Bun.write()`
+- **Environment Detection**: Development, production, and test mode detection
+- **Hot Reload**: `--watch` and `--hot` for development workflows
+
+### 🎨 Dashboard System
+- **Unicode-Aware Display**: Emojis, flags, ZWJ sequences, and special characters
 - **Live Status Updates**: Real-time monitoring with configurable intervals
 - **Performance Metrics**: CPU, memory, and response time tracking
 - **Integration Status**: Service health and connectivity monitoring
+- **Bun.stringWidth()**: Accurate terminal width calculation for all Unicode
 
-### Logging & Monitoring
+### 📝 Logging & Monitoring
 - **Multi-Level Logging**: DEBUG, INFO, WARN, ERROR, CRITICAL
 - **External Integration**: Elasticsearch, Splunk, Datadog, Prometheus support
-- **Audit Trails**: Comprehensive change tracking
-- **Performance Metrics**: Detailed monitoring and alerting
+- **Audit Trails**: Immutable change tracking with blockchain hashing
+- **Performance Metrics**: Detailed monitoring with alerting
+- **Structured Logging**: JSON-formatted logs with metadata
 
 ## Quick Start
 
 ```bash
 # Clone and install
-git clone <repository-url>
+git clone https://github.com/brendadeeznuts1111/geelark.git
 cd geelark
 bun install
 
 # Run codebase analysis
-bun insights
+bun insights                    # Default output
+bun insights --table            # Table format
+bun insights --json > report.json
 
 # Check system health
 bun health
 
 # Start development server
-bun serve
+bun serve                       # Port 3000
+bun serve --port 8080           # Custom port
+
+# Run tests
+bun test
+bun test --coverage
 ```
 
 ## CLI Commands
@@ -70,59 +101,85 @@ bun serve
 
 ```bash
 # Codebase insights (multiple formats)
-bun insights                    # Default output
-bun insights --table            # Table format
-bun insights --json > report.json
-bun insights --markdown > README.md
-bun insights --csv > analysis.csv
+bunx dev-hq insights                    # Default output
+bunx dev-hq insights --table            # Table format
+bunx dev-hq insights --json             # JSON format
+bunx dev-hq insights --csv > analysis.csv
+bunx dev-hq insights --markdown > README.md
 
 # System health checks
-bun health                      # Basic health check
-bun health --verbose            # Detailed health
+bunx dev-hq health                      # Basic health
+bunx dev-hq health --verbose            # Detailed health
 
 # Development server
-bun serve                       # Start on port 3000
-bun serve --port 8080           # Custom port
+bunx dev-hq serve                       # Port 3000
+bunx dev-hq serve --port 8080           # Custom port
 
 # Testing
-bun test                        # Run all tests
-bun test --coverage             # With coverage
-bun test --watch                # Watch mode
+bunx dev-hq test                        # Run tests
+bunx dev-hq test --coverage             # With coverage
+bunx dev-hq test --watch                # Watch mode
 
 # Git analysis
-bun hq git                      # Repository insights
-bun hq git --json               # JSON output
+bunx dev-hq git                        # Repository insights
+bunx dev-hq git --json                 # JSON output
 
-# Performance benchmarking
-bun bench                       # Run benchmarks
-bun bench:compare               # Compare builds
+# CLOC (Count Lines of Code)
+bunx dev-hq cloc                        # Language breakdown
+
+# Docker insights
+bunx dev-hq docker                      # Container analysis
+
+# Run with monitoring
+bunx dev-hq run "npm test" --metrics     # Execute with metrics
 ```
+
+### Command Aliases
+
+| Command | Aliases |
+|---------|---------|
+| `insights` | `analyze`, `i` |
+| `health` | `h` |
+| `test` | `t` |
+| `git` | `g` |
+| `cloc` | `c` |
+| `docker` | `d` |
+| `serve` | `s` |
+| `run` | `r` |
 
 ### Global Options
 
+| Option | Description |
+|--------|-------------|
+| `--json` | JSON format output |
+| `--table` | Table format using `Bun.inspect.table` |
+| `--format` | Output format: json|table|pretty |
+| `--perf` | Show Bun execution timing |
+| `--verbose` | Verbose logging |
+| `--quiet` | Minimal output |
+| `--timeout` | Command timeout in milliseconds |
+| `--bun` | Bun-themed ASCII output |
+| `--check-deps` | Validate package.json dependencies |
+| `--output` | Save output to file |
+
+### Flag Separation Pattern
+
 ```bash
---json          # JSON output
---table         # Table format
---format <fmt>  # json|table|pretty
---perf          # Show timing
---verbose       # Verbose logging
---quiet         # Minimal output
---timeout <ms>  # Command timeout
---bun           # Bun-themed output
---check-deps    # Validate dependencies
---output <file> # Save to file
+# Bun flags | Script | Command | CLI flags
+bun --hot --watch dev-hq-cli.ts insights --table --json
+#  └─Bun Flags─┘ └──Script──┘ └─Cmd─┘ └─CLI Flags──┘
 ```
 
 ## Build Configurations
 
-| Build Type | Command | Features | Size | Use Case |
-|------------|---------|----------|------|----------|
-| **Development** | `bun run build:dev` | DEV + Extended Logging + Mock API | 450KB | Local Development |
-| **Production Lite** | `bun run build:prod-lite` | PROD + Encryption | 320KB | Minimal Deployment |
-| **Production Standard** | `bun run build:prod-standard` | PROD + Auto-heal + Notifications + Encryption + Batch | 280KB | Standard Deployment |
-| **Production Premium** | `bun run build:prod-premium` | All PROD + Premium + Advanced Monitoring | 340KB | Premium Deployment |
-| **Test Build** | `bun run build:test` | DEV + Mock API | 180KB | CI/CD Testing |
-| **Audit Build** | `bun run build:audit` | All features + Debug symbols | 600KB | Security Audit |
+| Build Type | Command | Features | Size | DCE | Use Case |
+|------------|---------|----------|------|-----|----------|
+| **Development** | `bun run build:dev` | ENV_DEVELOPMENT + Extended Logging + Mock API | 450KB | 0% | Local Development |
+| **Production Lite** | `bun run build:prod-lite` | ENV_PRODUCTION + Encryption | 320KB | 29% | Minimal Deployment |
+| **Production Standard** | `bun run build:prod-standard` | PROD + Auto-heal + Notifications + Encryption + Batch | 280KB | 38% | Standard Deployment |
+| **Production Premium** | `bun run build:prod-premium` | All PROD + Premium + Advanced Monitoring | 340KB | 24% | Premium Deployment |
+| **Test Build** | `bun run build:test` | ENV_DEVELOPMENT + Mock API | 180KB | 60% | CI/CD Testing |
+| **Audit Build** | `bun run build:audit` | All features + Debug symbols | 600KB | 0% | Security Audit |
 
 ## Project Structure
 
@@ -132,13 +189,27 @@ geelark/
 ├── bunfig.toml           # Bun configuration
 ├── package.json           # Build configurations and scripts
 ├── tsconfig.json          # TypeScript configuration
+├── meta.json              # System metadata and manifest
 ├── docs/                  # Documentation suite
 │   ├── README.md          # Documentation index
 │   ├── api/               # API documentation
+│   │   ├── CLI_REFERENCE.md
+│   │   ├── SERVER_API.md
+│   │   └── flags-reference.md
 │   ├── guides/            # Feature guides
+│   │   ├── EXPECTTYPEOF_GUIDE.md
+│   │   ├── FEATURE_FLAGS_PRO_TIPS.md
+│   │   └── TESTING_ALIGNMENT.md
 │   └── tutorials/         # Tutorial documents
+│       ├── SETUP.md
+│       ├── USER_GUIDE.md
+│       └── DEPLOYMENT.md
 ├── scripts/               # Automation scripts
 ├── tests/                 # Test files
+│   ├── unit/              # Unit tests
+│   ├── integration/       # Integration tests
+│   ├── e2e/               # End-to-end tests
+│   └── performance/       # Performance benchmarks
 ├── bench/                 # Benchmark suite
 ├── examples/              # Example code
 ├── bin/                   # CLI entry points
@@ -152,6 +223,10 @@ geelark/
     ├── Logger.ts          # Logging system
     ├── StringWidth.ts     # Unicode text utilities
     ├── CLI.ts             # Command-line interface
+    ├── constants/         # Runtime constants
+    │   ├── index.ts       # Main constants export
+    │   ├── templates.ts   # Bun create templates
+    │   └── features/       # Feature flag constants
     ├── context/           # Bun context wrappers
     ├── config/            # Config loading utilities
     ├── server/            # HTTP/WebSocket server
@@ -164,8 +239,6 @@ geelark/
 ## Configuration
 
 ### bunfig.toml
-
-The project uses a comprehensive `bunfig.toml` for Bun-specific configuration:
 
 ```toml
 [test]
@@ -185,15 +258,19 @@ print = "yarn"
 [run]
 shell = "bun"
 bun = true
-```
 
-See [bunfig.toml](bunfig.toml) for full configuration options.
+[http]
+user-agent = "geelark/1.0.0"
+connectTimeout = 10000
+readTimeout = 30000
+keepAlive = true
+```
 
 ### Environment Variables
 
 ```bash
 # API Configuration
-GEELARK_API_KEY=your_api_key_here
+GEELARK_API_KEY=your_api_key
 GEELARK_BASE_URL=https://api.geelark.com
 
 # Service Integrations
@@ -217,6 +294,50 @@ HEALTH_CHECK_INTERVAL=30
 MONITORING_INTERVAL=5
 ```
 
+## Feature Flags
+
+### Core Feature Flags
+
+| Flag | Enabled Badge | Disabled Badge | Impact |
+|------|---------------|----------------|--------|
+| `ENV_DEVELOPMENT` | `🌍 DEV` | `🌍 PROD` | +15% size |
+| `ENV_PRODUCTION` | `🌍 PROD` | `🌍 DEV` | -25% size |
+| `FEAT_PREMIUM` | `🏆 PREMIUM` | `🔓 FREE` | +15% size |
+| `FEAT_AUTO_HEAL` | `🔄 AUTO-HEAL` | `⚠️ MANUAL` | +10% size |
+| `FEAT_NOTIFICATIONS` | `🔔 ACTIVE` | `🔕 SILENT` | +8% size |
+| `FEAT_ENCRYPTION` | `🔐 ENCRYPTED` | `⚠️ PLAINTEXT` | +5% size |
+| `FEAT_MOCK_API` | `🧪 MOCK` | `🚀 REAL` | -20% size |
+| `FEAT_EXTENDED_LOGGING` | `📝 VERBOSE` | `📋 NORMAL` | +12% size |
+| `FEAT_ADVANCED_MONITORING` | `📈 ADVANCED` | `📊 BASIC` | +7% size |
+| `FEAT_BATCH_PROCESSING` | `⚡ BATCH` | `🐌 SEQUENTIAL` | +8% size |
+| `FEAT_VALIDATION_STRICT` | `✅ STRICT` | `⚠️ LENIENT` | +5% size |
+
+### Compile-Time Features
+
+See [`src/constants/features/compile-time.ts`](src/constants/features/compile-time.ts) for the complete feature flag system with dead code elimination.
+
+## Dashboard System
+
+### Dashboard Components
+
+| Component | Update Frequency | Data Source |
+|-----------|------------------|-------------|
+| Top Status Bar | Real-time | Feature Registry |
+| Environment Panel | On-change | ENV_* flags |
+| Security Status | Real-time | Security flags |
+| Notification Panel | 1 second | Notification queue |
+| Performance Graph | 2 seconds | Performance metrics |
+| Integration Grid | 30 seconds | Health checks |
+
+### Unicode Support
+
+The dashboard uses `Bun.stringWidth()` for accurate terminal width calculation:
+- Flag emoji (🇺🇸) - 2 columns
+- Skin tone modifiers (👋🏽) - 2 columns
+- ZWJ sequences (👨‍👩‍👧) - 2 columns
+- ANSI escape sequences - excluded from width
+- OSC hyperlinks - excluded from width
+
 ## Testing
 
 ```bash
@@ -227,7 +348,7 @@ bun test
 bun test:unit                 # Unit tests only
 bun test:integration          # Integration tests only
 bun test:e2e                  # E2E tests only
-bun test:types                # Type testing
+bun test:types                # Type testing with expectTypeOf
 bun test:servers              # Server tests
 bun test:dev-hq-api          # Dev-HQ API tests
 
@@ -236,6 +357,16 @@ bun test:coverage
 
 # Watch mode
 bun test:watch
+```
+
+### Type Testing
+
+```typescript
+import { expectTypeOf } from "bun:test";
+
+expectTypeOf(user).toMatchObjectOf<User>();
+expectTypeOf(config).toBeObject();
+expectTypeOf(fn).returns.toBeVoid();
 ```
 
 ## Development
@@ -264,65 +395,67 @@ bun lint
 bun lint:fix
 ```
 
-### Adding New Features
+### Bun-Pure Standards
 
-1. **Define Feature Flag** in `src/types.ts`:
 ```typescript
-export enum FeatureFlag {
-  FEAT_NEW_FEATURE = 'FEAT_NEW_FEATURE',
-}
-```
+// Files
+await Bun.file("path.txt").text()
+await Bun.write("out.txt", "content")
 
-2. **Configure Feature** in `src/config.ts`:
-```typescript
-[FeatureFlag.FEAT_NEW_FEATURE]: {
-  flag: FeatureFlag.FEAT_NEW_FEATURE,
-  criticalLevel: CriticalLevel.MEDIUM,
-  logHook: LogType.FEATURE_CHANGE,
-  badgeEnabled: '✨ NEW',
-  badgeDisabled: '🚫 DISABLED',
-  buildTimeImpact: '+5% size',
-},
-```
+// Server
+Bun.serve({ port: 3000, fetch: req => new Response("OK") })
 
-3. **Implement Feature Logic**:
-```typescript
-if (featureRegistry.isEnabled(FeatureFlag.FEAT_NEW_FEATURE)) {
-  // Feature implementation
-}
+// Database
+import { Database } from "bun:sqlite";
+const db = new Database("app.db");
+
+// Test
+import { test, expect } from "bun:test";
+
+// Glob
+for await (const f of new Bun.Glob("**/*.ts").scan(".")) console.log(f)
 ```
 
 ## Documentation
 
-- [API Reference](docs/api/CLI_REFERENCE.md) - Complete CLI documentation
-- [Architecture](docs/ARCHITECTURE.md) - System architecture overview
-- [Bun Runtime Features](docs/BUN_RUNTIME_FEATURES.md) - Bun feature integration
-- [Feature Flags Guide](docs/guides/FEATURE_FLAGS_PRO_TIPS.md) - Feature flag patterns
-- [expectTypeOf Guide](docs/guides/EXPECTTYPEOF_GUIDE.md) - Type checking guide
-- [Setup Tutorial](docs/tutorials/SETUP.md) - Getting started tutorial
-- [User Guide](docs/tutorials/USER_GUIDE.md) - Comprehensive user manual
+| Document | Description |
+|----------|-------------|
+| [Documentation Index](docs/README.md) | Complete documentation suite |
+| [CLI Reference](docs/api/CLI_REFERENCE.md) | Complete command-line interface reference |
+| [Server API](docs/api/SERVER_API.md) | HTTP/WebSocket server documentation |
+| [Deployment Guide](docs/tutorials/DEPLOYMENT.md) | Platform-specific deployment instructions |
+| [Architecture](docs/ARCHITECTURE.md) | System architecture overview |
+| [Bun Runtime Features](docs/BUN_RUNTIME_FEATURES.md) | Bun feature integration |
+| [Bun Constants](docs/BUN_CONSTANTS.md) | Runtime constants reference |
+| [Feature Matrix](docs/FEATURE_MATRIX.md) | Complete feature flags matrix |
+| [expectTypeOf Guide](docs/guides/EXPECTTYPEOF_GUIDE.md) | Type checking guide |
 
 ## Roadmap
 
-### Phase 1: Core System (Current)
+### Phase 1: Core System ✅
 - ✅ Feature flag system
 - ✅ Unicode-aware string width calculations
 - ✅ Comprehensive logging system
 - ✅ Dashboard components
 - ✅ CLI interface
 - ✅ Health monitoring
+- ✅ HTTP/WebSocket server
+- ✅ Security headers & TLS
+- ✅ Route decorators
+- ✅ JSX components
 
-### Phase 2: Advanced Features (Q1 2026)
+### Phase 2: Advanced Features 🔄
 - 🔄 Real-time dashboard with live updates
 - 🔄 Advanced security features
 - 🔄 Performance optimization
 - 🔄 Notification system
-
-### Phase 3: Enterprise Features (Q2 2026)
-- 🔄 Multi-tenant support
-- 🔄 Advanced analytics dashboard
 - 🔄 Automated scaling
-- 🔄 Advanced monitoring integrations
+
+### Phase 3: Enterprise Features 📋
+- 📋 Multi-tenant support
+- 📋 Advanced analytics dashboard
+- 📋 Automated scaling
+- 📋 Advanced monitoring integrations
 
 ## Contributing
 
@@ -345,8 +478,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Issue Tracker](https://github.com/your-org/geelark/issues)
-- 💬 [Discussions](https://github.com/your-org/geelark/discussions)
+- 🐛 [Issue Tracker](https://github.com/brendadeeznuts1111/geelark/issues)
+- 💬 [Discussions](https://github.com/brendadeeznuts1111/geelark/discussions)
 
 ---
 

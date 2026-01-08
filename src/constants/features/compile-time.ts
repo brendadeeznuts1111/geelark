@@ -198,11 +198,10 @@ export const COMPILE_TIME_CONFIG = {
       : 30,
 
     // External logging
-    EXTERNAL_LOGGING:
-      feature("FEAT_AUDIT_LOGGING") || feature("FEAT_ADVANCED_MONITORING"),
+    EXTERNAL_LOGGING: feature("FEAT_AUDIT_LOGGING") ? true : feature("FEAT_ADVANCED_MONITORING") ? true : false,
 
     // Structured logging
-    STRUCTURED: feature("FEAT_ADVANCED_MONITORING"),
+    STRUCTURED: feature("FEAT_ADVANCED_MONITORING") ? true : false,
   } as const,
 
   // 📱 Phone Management Configuration
@@ -229,8 +228,8 @@ export const COMPILE_TIME_CONFIG = {
       : 30000,
 
     // Automation features
-    AUTOMATION_ENABLED: feature("PHONE_AUTOMATION_ENABLED"),
-    BULK_OPERATIONS: feature("PHONE_BULK_OPERATIONS"),
+    AUTOMATION_ENABLED: feature("PHONE_AUTOMATION_ENABLED") ? true : false,
+    BULK_OPERATIONS: feature("PHONE_BULK_OPERATIONS") ? true : false,
   } as const,
 
   // 📈 Performance Configuration

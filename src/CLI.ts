@@ -20,14 +20,32 @@ program
   .option("-v, --verbose", "Enable verbose logging")
   .option("--dry-run", "Execute in dry-run mode")
   .option("--ascii", "Force ASCII mode for dashboard")
-  .option("--no-color", "Disable colored output");
+  .option("--no-color", "Disable colored output")
+
+  // Dependency & Module Resolution Options
+  .option("--preload <module>", "Import a module before other modules are loaded")
+  .option("-r, --require <module>", "Alias of --preload, for Node.js compatibility")
+  .option("--import <module>", "Alias of --preload, for Node.js compatibility")
+  .option("--no-install", "Disable auto install in the Bun runtime")
+  .option("--install <behavior>", "Configure auto-install behavior (auto|fallback|force)", "auto")
+  .option("-i", "Auto-install dependencies during execution. Equivalent to --install=fallback")
+  .option("--prefer-offline", "Skip staleness checks for packages in the Bun runtime and resolve from disk")
+  .option("--prefer-latest", "Use the latest matching versions of packages in the Bun runtime, always checking npm")
+  .option("--conditions <conditions>", "Pass custom conditions to resolve")
+  .option("--main-fields <fields>", "Main fields to lookup in package.json. Defaults to --target dependent")
+  .option("--preserve-symlinks", "Preserve symlinks when resolving files")
+  .option("--preserve-symlinks-main", "Preserve symlinks when resolving the main entry point")
+  .option("--extension-order <extensions>", "File extension resolution order", ".tsx,.ts,.jsx,.js,.json");
 
 // Initialize system components
 let featureRegistry: FeatureRegistry;
 let logger: Logger;
 let dashboard: Dashboard;
 
-function initializeSystem(options: any) {
+async function initializeSystem(options: any) {
+  // Handle dependency and module resolution options
+  await handleDependencyOptions(options);
+
   const environment =
     process.env.NODE_ENV === "production" ? "production" : "development";
   const platform =
@@ -78,7 +96,7 @@ program
   .option("--watch", "Enable live updates")
   .option("--interval <seconds>", "Update interval in seconds", "5")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.watch) {
       const interval = parseInt(options.interval) * 1000;
@@ -104,7 +122,7 @@ program
   .option("--component <name>", "Display specific component only")
   .option("--export <format>", "Export dashboard (json|csv|html)")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.component) {
       dashboard.displayComponent(options.component);
@@ -122,7 +140,7 @@ program
   .option("--integrations", "Check integration health only")
   .option("--detailed", "Show detailed health information")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.integrations) {
       await dashboard.checkIntegrationHealth();
@@ -147,7 +165,7 @@ program
   .option("--export <format>", "Export logs (json|csv)")
   .option("--tail", "Tail logs in real-time")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.tail) {
       logger.tailLogs();
@@ -172,8 +190,8 @@ program
   .option("--toggle <flag>", "Toggle a specific feature flag")
   .option("--reset", "Reset all flags to defaults")
   .option("--rotate", "Rotate feature flags (quarterly maintenance)")
-  .action((options) => {
-    initializeSystem(program.opts());
+  .action(async (options) => {
+    await initializeSystem(program.opts());
 
     if (options.list) {
       featureRegistry.displayAllFlags();
@@ -224,7 +242,7 @@ program
   .option("--full", "Run comprehensive audit with debug symbols")
   .option("--report <format>", "Generate audit report (json|pdf)")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     console.log(chalk.blue("🔍 Running system audit..."));
 
@@ -246,7 +264,7 @@ program
   .option("--performance", "Review performance metrics only")
   .option("--optimize", "Suggest optimizations")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.performance) {
       await dashboard.reviewPerformance(options.optimize);
@@ -262,7 +280,7 @@ program
   .option("--optimize", "Analyze and optimize build")
   .option("--analyze", "Analyze bundle composition")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.optimize) {
       await dashboard.optimizeBuild();
@@ -282,7 +300,7 @@ program
   .option("--port <number>", "Port to run on", "3000")
   .option("--mock", "Use mock API services")
   .action(async (options) => {
-    initializeSystem(program.opts());
+    await initializeSystem(program.opts());
 
     if (options.mock) {
       featureRegistry.enableFeature(FeatureFlag.FEAT_MOCK_API);
@@ -299,6 +317,123 @@ program
       dashboard.startMonitoring();
     }
   });
+
+// Handle dependency and module resolution options
+async function handleDependencyOptions(options: any) {
+  // Handle null/undefined options
+  if (!options) {
+    return;
+  }
+
+  // Handle preload/require/import options
+  const preloadModules = [];
+
+  if (options.preload) {
+    preloadModules.push(options.preload);
+  }
+  if (options.require) {
+    preloadModules.push(options.require);
+  }
+  if (options.import) {
+    preloadModules.push(options.import);
+  }
+
+  // Load preload modules
+  for (const module of preloadModules) {
+    try {
+      await import(module);
+      if (options.verbose) {
+        console.log(chalk.green(`✅ Preloaded module: ${module}`));
+      }
+    } catch (error) {
+      console.error(chalk.red(`❌ Failed to preload module: ${module}`), error);
+      if (!options.dryRun) {
+        process.exit(1);
+      }
+    }
+  }
+
+  // Handle install behavior
+  if (options.noInstall) {
+    process.env.BUN_NO_INSTALL = "true";
+    if (options.verbose) {
+      console.log(chalk.yellow("🔧 Auto-install disabled"));
+    }
+  }
+
+  if (options.install && options.install !== "auto") {
+    const validBehaviors = ["auto", "fallback", "force"];
+    if (!validBehaviors.includes(options.install)) {
+      console.error(chalk.red(`❌ Invalid install behavior: ${options.install}. Valid options: ${validBehaviors.join(", ")}`));
+      process.exit(1);
+    }
+    process.env.BUN_INSTALL = options.install;
+    if (options.verbose) {
+      console.log(chalk.yellow(`🔧 Install behavior set to: ${options.install}`));
+    }
+  }
+
+  if (options.i) {
+    process.env.BUN_INSTALL = "fallback";
+    if (options.verbose) {
+      console.log(chalk.yellow("🔧 Auto-install enabled (fallback mode)"));
+    }
+  }
+
+  // Handle package resolution preferences
+  if (options.preferOffline) {
+    process.env.BUN_PREFER_OFFLINE = "true";
+    if (options.verbose) {
+      console.log(chalk.yellow("🔧 Preferring offline packages"));
+    }
+  }
+
+  if (options.preferLatest) {
+    process.env.BUN_PREFER_LATEST = "true";
+    if (options.verbose) {
+      console.log(chalk.yellow("🔧 Preferring latest package versions"));
+    }
+  }
+
+  // Handle custom conditions
+  if (options.conditions) {
+    process.env.BUN_CONDITIONS = options.conditions;
+    if (options.verbose) {
+      console.log(chalk.yellow(`🔧 Custom conditions: ${options.conditions}`));
+    }
+  }
+
+  // Handle main fields
+  if (options.mainFields) {
+    process.env.BUN_MAIN_FIELDS = options.mainFields;
+    if (options.verbose) {
+      console.log(chalk.yellow(`🔧 Main fields: ${options.mainFields}`));
+    }
+  }
+
+  // Handle symlink preservation
+  if (options.preserveSymlinks) {
+    process.env.BUN_PRESERVE_SYMLINKS = "true";
+    if (options.verbose) {
+      console.log(chalk.yellow("🔧 Preserving symlinks when resolving files"));
+    }
+  }
+
+  if (options.preserveSymlinksMain) {
+    process.env.BUN_PRESERVE_SYMLINKS_MAIN = "true";
+    if (options.verbose) {
+      console.log(chalk.yellow("🔧 Preserving symlinks when resolving main entry point"));
+    }
+  }
+
+  // Handle extension order
+  if (options.extensionOrder && options.extensionOrder !== ".tsx,.ts,.jsx,.js,.json") {
+    process.env.BUN_EXTENSION_ORDER = options.extensionOrder;
+    if (options.verbose) {
+      console.log(chalk.yellow(`🔧 Extension order: ${options.extensionOrder}`));
+    }
+  }
+}
 
 // Error handling
 program.configureOutput({

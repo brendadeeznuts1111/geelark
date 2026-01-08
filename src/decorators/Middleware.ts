@@ -101,7 +101,7 @@ export function chain(...fns: MiddlewareFunction[]): MiddlewareFunction {
     let chain = final;
     for (const fn of fns.reverse()) {
       const next = chain;
-      chain = () => fn(req, next);
+      chain = async () => await fn(req, next);
     }
     return chain();
   };

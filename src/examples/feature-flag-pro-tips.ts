@@ -42,15 +42,14 @@ if (process.env.ENABLE_FEATURE_X) {
 }
 
 // ============================================================================
-// 📦 BUNDLE SIZE OPTIMIZATION
+// BUNDLE SIZE OPTIMIZATION
 // ============================================================================
 
 // Entire modules can be eliminated
-export async function loadAdminModule() {
+export async function loadAdminPanel() {
   if (feature("FEAT_PREMIUM")) {
-    // This import is tree-shaken away if FEAT_PREMIUM=false
-    const adminModule = await import("./admin-panel");
-    return adminModule;
+    // This would be tree-shaken away if FEAT_PREMIUM=false
+    return { admin: true }; // Placeholder
   }
   return null;
 }
@@ -184,7 +183,8 @@ export function badPatterns() {
 // 1. Gate expensive imports
 export async function loadHeavyModule() {
   if (feature("FEAT_PREMIUM")) {
-    return await import("./heavy-admin-module");
+    // Placeholder for heavy module
+    return { heavy: true };
   }
   return null;
 }

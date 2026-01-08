@@ -211,6 +211,10 @@ export class Logger {
   }
 
   // Additional methods for CLI compatibility
+  async debug(message: string, data?: any): Promise<void> {
+    await this.log(LogType.PERFORMANCE_METRIC, LogLevel.DEBUG, message, data);
+  }
+
   async info(message: string, data?: any): Promise<void> {
     await this.log(LogType.FEATURE_CHANGE, LogLevel.INFO, message, data);
   }
@@ -253,13 +257,13 @@ export class Logger {
     this.logs = [];
   }
 
-  exportLogs(format: "json" | "csv" | "text" = "json"): string {
+  exportLogs(logs: LogEntry[], format: "json" | "csv" | "text" = "json"): string {
     switch (format) {
       case "json":
-        return JSON.stringify(this.logs, null, 2);
+        return JSON.stringify(logs, null, 2);
       case "csv":
         const headers = ["timestamp", "type", "level", "message", "prefix"];
-        const rows = this.logs.map((log) => [
+        const rows = logs.map((log) => [
           log.timestamp.toISOString(),
           log.type,
           log.level,
@@ -268,7 +272,7 @@ export class Logger {
         ]);
         return [headers, ...rows].map((row) => row.join(",")).join("\n");
       case "text":
-        return this.logs
+        return logs
           .map(
             (log) =>
               `${log.timestamp.toISOString()} ${log.prefix} ${log.message}`

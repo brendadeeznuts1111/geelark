@@ -17,7 +17,7 @@ export async function loadConfig<T = unknown>(path: string): Promise<T> {
   }
 
   try {
-    return await file.json<T>();
+    return await file.json() as T;
   } catch (error) {
     throw new Error(`Failed to parse configuration file ${path}: ${error}`);
   }
@@ -34,7 +34,7 @@ export function loadConfigSync<T = unknown>(path: string): T {
   }
 
   try {
-    return file.json<T>() as T;
+    return file.json() as T;
   } catch (error) {
     throw new Error(`Failed to parse configuration file ${path}: ${error}`);
   }
@@ -77,7 +77,7 @@ export function watchConfig<T>(
   path: string,
   onChange: (config: T) => void | Promise<void>
 ): () => void {
-  const watcher = new AbortController();
+  const controller = new AbortController();
   let currentConfig: T | null = null;
 
   (async () => {
@@ -85,35 +85,36 @@ export function watchConfig<T>(
       const file = Bun.file(path);
 
       // Initial load
-      currentConfig = await file.json<T>();
-      await onChange(currentConfig);
+      currentConfig = await file.json() as T;
+      await onChange(currentConfig as T);
 
-      // Watch for changes
-      const watcher = Bun.watch(path, {
-        signal: watcher.signal,
-        async onEvent(event) {
-          if (event.type === "create" || event.type === "modify") {
-            try {
-              const newConfig = await loadConfig<T>(path);
-              if (JSON.stringify(newConfig) !== JSON.stringify(currentConfig)) {
-                currentConfig = newConfig;
-                await onChange(newConfig);
-              }
-            } catch (error) {
-              console.error(`Error reloading config: ${error}`);
-            }
+      // Watch for changes using polling
+      const checkFile = async () => {
+        try {
+          const newConfig = await loadConfig<T>(path);
+          if (JSON.stringify(newConfig) !== JSON.stringify(currentConfig)) {
+            currentConfig = newConfig;
+            await onChange(newConfig);
           }
-        },
+        } catch (error) {
+          console.error(`Error reloading config: ${error}`);
+        }
+      };
+
+      // Poll every 5 seconds
+      const interval = setInterval(checkFile, 5000);
+
+      // Cleanup when aborted
+      controller.signal.addEventListener('abort', () => {
+        clearInterval(interval);
       });
 
-      // Store ref for cleanup
-      (watcher as any).close = () => watcher.close();
     } catch (error) {
       console.error(`Error watching config file ${path}:`, error);
     }
   })();
 
-  return () => watcher.abort();
+  return () => controller.abort();
 }
 
 /**

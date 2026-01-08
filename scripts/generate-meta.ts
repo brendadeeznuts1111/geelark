@@ -1,9 +1,8 @@
 #!/usr/bin/env bun
-import { writeFileSync, readFileSync } from 'fs';
-import { join } from 'path';
+import { writeFileSync } from 'fs';
 import { version } from '../package.json';
-import { FeatureFlag } from '../src/types';
 import { FEATURE_FLAG_CONFIGS } from '../src/config';
+import { FeatureFlag } from '../src/types';
 
 interface MetaManifest {
   $schema: string;
@@ -672,7 +671,11 @@ async function generateMetaJson(): Promise<void> {
 
   // Calculate checksum
   const jsonString = JSON.stringify(meta, null, 2);
-  const checksum = await Bun.hash(jsonString, 'sha256');
+  const encoder = new TextEncoder();
+  const data = encoder.encode(jsonString);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const checksum = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   meta.meta.checksum = `sha256:${checksum}`;
 
   // Write to file

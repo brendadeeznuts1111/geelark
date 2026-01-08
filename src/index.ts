@@ -102,16 +102,13 @@ export class PhoneManagementSystem {
       level: options.verbose ? LogLevel.DEBUG : this.config.logging.level,
       externalServices: this.config.logging.externalServices,
       retention: this.config.logging.retention,
-      structured: true,
-      metrics: this.config.performance.metrics,
+      featureRegistry,
     });
 
     // Initialize dashboard after dependencies are ready
     const dashboard = new Dashboard(featureRegistry, logger, {
       ascii: options.ascii || false,
-      realTime: true,
-      metrics: this.config.performance.metrics,
-      profiling: this.config.performance.profiling,
+      updateInterval: this.config.performance.metrics ? 1000 : 5000,
     });
 
     this.featureRegistry = featureRegistry;
@@ -307,11 +304,11 @@ export class PhoneManagementSystem {
       this.recordCommandExecution(command, args.slice(1), false, duration);
 
       this.logger.error(`Command failed: ${command}`, {
-        error: error.message,
-        stack: error.stack,
+        error: (error as Error).message,
+        stack: (error as Error).stack,
         metrics: this.getCommandMetrics(command),
       });
-      console.error(`Error: ${error.message}`);
+      console.error(`Error: ${(error as Error).message}`);
       process.exit(1);
     } finally {
       this.endPerformanceProfile(`command_${command}`);
@@ -793,7 +790,7 @@ For detailed help on each command, use:
       const logs = this.logger.getLogs(type as any);
 
       if (format) {
-        await this.logger.exportLogs(logs, format);
+        await this.logger.exportLogs(logs, format as "json" | "csv" | "text");
       } else {
         this.logger.displayLogs(logs);
       }

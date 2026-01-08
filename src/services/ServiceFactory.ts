@@ -286,11 +286,11 @@ export class ServiceFactory {
       phones: new Map(),
       maxAccounts,
 
-      // Feature-based capabilities
-      automationEnabled: feature("PHONE_AUTOMATION_ENABLED"),
-      realTimeSync: feature("PHONE_REAL_TIME_SYNC"),
-      advancedAnalytics: feature("PHONE_ADVANCED_ANALYTICS"),
-      bulkOperations: feature("PHONE_BULK_OPERATIONS"),
+      // Feature-based capabilities (using conditional evaluation)
+      automationEnabled: feature("PHONE_AUTOMATION_ENABLED") ? true : false,
+      realTimeSync: feature("PHONE_REAL_TIME_SYNC") ? true : false,
+      advancedAnalytics: feature("PHONE_ADVANCED_ANALYTICS") ? true : false,
+      bulkOperations: feature("PHONE_BULK_OPERATIONS") ? true : false,
 
       // Compile-time optimized methods
       canCreateAccount() {

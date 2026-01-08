@@ -80,9 +80,7 @@ export interface SecurityHeadersOptions {
 export const defaultSecurityHeaders: Required<
   Omit<SecurityHeadersOptions, "frameOptions" | "strictTransportSecurity" | "contentSecurityPolicy" | "permissionsPolicy" | "crossOriginEmbedderPolicy" | "crossOriginOpenerPolicy">
 > = {
-  frameOptions: "DENY",
   contentTypeOptions: true,
-  strictTransportSecurity: true,
   xssProtection: true,
   referrerPolicy: "strict-origin-when-cross-origin",
 };

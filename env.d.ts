@@ -1,5 +1,6 @@
 // Type Safety Registry for Bun Feature Flags
 // Provides compile-time validation and autocomplete for all feature flags
+// Enhanced for Bun 1.1+ compile-time elimination
 
 declare module "bun:bundle" {
   interface Registry {
@@ -141,6 +142,91 @@ declare global {
     sourcemap: boolean;
     define?: Record<string, string>;
   }
+
+  // Enhanced feature metadata for Bun 1.1+
+  interface FeatureMetadata {
+    name: FeatureFlag;
+    category: "environment" | "tier" | "security" | "performance" | "platform" | "integration" | "phone" | "ui" | "analytics" | "advanced";
+    description: string;
+    bundleImpact: {
+      size: string;
+      memory: string;
+      cpu: string;
+    };
+    dependencies?: FeatureFlag[];
+    conflicts?: FeatureFlag[];
+    experimental?: boolean;
+    deprecated?: boolean;
+    since?: string; // Bun version
+  }
+
+  // Compile-time elimination result
+  interface EliminationResult {
+    feature: FeatureFlag;
+    eliminated: boolean;
+    reason?: "feature_disabled" | "dependency_missing" | "conflict_detected" | "platform_mismatch";
+    estimatedSavings?: {
+      size: number; // KB
+      memory: number; // MB
+      cpu: number; // percentage
+    };
+  }
+
+  // Bundle analysis result
+  interface BundleAnalysis {
+    totalFeatures: number;
+    includedFeatures: number;
+    eliminatedFeatures: number;
+    eliminationRate: number; // percentage
+    estimatedSize: number; // KB
+    estimatedMemory: number; // MB
+    performanceImpact: number; // percentage
+    featureResults: EliminationResult[];
+    recommendations: string[];
+    warnings: string[];
+    errors: string[];
+  }
+
+  // Unicode width test case
+  interface UnicodeTestCase {
+    text: string;
+    expected: number;
+    description: string;
+    category: "emoji" | "ansi" | "rtl" | "combining" | "zwj" | "control";
+  }
+
+  // Terminal formatting options
+  interface TerminalFormatOptions {
+    width?: number;
+    padding?: number;
+    alignment?: "left" | "center" | "right";
+    color?: string;
+    backgroundColor?: string;
+    bold?: boolean;
+    italic?: boolean;
+    underline?: boolean;
+  }
+
+  // Progress bar options
+  interface ProgressBarOptions {
+    width?: number;
+    showPercentage?: boolean;
+    showValue?: boolean;
+    filledChar?: string;
+    emptyChar?: string;
+    color?: string;
+  }
+
+  // Table formatting options
+  interface TableOptions {
+    headers: string[];
+    rows: string[][];
+    columnWidths?: number[];
+    alignment?: ("left" | "center" | "right")[];
+    borders?: boolean;
+    headerColor?: string;
+    alternateRowColors?: boolean;
+  }
 }
 
-export {};
+export { };

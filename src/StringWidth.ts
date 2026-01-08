@@ -124,8 +124,8 @@ export class StringWidth {
     }
 
     // Other flag emojis (check if it's a flag emoji)
-    return /\p{Emoji_Presentation}\p{Emoji_Presentation}/.test(char) ||
-           /\p{Emoji}\uFE0F/.test(char);
+    return /\p{Emoji_Presentation}\p{Emoji_Presentation}/u.test(char) ||
+           /\p{Emoji}\uFE0F/u.test(char);
   }
 
   private static isZWJSequence(fullString: string, index: number): boolean {
