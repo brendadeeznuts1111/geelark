@@ -1,9 +1,10 @@
 // dev-hq/spawn-server.ts - Enhanced Automation as a Service
-import { DevHQActions, DevHQAutomation } from "../core/automation.js";
+/// <reference types="bun" />
+import { AutomationActions, AutomationService } from "../core/automation.js";
 
 /// <reference path="../scripts/types.d.ts" />
 
-interface ServerConfig {
+interface ServerConfiguration {
   port: number;
   hostname: string;
   maxConnections: number;
@@ -13,16 +14,16 @@ interface ServerConfig {
   enableWebSocket: boolean;
 }
 
-interface AuthToken {
+interface AuthenticationToken {
   token: string;
   expires: number;
   permissions: string[];
 }
 
-interface CommandRequest {
-  cmd: string[];
-  cwd?: string;
-  env?: Record<string, string>;
+interface ExecutionRequest {
+  command: string[];
+  workingDirectory?: string;
+  environment?: Record<string, string>;
   stream?: boolean;
   timeout?: number;
   auth?: string;
@@ -37,12 +38,12 @@ interface ServerMetrics {
   averageResponseTime: number;
 }
 
-class EnhancedDevHQServer {
-  private automation: DevHQAutomation;
+class AutomationServer {
+  private automation: AutomationService;
   private server: any;
-  private config: ServerConfig;
+  private config: ServerConfiguration;
   private metrics: ServerMetrics;
-  private authTokens: Map<string, AuthToken> = new Map();
+  private authTokens: Map<string, AuthenticationToken> = new Map();
   private activeConnections: Set<any> = new Set();
   private commandHistory: Array<{
     timestamp: number;
@@ -51,8 +52,8 @@ class EnhancedDevHQServer {
     duration: number;
   }> = [];
 
-  constructor(config: Partial<ServerConfig> = {}) {
-    this.automation = new DevHQAutomation();
+  constructor(configuration: Partial<ServerConfiguration> = {}) {
+    this.automation = new AutomationService();
     this.config = {
       port: 0,
       hostname: "0.0.0.0",
@@ -61,7 +62,7 @@ class EnhancedDevHQServer {
       enableAuth: true,
       enableMetrics: true,
       enableWebSocket: true,
-      ...config
+      ...configuration
     };
 
     this.metrics = {
@@ -85,9 +86,9 @@ class EnhancedDevHQServer {
     }
   }
 
-  private generateAuthToken(role: string, permissions: string[]): AuthToken {
+  private generateAuthToken(role: string, permissions: string[]): AuthenticationToken {
     const token = Buffer.from(`${role}:${Date.now()}:${Math.random()}`).toString('base64');
-    const authToken: AuthToken = {
+    const authToken: AuthenticationToken = {
       token,
       expires: Date.now() + (24 * 60 * 60 * 1000), // 24 hours
       permissions
@@ -100,11 +101,8 @@ class EnhancedDevHQServer {
     if (!this.config.enableAuth) return true;
     if (!authHeader) return false;
 
-    const token = authHeader.replace('Bearer ', '');
-    const authToken = this.authTokens.get(token);
-
+    const authToken: AuthenticationToken | undefined = this.authTokens.get(authHeader);
     if (!authToken || authToken.expires < Date.now()) {
-      this.authTokens.delete(token);
       return false;
     }
 
@@ -142,7 +140,7 @@ class EnhancedDevHQServer {
     const startTime = Date.now();
 
     try {
-      const body: CommandRequest = await req.json();
+      const body: ExecutionRequest = await req.json();
 
       // Validate authentication
       if (!this.validateAuth(body.auth)) {
@@ -150,30 +148,30 @@ class EnhancedDevHQServer {
       }
 
       // Validate command
-      if (!body.cmd || !Array.isArray(body.cmd) || body.cmd.length === 0) {
+      if (!body.command || !Array.isArray(body.command) || body.command.length === 0) {
         return new Response('Invalid command', { status: 400 });
       }
 
       // Security check - prevent dangerous commands
       const dangerousCommands = ['rm -rf', 'sudo rm', 'format', 'del /f'];
-      const commandString = body.cmd.join(' ');
+      const commandString = body.command.join(' ');
       if (dangerousCommands.some(dangerous => commandString.includes(dangerous))) {
         return new Response('Dangerous command detected', { status: 403 });
       }
 
-      const proc = await this.automation.runCommand(body.cmd[0], body.cmd, {
-        cwd: body.cwd || process.cwd(),
-        env: { ...process.env, ...body.env } as Record<string, string>,
+      const result = await this.automation.executeCommand("user-command", body.command, {
+        workingDirectory: body.workingDirectory,
+        environment: body.environment,
         stream: body.stream,
-        timeout: body.timeout || this.config.timeout,
+        timeout: body.timeout
       });
 
-      if (body.stream && "stdout" in proc) {
+      if (body.stream && "stdout" in result) {
         // Stream output in real-time with enhanced error handling
         return new Response(
           new ReadableStream({
             async start(controller) {
-              const reader = (proc as any).stdout.getReader();
+              const reader = (result as any).stdout.getReader();
               try {
                 while (true) {
                   const { done, value } = await reader.read();
@@ -200,10 +198,10 @@ class EnhancedDevHQServer {
 
       const responseTime = Date.now() - startTime;
       this.updateMetrics(responseTime, true);
-      this.logCommand(body.cmd, true, responseTime);
+      this.logCommand(body.command, true, responseTime);
 
       return Response.json({
-        ...proc,
+        ...result,
         metrics: {
           executionTime: responseTime,
           timestamp: Date.now()
@@ -297,6 +295,7 @@ class EnhancedDevHQServer {
 
           // 🏃‍♂️ Execute commands via API
           if (url.pathname === "/run" && req.method === 'POST') {
+            const body: ExecutionRequest = await req.json() as ExecutionRequest;
             const response = await self.handleCommandRequest(req);
             return new Response(response.body, {
               status: response.status,
@@ -306,23 +305,19 @@ class EnhancedDevHQServer {
 
           // 📊 Pre-built insights
           if (url.pathname === "/git-insights") {
-            const insights = await DevHQActions.gitInsights();
+            const insights = await AutomationActions.getGitInsights();
             return Response.json(insights, { headers: corsHeaders });
           }
 
           if (url.pathname === "/cloc") {
-            const cloc = await DevHQActions.analyzeWithCLOC();
-            return Response.json(cloc, { headers: corsHeaders });
+            const analysis = await AutomationActions.analyzeCodeWithCLOC();
+            return Response.json(analysis, { headers: corsHeaders });
           }
 
           // 📈 Enhanced resource monitoring
           if (url.pathname === "/resources") {
-            const usage = await self.automation.getResourceUsage();
-            return Response.json({
-              ...usage,
-              serverMetrics: self.metrics,
-              timestamp: Date.now()
-            }, { headers: corsHeaders });
+            const resources = await self.automation.getResourceStatistics();
+            return Response.json(resources, { headers: corsHeaders });
           }
 
           // 🏥 Health check endpoint
@@ -469,7 +464,8 @@ class EnhancedDevHQServer {
         .prompt::after { content: '▋'; animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
         .metrics {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 10px; margin: 10px 0;
         }
         .metric {
@@ -877,7 +873,7 @@ class EnhancedDevHQServer {
 }
 
 // Create and start the enhanced server
-const server = new EnhancedDevHQServer({
+const server = new AutomationServer({
   enableAuth: process.env.NODE_ENV !== 'development',
   enableMetrics: true,
   enableWebSocket: true,
@@ -885,7 +881,9 @@ const server = new EnhancedDevHQServer({
   timeout: 30000
 });
 
-server.start();
+if (import.meta.main) {
+  server.start();
+}
 
 // Graceful shutdown
 process.on('SIGINT', () => {

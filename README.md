@@ -1,33 +1,68 @@
-# 📊 Comprehensive Phone Management System
+# 🚀 Dev HQ - Advanced Codebase Analysis & Automation
 
-A sophisticated phone management system built with Bun, featuring advanced feature flag management, real-time dashboards, comprehensive logging, and robust monitoring capabilities.
+A powerful codebase analysis and automation tool built with Bun, featuring comprehensive insights, performance monitoring, networking capabilities, and advanced transpilation features.
 
 [![Bun](https://img.shields.io/badge/Bun-1.0.0-FFDF00)](https://bun.sh)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![CLI Version](https://img.shields.io/badge/CLI-2.0.0-purple)](docs/CLI_REFERENCE.md)
+
+## 🎯 Quick Start
+
+```bash
+# Install and analyze your codebase
+bunx dev-hq insights
+
+# Start the web server
+bunx dev-hq serve
+
+# Check system health
+bunx dev-hq health
+```
 
 ## 🌟 Features
 
-### 🎛️ Core Feature Flags & Status Management
-- **Environment Control**: Development/Production switching with automatic optimizations
-- **Premium Features**: Advanced functionality with performance monitoring
-- **Resilience**: Auto-healing capabilities with health monitoring
-- **Security**: End-to-end encryption with strict validation
-- **Monitoring**: Advanced analytics and real-time notifications
-- **Performance**: Batch processing optimization
-- **Platform Support**: Android/iOS specific features
+### 📊 Comprehensive Codebase Analysis
+- **Multi-Language Support**: TypeScript, JavaScript, JSX, TOML, YAML, WASM
+- **Dependency Analysis**: Package.json validation and security scanning
+- **Performance Metrics**: Build optimization and transpilation analysis
+- **Git Insights**: Repository statistics and contributor analysis
+
+### 🌐 Advanced Networking & Security
+- **HTTP/HTTPS Servers**: Built-in server creation with TLS support
+- **Security Headers**: CORS, CSP, HSTS, and security best practices
+- **Redis Integration**: Connection pooling and performance optimization
+- **Network Diagnostics**: IPv4/IPv6 connectivity and DNS resolution
+
+### ⚡ Bun Transpilation & Language Features
+- **TypeScript Configuration**: Advanced tsconfig.json management
+- **Build Optimization**: Dead code elimination and tree shaking
+- **React JSX Support**: Automatic JSX transformation and optimization
+- **Custom Loaders**: TOML, YAML, and WASM file handling
+
+### 📁 Configuration Management
+- **bunfig.toml Parser**: Complete Bun configuration analysis
+- **Enhanced package.json**: Bun-specific metadata and insights
+- **Environment Detection**: Development/production optimization
+- **Configuration Validation**: Best practices and recommendations
+
+### 🎛️ Feature Flags & Status Management
+- **Environment Control**: Development/Production switching
+- **Premium Features**: Advanced functionality with monitoring
+- **Resilience**: Auto-healing capabilities with health checks
+- **Security**: End-to-end encryption with validation
 
 ### 📊 Real-Time Dashboard System
-- **Unicode-Aware Display**: Proper handling of emojis, flags, and special characters
-- **Live Status Updates**: Real-time feature flag and health monitoring
+- **Unicode-Aware Display**: Emojis, flags, and special characters
+- **Live Status Updates**: Real-time monitoring and alerts
 - **Performance Metrics**: CPU, memory, and response time tracking
-- **Integration Status**: Service health checks and connectivity monitoring
+- **Integration Status**: Service health and connectivity
 
 ### 🔄 Advanced Logging & Monitoring
-- **Multi-Level Logging**: DEBUG, INFO, WARN, ERROR, CRITICAL levels
-- **External Integration**: Elasticsearch, Splunk, Datadog, Prometheus, Sentry, CloudWatch
-- **Audit Trails**: Comprehensive change tracking with retention policies
-- **Performance Metrics**: Detailed performance monitoring and alerting
+- **Multi-Level Logging**: DEBUG, INFO, WARN, ERROR, CRITICAL
+- **External Integration**: Elasticsearch, Splunk, Datadog, Prometheus
+- **Audit Trails**: Comprehensive change tracking
+- **Performance Metrics**: Detailed monitoring and alerting
 
 ### 🛡️ Security & Compliance
 - **Encryption**: AES-256-GCM encryption for sensitive data
@@ -61,6 +96,115 @@ bun run build:dev
 # Run the system
 bun run start:dev
 ```
+
+## 🎛️ CLI Commands & Usage
+
+### Installation
+```bash
+# Install globally
+npm install -g @dev-hq/cli
+
+# Or use with npx/bunx
+bunx dev-hq --help
+```
+
+### Core Commands
+
+#### 📊 Codebase Analysis
+```bash
+# Comprehensive analysis
+bunx dev-hq insights
+
+# Different output formats
+bunx dev-hq insights --table
+bunx dev-hq insights --json > report.json
+bunx dev-hq insights --csv > analysis.csv
+bunx dev-hq insights --markdown > README.md
+```
+
+#### 🏥 System Health
+```bash
+# Check system health
+bunx dev-hq health
+
+# Detailed health check
+bunx dev-hq health --verbose
+```
+
+#### 🚀 Development Server
+```bash
+# Start server (default port 3000)
+bunx dev-hq serve
+
+# Custom port
+bunx dev-hq serve --port 8080
+```
+
+#### 🧪 Testing
+```bash
+# Run tests
+bunx dev-hq test
+
+# With coverage
+bunx dev-hq test --coverage
+
+# Watch mode
+bunx dev-hq test --watch
+```
+
+#### 📊 Git Analysis
+```bash
+# Repository insights
+bunx dev-hq git
+
+# Git statistics
+bunx dev-hq git --json
+```
+
+#### 🔢 Code Metrics
+```bash
+# Count lines of code
+bunx dev-hq cloc
+
+# Detailed analysis
+bunx dev-hq cloc --json
+```
+
+### Global Options
+```bash
+# Output formats
+--json          # JSON output
+--table         # Table format
+--format <fmt>  # json|table|pretty
+
+# Performance
+--perf          # Show timing
+--verbose       # Verbose logging
+--quiet         # Minimal output
+--timeout <ms>  # Command timeout
+
+# Features
+--bun           # Bun-themed output
+--check-deps    # Validate dependencies
+--output <file> # Save to file
+```
+
+### Examples
+```bash
+# Complete project analysis
+bunx dev-hq insights --table --perf --check-deps
+
+# CI/CD integration
+bunx dev-hq health --json --quiet > health.json
+
+# Development workflow
+bunx dev-hq health && bunx dev-hq test --coverage && bunx dev-hq serve
+
+# Export analysis
+bunx dev-hq insights --markdown > docs/analysis.md
+```
+
+📖 **Full CLI Reference**: See [CLI_REFERENCE.md](docs/CLI_REFERENCE.md) for complete command documentation.
 
 ### First Run Dashboard
 

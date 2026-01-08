@@ -27,10 +27,21 @@ export function measure<T>(fn: () => T): { result: T; duration: number } {
  * Measure function execution time using Bun.nanoseconds()
  */
 export function measureNanoseconds<T>(fn: () => T): { result: T; duration: number } {
+  // @ts-ignore - Bun.nanoseconds is available at runtime
   const start = Bun.nanoseconds();
   const result = fn();
+  // @ts-ignore - Bun.nanoseconds is available at runtime
   const end = Bun.nanoseconds();
   return { result, duration: (end - start) / 1_000_000 }; // Convert to milliseconds
+}
+
+/**
+ * Measure time from a starting point
+ */
+export function measureTimeFrom(start: number): number {
+  // @ts-ignore - Bun.nanoseconds is available at runtime
+  const end = Bun.nanoseconds();
+  return end - start;
 }
 
 /**
@@ -44,22 +55,22 @@ export function benchmark(
   const times: number[] = [];
 
   // Warmup run (not measured)
-  for (let i = 0; i < Math.min(10, iterations); i++) {
+  fn();
+
+  // Measure iterations
+  for (let i = 0; i < iterations; i++) {
+    // @ts-ignore - Bun.nanoseconds is available at runtime
+    const start = Bun.nanoseconds();
     fn();
+    // @ts-ignore - Bun.nanoseconds is available at runtime
+    const end = Bun.nanoseconds();
+    times.push(end - start);
   }
 
-  // Force GC before benchmarking
-  Bun.gc(true);
-
-  // Actual benchmark runs
+  // Periodic GC to avoid memory pressure
   for (let i = 0; i < iterations; i++) {
-    const start = performance.now();
-    fn();
-    const end = performance.now();
-    times.push(end - start);
-
-    // Periodic GC to avoid memory pressure
     if (i % 100 === 0 && i > 0) {
+      // @ts-ignore - Bun.gc is available at runtime
       Bun.gc(true);
     }
   }
@@ -140,6 +151,7 @@ export function compareBaseline(
  * Force garbage collection between benchmark runs
  */
 export function gcBetweenRuns(): void {
+  // @ts-ignore - Bun.gc is available at runtime
   Bun.gc(true);
 }
 
@@ -172,4 +184,3 @@ export function createBenchmarkSuite(name: string, iterations: number = 1000) {
     },
   };
 }
-

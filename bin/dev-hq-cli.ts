@@ -5,12 +5,15 @@
  * Perfect flag separation pattern with Commander.js and Bun-specific optimizations
  *
  * Usage:
+ *   bunx dev-hq [command] [cli-flags]
  *   bun [bun-flags] dev-hq-cli.ts [command] [cli-flags]
  *
  * Examples:
- *   bun --hot --watch dev-hq-cli.ts insights --table --json
- *   bun --smol dev-hq-cli.ts analyze --bun --check-deps
- *   bun --inspect dev-hq-cli.ts serve --port 3000
+ *   bunx dev-hq insights --table
+ *   bunx dev-hq insights --json > insights.json
+ *   bunx dev-hq insights --markdown > README.md
+ *   bunx dev-hq insights --csv > insights.csv
+ *   bun bin/dev-hq-cli.ts insights --table
  */
 
 import { inspect, spawn } from "bun";
@@ -65,8 +68,8 @@ const CONFIG = {
     'profle': 'profile'
   } as Record<string, string>,
 
-  // Local-only commands (not available in global binary)
-  LOCAL_ONLY_COMMANDS: ['insights', 'analyze', 'debug', 'profile', 'coverage'],
+  // Local-only commands (development-only, not recommended for global binary)
+  LOCAL_ONLY_COMMANDS: ['debug', 'profile', 'coverage'],
 
   // Default flags for commands
   DEFAULT_FLAGS: {
@@ -100,7 +103,18 @@ interface CodebaseInsights {
   performance?: {
     analysisTime: number;
     memoryUsed: number;
+    heapGrowth: number;
+    heapTotal: number;
+    heapUsed: number;
+    external: number;
+    rss: number;
     filesPerSecond: number;
+    avgComplexity: number;
+    avgLineCount: number;
+    functionCount: number;
+    classCount: number;
+    importCount: number;
+    totalComplexity: number;
   };
 }
 
@@ -217,13 +231,27 @@ async function analyzeCodebase(options: {
   perf?: boolean;
 }): Promise<CodebaseInsights> {
   const startTime = performance.now();
-  const startMemory = process.memoryUsage().heapUsed;
+  const startMemory = process.memoryUsage();
+  let startHeap = { heapUsed: 0, heapTotal: 0 };
+
+  try {
+    // Try to get Bun heap usage if available
+    if (typeof Bun !== 'undefined' && (Bun as any).heapUsage) {
+      startHeap = (Bun as any).heapUsage();
+    }
+  } catch {
+    // Fall back to 0 if not available
+  }
 
   const glob = new Bun.Glob("**/*.{ts,tsx,js,jsx,json,mjs,cjs}");
   const files: FileStats[] = [];
   const languages: Record<string, number> = {};
   let totalLines = 0;
   let totalSize = 0;
+  let totalComplexity = 0;
+  let functionCount = 0;
+  let classCount = 0;
+  let importCount = 0;
 
   try {
     for await (const filePath of glob.scan(process.cwd())) {
@@ -268,6 +296,17 @@ async function analyzeCodebase(options: {
           languages[language] = (languages[language] || 0) + 1;
           totalLines += lines;
           totalSize += size;
+
+          // Estimate code complexity
+          const funcMatches = (text.match(/function\s+\w+|const\s+\w+\s*=\s*\(|=>\s*\{/g) || []).length;
+          const classMatches = (text.match(/class\s+\w+|interface\s+\w+/g) || []).length;
+          const importMatches = (text.match(/import\s+|require\s*\(/g) || []).length;
+          const cycloComplexity = (text.match(/if\s*\(|else|switch|case|for\s*\(|while\s*\(|catch|&&|\|\||ternary/g) || []).length;
+
+          functionCount += funcMatches;
+          classCount += classMatches;
+          importCount += importMatches;
+          totalComplexity += cycloComplexity;
         } catch {
           // Skip binary files or files we can't read
         }
@@ -283,7 +322,9 @@ async function analyzeCodebase(options: {
     dependencies = await checkDependencies();
   }
 
-  // Calculate health score
+  // Calculate health score with more factors
+  const avgComplexity = files.length > 0 ? totalComplexity / files.length : 0;
+  const avgLineCount = files.length > 0 ? totalLines / files.length : 0;
   const healthScore = Math.min(
     100,
     Math.max(
@@ -291,14 +332,28 @@ async function analyzeCodebase(options: {
       100 -
         (files.length > 1000 ? 20 : 0) -
         (totalLines > 50000 ? 30 : 0) -
+        (avgComplexity > 15 ? 15 : 0) -
+        (avgLineCount > 500 ? 10 : 0) -
         (dependencies?.missing ? dependencies.missing * 2 : 0),
     ),
   );
 
   const endTime = performance.now();
-  const endMemory = process.memoryUsage().heapUsed;
+  const endMemory = process.memoryUsage();
+  let endHeap = { heapUsed: 0, heapTotal: 0 };
+
+  try {
+    // Try to get Bun heap usage if available
+    if (typeof Bun !== 'undefined' && (Bun as any).heapUsage) {
+      endHeap = (Bun as any).heapUsage();
+    }
+  } catch {
+    // Fall back to 0 if not available
+  }
+
   const analysisTime = endTime - startTime;
-  const memoryUsed = endMemory - startMemory;
+  const memoryUsed = endMemory.heapUsed - startMemory.heapUsed;
+  const heapGrowth = endHeap.heapUsed - startHeap.heapUsed;
 
   return {
     files: files.slice(0, 100), // Limit for display
@@ -314,7 +369,18 @@ async function analyzeCodebase(options: {
       performance: {
         analysisTime,
         memoryUsed,
+        heapGrowth,
+        heapTotal: endHeap.heapTotal,
+        heapUsed: endHeap.heapUsed,
+        external: endMemory.external,
+        rss: endMemory.rss,
         filesPerSecond: files.length / (analysisTime / 1000),
+        avgComplexity,
+        avgLineCount,
+        functionCount,
+        classCount,
+        importCount,
+        totalComplexity,
       },
     }),
   };
@@ -409,12 +475,116 @@ ${insights.files
   `);
 }
 
+// Format converters
+function insightsToCSV(insights: CodebaseInsights): string {
+  const lines: string[] = [];
+
+  // Header
+  lines.push("Path,Lines,Size (KB),Language");
+
+  // File data
+  for (const file of insights.files.slice(0, 100)) {
+    const path = `"${file.path.replace(/"/g, '""')}"`;
+    const size = (file.size / 1024).toFixed(1);
+    lines.push(`${path},${file.lines},${size},${file.language}`);
+  }
+
+  // Add summary section
+  lines.push("");
+  lines.push("Metric,Value");
+  lines.push(`Total Files,${insights.stats.totalFiles}`);
+  lines.push(`Total Lines,${insights.stats.totalLines}`);
+  lines.push(`Total Size (MB),${(insights.stats.totalSize / 1024 / 1024).toFixed(2)}`);
+  lines.push(`Health Score,%,${insights.stats.healthScore}`);
+
+  if (insights.stats.dependencies) {
+    lines.push(`Dependencies Installed,,${insights.stats.dependencies.installed}`);
+    lines.push(`Dependencies Missing,,${insights.stats.dependencies.missing}`);
+  }
+
+  if (insights.performance) {
+    lines.push(`Analysis Time (ms),,${insights.performance.analysisTime.toFixed(2)}`);
+    lines.push(`Memory Used (MB),,${(insights.performance.memoryUsed / 1024 / 1024).toFixed(2)}`);
+  }
+
+  return lines.join("\n");
+}
+
+function insightsToMarkdown(insights: CodebaseInsights): string {
+  const lines: string[] = [];
+
+  lines.push("# Dev HQ Codebase Analysis Report");
+  lines.push("");
+  lines.push(`**Generated:** ${new Date().toISOString()}`);
+  lines.push("");
+
+  // Summary section
+  lines.push("## 📊 Summary");
+  lines.push("");
+  lines.push("| Metric | Value |");
+  lines.push("|--------|-------|");
+  lines.push(`| Total Files | ${insights.stats.totalFiles} |`);
+  lines.push(`| Total Lines | ${insights.stats.totalLines.toLocaleString()} |`);
+  lines.push(`| Total Size | ${(insights.stats.totalSize / 1024 / 1024).toFixed(2)} MB |`);
+  lines.push(`| Health Score | ${insights.stats.healthScore}% |`);
+  lines.push("");
+
+  // Languages section
+  lines.push("## 📚 Languages");
+  lines.push("");
+  lines.push("| Language | Files |");
+  lines.push("|----------|-------|");
+  for (const [lang, count] of Object.entries(insights.stats.languages)) {
+    lines.push(`| ${lang} | ${count} |`);
+  }
+  lines.push("");
+
+  // Dependencies section
+  if (insights.stats.dependencies) {
+    lines.push("## 📦 Dependencies");
+    lines.push("");
+    lines.push("| Type | Count |");
+    lines.push("|------|-------|");
+    lines.push(`| Installed | ${insights.stats.dependencies.installed} |`);
+    lines.push(`| Missing | ${insights.stats.dependencies.missing} |`);
+    lines.push(`| Outdated | ${insights.stats.dependencies.outdated} |`);
+    lines.push("");
+  }
+
+  // Performance section
+  if (insights.performance) {
+    lines.push("## ⚡ Performance");
+    lines.push("");
+    lines.push("| Metric | Value |");
+    lines.push("|--------|-------|");
+    lines.push(`| Analysis Time | ${insights.performance.analysisTime.toFixed(2)}ms |`);
+    lines.push(`| Memory Used | ${(insights.performance.memoryUsed / 1024 / 1024).toFixed(2)} MB |`);
+    lines.push(`| Files/Second | ${insights.performance.filesPerSecond.toFixed(0)} |`);
+    lines.push("");
+  }
+
+  // Top files section
+  lines.push("## 🔝 Top Files by Lines of Code");
+  lines.push("");
+  lines.push("| File | Lines | Size | Language |");
+  lines.push("|------|-------|------|----------|");
+  for (const file of insights.files.sort((a, b) => b.lines - a.lines).slice(0, 10)) {
+    const displayPath = file.path.length > 60 ? "..." + file.path.slice(-57) : file.path;
+    lines.push(`| ${displayPath} | ${file.lines} | ${(file.size / 1024).toFixed(1)} KB | ${file.language} |`);
+  }
+  lines.push("");
+
+  return lines.join("\n");
+}
+
 // Insights command
 program
   .command("insights")
   .alias("analyze")
   .alias("i")  // Shortcut alias
   .description("Comprehensive codebase analysis")
+  .option("--csv", "CSV format output")
+  .option("--markdown", "Markdown format output")
   .action(async () => {
     const options = program.opts();
     const insights = await analyzeCodebase({
@@ -422,22 +592,35 @@ program
       perf: options.perf,
     });
 
+    // Determine output format (check for specific format flags first)
+    let output = "";
+    let format = "pretty";
+
+    if (options.csv) {
+      output = insightsToCSV(insights);
+      format = "csv";
+    } else if (options.markdown) {
+      output = insightsToMarkdown(insights);
+      format = "markdown";
+    } else if (options.json) {
+      output = JSON.stringify(insights, null, 2);
+      format = "json";
+    }
+
+    // Write to file if specified
     if (options.output) {
+      const outputContent = output || JSON.stringify(insights, null, 2);
       const outputFile = Bun.file(options.output);
-      await Bun.write(
-        outputFile,
-        options.json
-          ? JSON.stringify(insights, null, 2)
-          : JSON.stringify(insights, null, 2),
-      );
+      await Bun.write(outputFile, outputContent);
       if (!options.quiet) {
-        console.log(`✅ Output written to ${options.output}`);
+        console.log(`✅ Output written to ${options.output} (${format})`);
       }
       return;
     }
 
-    if (options.json) {
-      console.log(JSON.stringify(insights, null, 2));
+    // Display output
+    if (output) {
+      console.log(output);
     } else if (options.table) {
       const tableData = insights.files.slice(0, 20).map((f) => ({
         Path: f.path.length > 50 ? "..." + f.path.slice(-47) : f.path,

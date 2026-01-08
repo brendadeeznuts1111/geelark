@@ -13,21 +13,63 @@ export class FeatureRegistry {
   private changeListeners: ((flag: FeatureFlag, enabled: boolean) => void)[] =
     [];
 
-  constructor(initialFlags?: Partial<Record<FeatureFlag, boolean>>) {
-    // Initialize all flags with their default states
+  constructor(initialFlags?: Partial<Record<FeatureFlag, boolean>> | Map<FeatureFlag, boolean>) {
+    // Convert Map to Record if needed
+    let flagsRecord: Partial<Record<FeatureFlag, boolean>> = {};
+    if (initialFlags instanceof Map) {
+      for (const [key, value] of initialFlags) {
+        flagsRecord[key] = value;
+      }
+    } else {
+      flagsRecord = initialFlags || {};
+    }
+
+    // Initialize environment flags FIRST to avoid circular dependency
+    const envDevelopmentDefault = flagsRecord?.[FeatureFlag.ENV_DEVELOPMENT] ?? true;
+    this.flags.set(FeatureFlag.ENV_DEVELOPMENT, envDevelopmentDefault);
+
+    const envProductionDefault = flagsRecord?.[FeatureFlag.ENV_PRODUCTION] ?? false;
+    this.flags.set(FeatureFlag.ENV_PRODUCTION, envProductionDefault);
+
+    // Now initialize all other flags with their default states
     Object.values(FeatureFlag).forEach((flag) => {
+      // Skip environment flags, already initialized
+      if (
+        flag === FeatureFlag.ENV_DEVELOPMENT ||
+        flag === FeatureFlag.ENV_PRODUCTION
+      ) {
+        return;
+      }
+
       const config = FEATURE_FLAG_CONFIGS[flag];
       if (config) {
         this.configs.set(flag, {
           ...config,
-          enabled: initialFlags?.[flag] ?? this.getDefaultState(flag),
+          enabled: flagsRecord?.[flag] ?? this.getDefaultState(flag),
         });
         this.flags.set(
           flag,
-          initialFlags?.[flag] ?? this.getDefaultState(flag)
+          flagsRecord?.[flag] ?? this.getDefaultState(flag)
         );
       }
     });
+
+    // Initialize configs for environment flags
+    const envDevConfig = FEATURE_FLAG_CONFIGS[FeatureFlag.ENV_DEVELOPMENT];
+    if (envDevConfig) {
+      this.configs.set(FeatureFlag.ENV_DEVELOPMENT, {
+        ...envDevConfig,
+        enabled: envDevelopmentDefault,
+      });
+    }
+
+    const envProdConfig = FEATURE_FLAG_CONFIGS[FeatureFlag.ENV_PRODUCTION];
+    if (envProdConfig) {
+      this.configs.set(FeatureFlag.ENV_PRODUCTION, {
+        ...envProdConfig,
+        enabled: envProductionDefault,
+      });
+    }
   }
 
   private getDefaultState(flag: FeatureFlag): boolean {

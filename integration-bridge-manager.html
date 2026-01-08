@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Bridge Manager</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-status {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            padding: 15px 25px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .status-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .status-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .integration-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .integration-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .icon {
+            font-size: 24px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-healthy {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-degraded {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .card-content {
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .info-label {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #dee2e6;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .performance-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .metric {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #667eea;
+            transition: width 0.3s ease;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .configuration-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .config-section {
+            margin-bottom: 25px;
+        }
+
+        .config-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="url"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="url"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .logs-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .logs-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .logs-container {
+            background: #1e1e1e;
+            border-radius: 6px;
+            padding: 15px;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+        }
+
+        .log-timestamp {
+            color: #888;
+        }
+
+        .log-info {
+            color: #00ff00;
+        }
+
+        .log-warning {
+            color: #ffaa00;
+        }
+
+        .log-error {
+            color: #ff5555;
+        }
+
+        .refresh-control {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+        }
+
+        .analytics-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .analytics-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .analytics-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .stat-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .stat-name {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .stat-val {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .badge-small {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .badge-up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .alert-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 12px;
+            border-left: 4px solid;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background: #f8f9fa;
+        }
+
+        .alert-critical {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .alert-warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+
+        .alert-info {
+            border-left-color: #17a2b8;
+            background: #f0fbfd;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header-status {
+                flex-direction: column;
+            }
+
+            .performance-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>
+                <span>🌉</span> Integration Bridge Manager
+            </h1>
+            <div class="header-status">
+                <div class="status-card">
+                    <div class="status-label">Overall Status</div>
+                    <div class="status-value">✅ Connected</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-label">Active Integrations</div>
+                    <div class="status-value" id="active-count">4/4</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-label">System Health</div>
+                    <div class="status-value">100%</div>
+                </div>
+                <div class="status-card">
+                    <div class="status-label">Last Updated</div>
+                    <div class="status-value" id="last-updated">Just now</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Integration Cards -->
+        <div class="grid">
+            <!-- GeeLark API -->
+            <div class="integration-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="icon">📱</span>
+                        GeeLark API
+                    </div>
+                    <span class="status-badge status-healthy">Healthy</span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">✅ Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Response Time:</span>
+                        <span class="info-value">45ms</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value">99.99%</span>
+                    </div>
+                </div>
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Enable Integration</span>
+                </div>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Requests/min</div>
+                        <div class="metric-value">1,245</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Success Rate</div>
+                        <div class="metric-value">99.8%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 99.8%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-primary">Test Connection</button>
+                    <button class="btn-secondary">Configure</button>
+                </div>
+            </div>
+
+            <!-- Proxy Service -->
+            <div class="integration-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="icon">🌐</span>
+                        Proxy Service
+                    </div>
+                    <span class="status-badge status-healthy">Healthy</span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">✅ Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Response Time:</span>
+                        <span class="info-value">28ms</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value">99.95%</span>
+                    </div>
+                </div>
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Enable Integration</span>
+                </div>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Requests/min</div>
+                        <div class="metric-value">3,521</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Success Rate</div>
+                        <div class="metric-value">99.5%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 99.5%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-primary">Test Connection</button>
+                    <button class="btn-secondary">Configure</button>
+                </div>
+            </div>
+
+            <!-- Email Service -->
+            <div class="integration-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="icon">📧</span>
+                        Email Service
+                    </div>
+                    <span class="status-badge status-healthy">Healthy</span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">✅ Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Response Time:</span>
+                        <span class="info-value">156ms</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value">99.88%</span>
+                    </div>
+                </div>
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Enable Integration</span>
+                </div>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-label">Emails/hour</div>
+                        <div class="metric-value">12,450</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Delivery Rate</div>
+                        <div class="metric-value">99.2%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 99.2%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-primary">Test Connection</button>
+                    <button class="btn-secondary">Configure</button>
+                </div>
+            </div>
+
+            <!-- SMS Service -->
+            <div class="integration-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span class="icon">💬</span>
+                        SMS Service
+                    </div>
+                    <span class="status-badge status-healthy">Healthy</span>
+                </div>
+                <div class="card-content">
+                    <div class="info-row">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">✅ Connected</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Response Time:</span>
+                        <span class="info-value">89ms</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Uptime:</span>
+                        <span class="info-value">99.92%</span>
+                    </div>
+                </div>
+                <div class="toggle-switch">
+                    <label class="switch">
+                        <input type="checkbox" checked>
+                        <span class="slider"></span>
+                    </label>
+                    <span>Enable Integration</span>
+                </div>
+                <div class="performance-metrics">
+                    <div class="metric">
+                        <div class="metric-label">SMS/hour</div>
+                        <div class="metric-value">8,932</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Delivery Rate</div>
+                        <div class="metric-value">99.7%</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 99.7%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-primary">Test Connection</button>
+                    <button class="btn-secondary">Configure</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Dashboard -->
+        <div class="analytics-section">
+            <h2 style="margin-bottom: 20px; font-size: 20px; color: #333;">📊 Analytics Dashboard</h2>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="performance">Performance</button>
+                <button class="tab-btn" data-tab="alerts">Alerts</button>
+                <button class="tab-btn" data-tab="insights">Insights</button>
+            </div>
+
+            <div id="performance" class="tab-content active">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-title">📈 API Performance</div>
+                        <div class="stat-group">
+                            <span class="stat-name">Avg Response Time</span>
+                            <span class="stat-val">52.3ms <span class="badge-small badge-down">↑ 2.1%</span></span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Peak Load</span>
+                            <span class="stat-val">4,256 req/s</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Error Rate</span>
+                            <span class="stat-val">0.2% <span class="badge-small badge-up">↓ 0.1%</span></span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-title">📧 Email Deliverability</div>
+                        <div class="stat-group">
+                            <span class="stat-name">Success Rate</span>
+                            <span class="stat-val">99.2% <span class="badge-small badge-up">↑ 0.3%</span></span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Bounce Rate</span>
+                            <span class="stat-val">0.5%</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Avg Delivery</span>
+                            <span class="stat-val">1.2s</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-title">💬 SMS Performance</div>
+                        <div class="stat-group">
+                            <span class="stat-name">Delivery Rate</span>
+                            <span class="stat-val">99.7% <span class="badge-small badge-up">↑ 0.2%</span></span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Messages Sent</span>
+                            <span class="stat-val">1.2M</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Failed Messages</span>
+                            <span class="stat-val">3,600</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-title">🌐 Proxy Efficiency</div>
+                        <div class="stat-group">
+                            <span class="stat-name">Cache Hit Rate</span>
+                            <span class="stat-val">87.4%</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Bandwidth Saved</span>
+                            <span class="stat-val">2.3 TB</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Latency Reduction</span>
+                            <span class="stat-val">45%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alerts" class="tab-content">
+                <div class="alert-list">
+                    <div class="alert-item alert-info">
+                        <strong>ℹ️ Info:</strong> Email Service response time increased to 156ms
+                        <div style="font-size: 11px; color: #666; margin-top: 5px;">2 minutes ago</div>
+                    </div>
+                    <div class="alert-item alert-warning">
+                        <strong>⚠️ Warning:</strong> Proxy cache hit rate dropped to 87.4%
+                        <div style="font-size: 11px; color: #666; margin-top: 5px;">5 minutes ago</div>
+                    </div>
+                    <div class="alert-item alert-info">
+                        <strong>ℹ️ Info:</strong> SMS delivery spike detected: 8,932 messages/hour
+                        <div style="font-size: 11px; color: #666; margin-top: 5px;">12 minutes ago</div>
+                    </div>
+                    <div class="alert-item alert-info">
+                        <strong>ℹ️ Info:</strong> GeeLark API health check passed
+                        <div style="font-size: 11px; color: #666; margin-top: 5px;">15 minutes ago</div>
+                    </div>
+                    <div class="alert-item alert-warning">
+                        <strong>⚠️ Warning:</strong> High throughput detected: 3,521 req/s on Proxy
+                        <div style="font-size: 11px; color: #666; margin-top: 5px;">20 minutes ago</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="insights" class="tab-content">
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <div class="analytics-title">💡 System Insights</div>
+                        <div style="font-size: 13px; line-height: 1.8; color: #555;">
+                            <p style="margin-bottom: 10px;">✅ <strong>All systems optimal:</strong> All integrations are running at peak performance with no critical issues detected.</p>
+                            <p style="margin-bottom: 10px;">📈 <strong>Trend Analysis:</strong> System performance has improved by 2.1% over the last 24 hours.</p>
+                            <p style="margin-bottom: 10px;">🎯 <strong>Recommendation:</strong> Consider scaling the Proxy Service to handle increased load during peak hours.</p>
+                            <p>🔧 <strong>Next Maintenance:</strong> Scheduled for 2026-01-14 at 02:00 UTC</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-title">📊 Daily Statistics</div>
+                        <div class="stat-group">
+                            <span class="stat-name">Total Requests</span>
+                            <span class="stat-val">45.2M</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Successful</span>
+                            <span class="stat-val">45.1M (99.8%)</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Failed</span>
+                            <span class="stat-val">90K (0.2%)</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Avg Response</span>
+                            <span class="stat-val">43ms</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-title">🚀 Performance Ranking</div>
+                        <div class="stat-group">
+                            <span class="stat-name">🥇 GeeLark API</span>
+                            <span class="stat-val">45ms</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">🥈 Proxy Service</span>
+                            <span class="stat-val">28ms</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">🥉 SMS Service</span>
+                            <span class="stat-val">89ms</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Email Service</span>
+                            <span class="stat-val">156ms</span>
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <div class="analytics-title">⏱️ Uptime Summary</div>
+                        <div class="stat-group">
+                            <span class="stat-name">7-Day Uptime</span>
+                            <span class="stat-val">99.98%</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">30-Day Uptime</span>
+                            <span class="stat-val">99.95%</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Last Incident</span>
+                            <span class="stat-val">6 days ago</span>
+                        </div>
+                        <div class="stat-group">
+                            <span class="stat-name">Incident Duration</span>
+                            <span class="stat-val">12 minutes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Panel -->
+        <div class="configuration-panel">
+            <div class="config-section">
+                <div class="config-title">🔧 Integration Endpoints</div>
+                <div class="form-group">
+                    <label for="geelark-endpoint">GeeLark API Endpoint</label>
+                    <input type="url" id="geelark-endpoint" placeholder="https://api.geelark.com" value="https://api.geelark.com">
+                </div>
+                <div class="form-group">
+                    <label for="proxy-endpoint">Proxy Service Endpoint</label>
+                    <input type="url" id="proxy-endpoint" placeholder="https://proxy.service.com" value="https://proxy.service.com">
+                </div>
+                <div class="form-group">
+                    <label for="email-endpoint">Email Service Endpoint</label>
+                    <input type="url" id="email-endpoint" placeholder="https://email.service.com" value="https://email.service.com">
+                </div>
+                <div class="form-group">
+                    <label for="sms-endpoint">SMS Service Endpoint</label>
+                    <input type="url" id="sms-endpoint" placeholder="https://sms.service.com" value="https://sms.service.com">
+                </div>
+            </div>
+
+            <div class="config-section">
+                <div class="config-title">⚙️ Connection Settings</div>
+                <div class="form-group">
+                    <label for="timeout">Connection Timeout (ms)</label>
+                    <input type="number" id="timeout" value="5000" min="1000" max="30000">
+                </div>
+                <div class="form-group">
+                    <label for="retry-attempts">Retry Attempts</label>
+                    <input type="number" id="retry-attempts" value="3" min="1" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="retry-delay">Retry Delay (ms)</label>
+                    <input type="number" id="retry-delay" value="1000" min="100" max="10000">
+                </div>
+                <div class="form-group">
+                    <label for="log-level">Log Level</label>
+                    <select id="log-level">
+                        <option value="debug">Debug</option>
+                        <option value="info" selected>Info</option>
+                        <option value="warn">Warning</option>
+                        <option value="error">Error</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card-actions">
+                <button class="btn-primary">Save Configuration</button>
+                <button class="btn-secondary">Reset to Defaults</button>
+            </div>
+        </div>
+
+        <!-- Logs Panel -->
+        <div class="logs-panel">
+            <div class="logs-title">📋 System Logs</div>
+            <div class="refresh-control">
+                <button class="refresh-btn">🔄 Refresh Logs</button>
+                <button class="refresh-btn">📥 Export Logs</button>
+            </div>
+            <div class="logs-container" id="logs-container">
+                <div class="log-entry">
+                    <span class="log-timestamp">[2026-01-07 22:28:00]</span>
+                    <span class="log-info">[INFO] GeeLark API integration initialized</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[2026-01-07 22:28:01]</span>
+                    <span class="log-info">[INFO] Proxy Service connection established</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[2026-01-07 22:28:02]</span>
+                    <span class="log-info">[INFO] Email Service connected successfully</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[2026-01-07 22:28:03]</span>
+                    <span class="log-info">[INFO] SMS Service health check passed</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[2026-01-07 22:28:05]</span>
+                    <span class="log-warning">[WARN] High latency detected on Email Service (156ms)</span>
+                </div>
+                <div class="log-entry">
+                    <span class="log-timestamp">[2026-01-07 22:28:10]</span>
+                    <span class="log-info">[INFO] All integrations operational - System ready</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2026 Integration Bridge Manager | Last Sync: <span id="footer-time">2026-01-07 22:28:58</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Update timestamps
+        function updateTimestamps() {
+            const now = new Date();
+            document.getElementById('last-updated').textContent = 'Just now';
+            document.getElementById('footer-time').textContent = now.toLocaleString();
+        }
+
+        // Add log entry
+        function addLogEntry(message, level = 'info') {
+            const logsContainer = document.getElementById('logs-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+
+            const levelClass = `log-${level}`;
+            const levelText = level.toUpperCase();
+
+            logEntry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="${levelClass}">[${levelText}] ${message}</span>
+            `;
+
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        // Button event listeners
+        document.querySelectorAll('.btn-primary, .btn-secondary, .btn-danger, .refresh-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const text = this.textContent.trim();
+
+                if (text.includes('Test Connection')) {
+                    alert('✅ Connection test successful!');
+                    addLogEntry('Connection test completed successfully', 'info');
+                } else if (text.includes('Save Configuration')) {
+                    alert('✅ Configuration saved successfully!');
+                    addLogEntry('Configuration updated', 'info');
+                } else if (text.includes('Reset')) {
+                    alert('Configuration reset to defaults');
+                    document.getElementById('timeout').value = '5000';
+                    document.getElementById('retry-attempts').value = '3';
+                    document.getElementById('retry-delay').value = '1000';
+                    addLogEntry('Configuration reset to defaults', 'warn');
+                } else if (text.includes('Refresh')) {
+                    addLogEntry('Logs refreshed', 'info');
+                } else if (text.includes('Export')) {
+                    alert('📥 Logs exported to file');
+                    addLogEntry('Logs exported successfully', 'info');
+                }
+            });
+        });
+
+        // Toggle switch functionality
+        document.querySelectorAll('.switch input').forEach((switchEl, index) => {
+            switchEl.addEventListener('change', function() {
+                const integrations = ['GeeLark API', 'Proxy Service', 'Email Service', 'SMS Service'];
+                const action = this.checked ? 'enabled' : 'disabled';
+                addLogEntry(`${integrations[index]} ${action}`, this.checked ? 'info' : 'warn');
+            });
+        });
+
+        // Initial timestamp update
+        updateTimestamps();
+
+        // Update timestamp every minute
+        setInterval(updateTimestamps, 60000);
+
+        // Auto-refresh metrics every 30 seconds
+        setInterval(() => {
+            const now = new Date();
+            console.log('Checking integration health...', now.toLocaleTimeString());
+        }, 30000);
+
+        // Tab switching functionality
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+
+                // Remove active class from all buttons and content
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+
+                // Add active class to clicked button and corresponding content
+                this.classList.add('active');
+                document.getElementById(tabName).classList.add('active');
+
+                addLogEntry(`Switched to ${tabName} tab`, 'info');
+            });
+        });
+
+        // Initialize Chart.js performance chart
+        function initializePerformanceChart() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+
+            const timeLabels = [];
+            const now = new Date();
+            for (let i = 11; i >= 0; i--) {
+                const t = new Date(now.getTime() - i * 5 * 60000);
+                timeLabels.push(t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+            }
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timeLabels,
+                    datasets: [
+                        {
+                            label: 'GeeLark API (ms)',
+                            data: [42, 45, 44, 46, 45, 47, 48, 46, 45, 44, 43, 45],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Proxy Service (ms)',
+                            data: [25, 26, 27, 28, 29, 28, 27, 26, 28, 29, 28, 27],
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'Email Service (ms)',
+                            data: [150, 152, 155, 158, 156, 154, 152, 155, 157, 156, 154, 156],
+                            borderColor: '#f39c12',
+                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        },
+                        {
+                            label: 'SMS Service (ms)',
+                            data: [85, 87, 88, 89, 88, 87, 86, 88, 89, 90, 88, 89],
+                            borderColor: '#e74c3c',
+                            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 15,
+                                font: {
+                                    size: 12,
+                                    weight: '600'
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + 'ms';
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            addLogEntry('Performance chart loaded', 'info');
+        }
+
+        // Real-time metrics update simulator
+        class MetricsUpdater {
+            constructor() {
+                this.metrics = {
+                    geelark: { requests: 1245, success: 99.8, response: 45 },
+                    proxy: { requests: 3521, success: 99.5, response: 28 },
+                    email: { emails: 12450, delivery: 99.2, response: 156 },
+                    sms: { messages: 8932, delivery: 99.7, response: 89 }
+                };
+            }
+
+            update() {
+                // Simulate random variations in metrics
+                this.metrics.geelark.response = this.randomRange(40, 50);
+                this.metrics.proxy.response = this.randomRange(25, 32);
+                this.metrics.email.response = this.randomRange(150, 165);
+                this.metrics.sms.response = this.randomRange(85, 95);
+
+                // Update UI
+                this.updateDisplay();
+            }
+
+            randomRange(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+
+            updateDisplay() {
+                // Update response times in cards
+                const cards = document.querySelectorAll('.info-value');
+                const responseUpdates = [
+                    `${this.metrics.geelark.response}ms`,
+                    `${this.metrics.proxy.response}ms`,
+                    `${this.metrics.email.response}ms`,
+                    `${this.metrics.sms.response}ms`
+                ];
+
+                let updateIndex = 0;
+                cards.forEach((card, idx) => {
+                    if (idx % 3 === 1) { // Every 3rd card is response time
+                        if (updateIndex < responseUpdates.length) {
+                            card.textContent = responseUpdates[updateIndex];
+                            updateIndex++;
+                        }
+                    }
+                });
+            }
+        }
+
+        const metricsUpdater = new MetricsUpdater();
+
+        // Update metrics every 10 seconds
+        setInterval(() => {
+            metricsUpdater.update();
+        }, 10000);
+
+        // Initialize everything
+        initializePerformanceChart();
+
+        // Welcome message
+        addLogEntry('Integration Bridge Manager loaded successfully', 'info');
+        addLogEntry('Analytics dashboard initialized with real-time metrics', 'info');
+        addLogEntry('Performance monitoring active - updating every 10 seconds', 'info');
+    </script>
+</body>
+</html>

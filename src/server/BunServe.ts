@@ -52,6 +52,7 @@ export class BunServe {
     path: string,
     handler: Route["handler"]
   ): this {
+    // @ts-ignore - URLPattern is available at runtime
     const pattern = new URLPattern({ pathname: path });
     this.routes.push({ method, pattern, handler });
     return this;
@@ -251,4 +252,4 @@ export function createServer(options: ServerOptions, setup: (server: BunServe) =
 /**
  * Re-export types for convenience
  */
-export type { ServerWebSocket, WebSocketHandler as BunWebSocketHandler };
+export type { WebSocketHandler as BunWebSocketHandler, ServerWebSocket };

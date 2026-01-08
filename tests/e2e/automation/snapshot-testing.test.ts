@@ -1,6 +1,8 @@
 #!/usr/bin/env bun
 
+// @ts-ignore - Bun types are available at runtime
 import { feature } from "bun:bundle";
+// @ts-ignore - Bun types are available at runtime
 import { describe, expect, it } from "bun:test";
 
 describe("Snapshot Testing for Feature Elimination", () => {

@@ -6,14 +6,51 @@ This directory contains performance benchmarks following [Bun's benchmarking bes
 
 ```
 bench/
-├── README.md                    # This file
-├── feature-flags.bench.ts       # Feature flag registry operations
-├── string-width.bench.ts        # Unicode string width calculations
-├── logger.bench.ts              # Logger performance benchmarks
-├── dashboard.bench.ts           # Dashboard rendering performance
-├── bundle-size.bench.ts         # Bundle size comparison benchmarks
-└── utils.ts                     # Shared benchmarking utilities
+├── README.md                           # This file
+├── feature-flags.bench.ts              # Feature flag registry operations
+├── string-width.bench.ts               # Unicode string width calculations
+├── logger.bench.ts                     # Logger performance benchmarks
+├── dashboard.bench.ts                  # Dashboard rendering performance
+├── bundle-size.bench.ts                # Bundle size comparison benchmarks
+├── bun-runtime-features.bench.ts       # Bun runtime features performance
+├── process-lifecycle.bench.ts          # Process lifecycle and management
+├── runtime-controls.bench.ts           # Runtime control operations
+├── networking-security.bench.ts        # 🌐 Networking & Security features
+├── transpilation-features.bench.ts     # ⚡ Transpilation & Language features
+├── configuration-management.bench.ts   # 📁 Configuration Management features
+└── utils.ts                            # Shared benchmarking utilities
 ```
+
+## 🆕 New Benchmark Categories
+
+### 🌐 Networking & Security (`networking-security.bench.ts`)
+Comprehensive benchmarks for Bun's networking and security capabilities:
+
+- **HTTP Server Performance**: Server creation, TLS configuration, CORS handling
+- **Network Connectivity**: IPv4/IPv6 tests, DNS resolution, latency measurement
+- **Security Headers**: Header generation, CORS preflight handling
+- **Redis Integration**: Connection parsing, pool management, connection resilience
+- **TLS Certificate**: Certificate parsing, self-signed generation
+- **Advanced Patterns**: Connection resilience scoring, concurrent handling
+
+### ⚡ Transpilation & Language Features (`transpilation-features.bench.ts`)
+Performance benchmarks for Bun's transpilation and language features:
+
+- **TypeScript Configuration**: Config generation, options parsing, custom defines
+- **File Loaders**: Loader configuration, type detection, content transformation
+- **Build Optimization**: Dead code elimination, minification, tree shaking
+- **React JSX Transformation**: Runtime detection, JSX transformation, plugin configuration
+- **Advanced Pipeline**: 4-stage pipeline simulation, concurrent compilation
+- **Code Analysis**: Transpilation analysis, performance optimization scoring
+
+### 📁 Configuration Management (`configuration-management.bench.ts`)
+Benchmarks for configuration file reading and analysis:
+
+- **bunfig.toml Parsing**: TOML content parsing, default generation, configuration merging
+- **package.json Enhancement**: Metadata extraction, dependency analysis, script validation
+- **TypeScript Configuration**: tsconfig parsing, configuration validation
+- **Comprehensive Analysis**: Project analysis, environment detection, recommendations
+- **File Operations**: Existence checking, content reading simulation
 
 ## 🎯 Benchmarking Best Practices
 
@@ -269,4 +306,3 @@ describe("Memory Management", () => {
 - [Bun Benchmark Examples](https://github.com/oven-sh/bun/tree/main/test)
 - [Performance.now() API](https://developer.mozilla.org/en-US/docs/Web/API/Performance/now)
 - [Bun.nanoseconds()](https://bun.sh/docs/api/bun)
-
