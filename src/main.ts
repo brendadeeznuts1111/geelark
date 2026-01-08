@@ -14,7 +14,7 @@ import { TerminalWidth, testStringWidth } from "./utils/TerminalWidth";
 // Main application entry point
 async function main() {
   console.log("📱 Enhanced Phone Management System");
-  console.log("=" .repeat(50));
+  console.log("=".repeat(50));
 
   // Show build analysis in development
   if (feature("ENV_DEVELOPMENT")) {
@@ -222,7 +222,7 @@ async function handleCliArgs(): Promise<boolean> {
 function showHelp(): void {
   const help = [
     "📱 Enhanced Phone Management System",
-    "=" .repeat(40),
+    "=".repeat(40),
     "",
     "Usage: bun run --features=<FEATURES> src/main.ts [OPTIONS]",
     "",

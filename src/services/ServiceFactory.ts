@@ -2,28 +2,67 @@
 // Creates different service implementations based on feature flags
 // Unused implementations are eliminated from the final bundle
 
-import { feature } from "bun:bundle";
 import {
   COMPILE_TIME_CONFIG,
   COMPILE_TIME_FEATURES,
 } from "../constants/features/compile-time.js";
 
 /**
+ * Type for feature flag function
+ * Allows dependency injection for testing while preserving compile-time optimization
+ */
+export type FeatureFn = (flag: string) => boolean;
+
+// Default feature function - returns false when not bundled (e.g., during tests)
+// When bundled with --features, bun:bundle feature() will be used instead
+const defaultFeature: FeatureFn = () => false;
+
+// Try to import the real feature function from bun:bundle
+// This will be replaced with a boolean at bundle time
+let realFeature: FeatureFn = defaultFeature;
+try {
+  // Dynamic import to avoid errors in non-bundled environments
+  const bunBundle = require("bun:bundle");
+  if (bunBundle && typeof bunBundle.feature === "function") {
+    realFeature = bunBundle.feature;
+  }
+} catch {
+  // bun:bundle not available - use default (returns false)
+}
+
+/**
  * SERVICE FACTORY WITH COMPILE-TIME OPTIMIZATION
  * Different service implementations based on feature flags
  * Unused implementations are eliminated at build time
+ *
+ * Uses dependency injection for testability:
+ * - Production: uses real `feature()` from bun:bundle
+ * - Tests: can inject mock function for runtime control
  */
 export class ServiceFactory {
+  /**
+   * @internal
+   */
+  private readonly featureFn: FeatureFn;
+
+  constructor(featureFn?: FeatureFn) {
+    // Default to real bun:bundle feature function
+    this.featureFn = featureFn ?? realFeature;
+  }
+
   /**
    * API Service Factory
    * Creates different API implementations based on features
    */
-  static createApiService() {
+  createApiService() {
+    // Capture feature function in closure for returned object methods
+    const featureFn = this.featureFn;
+
     // Mock API only included in development builds
-    if (feature("FEAT_MOCK_API")) {
+    if (featureFn("FEAT_MOCK_API")) {
       console.log("🧪 Creating mock API service (development only)");
       return {
-        async request(endpoint: string, options?: any) {
+        async request(endpoint: string) {
           // Mock implementation - eliminated in production
           await new Promise((resolve) =>
             setTimeout(resolve, Math.random() * 100)
@@ -31,7 +70,8 @@ export class ServiceFactory {
           return {
             success: true,
             mocked: true,
-            data: { endpoint, mock: true, timestamp: Date.now() },
+            data: { endpoint, mock: true },
+            timestamp: Date.now(),
             latency: Math.floor(Math.random() * 50),
           };
         },
@@ -77,7 +117,7 @@ export class ServiceFactory {
           return await response.json();
         } catch (error) {
           // Retry logic if enabled
-          if (feature("FEAT_RETRY_LOGIC") && retryAttempts > 0) {
+          if (featureFn("FEAT_RETRY_LOGIC") && retryAttempts > 0) {
             console.log(
               `🔄 Retrying API request (${retryAttempts} attempts remaining)`
             );
@@ -98,9 +138,11 @@ export class ServiceFactory {
    * Logging Service Factory
    * Creates different logging implementations based on features
    */
-  static createLoggingService() {
+  createLoggingService() {
+    const featureFn = this.featureFn;
+
     // Extended logging only included when feature is enabled
-    if (feature("FEAT_EXTENDED_LOGGING")) {
+    if (featureFn("FEAT_EXTENDED_LOGGING")) {
       console.log("📝 Creating extended logging service");
       return {
         log(message: string, metadata?: any) {
@@ -108,7 +150,7 @@ export class ServiceFactory {
           const timestamp = new Date().toISOString();
 
           // Structured logging if enabled
-          if (feature("FEAT_ADVANCED_MONITORING")) {
+          if (featureFn("FEAT_ADVANCED_MONITORING")) {
             const logEntry = {
               timestamp,
               level,
@@ -132,7 +174,7 @@ export class ServiceFactory {
         // Extended logging methods (eliminated when FEAT_EXTENDED_LOGGING is false)
         sendToExternalLogging(logEntry: any) {
           // External logging integration
-          if (feature("INTEGRATION_WEBHOOK")) {
+          if (featureFn("INTEGRATION_WEBHOOK")) {
             // Send to webhook service
             fetch("/api/logs", {
               method: "POST",
@@ -141,9 +183,9 @@ export class ServiceFactory {
           }
         },
 
-        analyzeLogPatterns(message: string) {
+        analyzeLogPatterns(message: string): string[] | undefined {
           // Pattern analysis logic (premium feature)
-          if (feature("FEAT_PREMIUM")) {
+          if (featureFn("FEAT_PREMIUM")) {
             // Analyze log patterns for anomalies
             const patterns = this.extractPatterns(message);
             return patterns;
@@ -157,7 +199,7 @@ export class ServiceFactory {
 
         // Audit logging
         audit(action: string, user: string, details?: any) {
-          if (feature("FEAT_AUDIT_LOGGING")) {
+          if (featureFn("FEAT_AUDIT_LOGGING")) {
             this.log(`AUDIT: ${action}`, { user, details, type: "audit" });
           }
         },
@@ -177,9 +219,11 @@ export class ServiceFactory {
    * Monitoring Service Factory
    * Creates different monitoring implementations based on features
    */
-  static createMonitoringService() {
+  createMonitoringService() {
+    const featureFn = this.featureFn;
+
     // Advanced monitoring only included in premium builds
-    if (feature("FEAT_ADVANCED_MONITORING")) {
+    if (featureFn("FEAT_ADVANCED_MONITORING")) {
       console.log("📈 Creating advanced monitoring service");
       return {
         metrics: new Map(),
@@ -189,13 +233,13 @@ export class ServiceFactory {
           console.log(`📈 Metric: ${name} = ${value}`);
 
           // Premium monitoring features
-          if (feature("FEAT_PREMIUM")) {
+          if (featureFn("FEAT_PREMIUM")) {
             this.calculateTrends(name, value);
             this.predictAnomalies(name, value);
           }
 
           // Real-time dashboard updates
-          if (feature("FEAT_REAL_TIME_DASHBOARD")) {
+          if (featureFn("FEAT_REAL_TIME_DASHBOARD")) {
             this.updateDashboard(name, value);
           }
         },
@@ -219,7 +263,7 @@ export class ServiceFactory {
               console.log(`⚠️ Anomaly detected for ${name}: ${anomaly}`);
 
               // Send notifications if enabled
-              if (feature("FEAT_NOTIFICATIONS")) {
+              if (featureFn("FEAT_NOTIFICATIONS")) {
                 this.sendAlert(name, value, anomaly);
               }
             }
@@ -274,11 +318,13 @@ export class ServiceFactory {
    * Phone Manager Factory
    * Creates different phone management implementations based on features
    */
-  static createPhoneManager() {
+  createPhoneManager() {
     console.log("📱 Creating phone manager");
 
+    const featureFn = this.featureFn;
+
     // Multi-account feature affects max accounts
-    const maxAccounts = feature("PHONE_MULTI_ACCOUNT")
+    const maxAccounts = featureFn("PHONE_MULTI_ACCOUNT")
       ? COMPILE_TIME_CONFIG.PHONE.MAX_ACCOUNTS
       : 1;
 
@@ -287,15 +333,15 @@ export class ServiceFactory {
       maxAccounts,
 
       // Feature-based capabilities (using conditional evaluation)
-      automationEnabled: feature("PHONE_AUTOMATION_ENABLED") ? true : false,
-      realTimeSync: feature("PHONE_REAL_TIME_SYNC") ? true : false,
-      advancedAnalytics: feature("PHONE_ADVANCED_ANALYTICS") ? true : false,
-      bulkOperations: feature("PHONE_BULK_OPERATIONS") ? true : false,
+      automationEnabled: featureFn("PHONE_AUTOMATION_ENABLED") ? true : false,
+      realTimeSync: featureFn("PHONE_REAL_TIME_SYNC") ? true : false,
+      advancedAnalytics: featureFn("PHONE_ADVANCED_ANALYTICS") ? true : false,
+      bulkOperations: featureFn("PHONE_BULK_OPERATIONS") ? true : false,
 
       // Compile-time optimized methods
-      canCreateAccount() {
+      canCreateAccount(): boolean {
         // This condition is evaluated at build time for static values
-        if (feature("PHONE_MULTI_ACCOUNT")) {
+        if (featureFn("PHONE_MULTI_ACCOUNT")) {
           return this.phones.size < this.maxAccounts;
         }
         return this.phones.size === 0;
@@ -303,12 +349,12 @@ export class ServiceFactory {
 
       async createPhone(config: any) {
         if (!this.canCreateAccount()) {
-          const limit = feature("PHONE_MULTI_ACCOUNT") ? maxAccounts : 1;
+          const limit = featureFn("PHONE_MULTI_ACCOUNT") ? maxAccounts : 1;
           throw new Error(`Account limit reached (${limit})`);
         }
 
         const phone = {
-          id: `phone_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `phone_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
           ...config,
           createdAt: new Date().toISOString(),
 
@@ -324,7 +370,7 @@ export class ServiceFactory {
         this.phones.set(phone.id, phone);
 
         // Log creation if extended logging is enabled
-        if (feature("FEAT_EXTENDED_LOGGING")) {
+        if (featureFn("FEAT_EXTENDED_LOGGING")) {
           console.log(`📱 Phone created: ${phone.id}`);
         }
 
@@ -339,21 +385,21 @@ export class ServiceFactory {
         };
 
         // Automation methods (eliminated when PHONE_AUTOMATION_ENABLED is false)
-        if (feature("PHONE_AUTOMATION_ENABLED")) {
+        if (featureFn("PHONE_AUTOMATION_ENABLED")) {
           methods.automate = () => this.runAutomation();
           methods.schedule = () => this.scheduleTasks();
           methods.optimize = () => this.optimizeSettings();
         }
 
         // Analytics methods (eliminated when PHONE_ADVANCED_ANALYTICS is false)
-        if (feature("PHONE_ADVANCED_ANALYTICS")) {
+        if (featureFn("PHONE_ADVANCED_ANALYTICS")) {
           methods.analyze = () => this.analyzePerformance();
           methods.getInsights = () => this.getPerformanceInsights();
           methods.exportData = () => this.exportAnalyticsData();
         }
 
         // Bulk operations (eliminated when PHONE_BULK_OPERATIONS is false)
-        if (feature("PHONE_BULK_OPERATIONS")) {
+        if (featureFn("PHONE_BULK_OPERATIONS")) {
           methods.bulkUpdate = (updates: any[]) =>
             this.bulkUpdatePhones(updates);
           methods.bulkDelete = (ids: string[]) => this.bulkDeletePhones(ids);
@@ -426,8 +472,10 @@ export class ServiceFactory {
    * Notification Service Factory
    * Creates different notification implementations based on features
    */
-  static createNotificationService() {
-    if (!feature("FEAT_NOTIFICATIONS")) {
+  createNotificationService() {
+    const featureFn = this.featureFn;
+
+    if (!featureFn("FEAT_NOTIFICATIONS")) {
       console.log("🔕 Notifications disabled");
       return {
         send: async (message: string) => {
@@ -438,21 +486,21 @@ export class ServiceFactory {
 
     console.log("🔔 Creating notification service");
     return {
-      async send(message: string, channels?: string[]) {
+      async send(message: string) {
         console.log(`🔔 Sending notification: ${message}`);
 
         // Email notifications
-        if (feature("INTEGRATION_EMAIL_SERVICE")) {
+        if (featureFn("INTEGRATION_EMAIL_SERVICE")) {
           await this.sendEmail(message);
         }
 
         // SMS notifications
-        if (feature("INTEGRATION_SMS_SERVICE")) {
+        if (featureFn("INTEGRATION_SMS_SERVICE")) {
           await this.sendSMS(message);
         }
 
         // Webhook notifications
-        if (feature("INTEGRATION_WEBHOOK")) {
+        if (featureFn("INTEGRATION_WEBHOOK")) {
           await this.sendWebhook(message);
         }
       },
@@ -479,8 +527,10 @@ export class ServiceFactory {
    * Cache Service Factory
    * Creates different cache implementations based on features
    */
-  static createCacheService() {
-    if (!feature("FEAT_CACHE_OPTIMIZED")) {
+  createCacheService() {
+    const featureFn = this.featureFn;
+
+    if (!featureFn("FEAT_CACHE_OPTIMIZED")) {
       console.log("💾 Basic cache (no optimization)");
       // Use in-memory Map instead of localStorage (browser-specific)
       const cache = new Map<string, string>();
@@ -575,7 +625,7 @@ export class ServiceFactory {
 
       // Advanced cache features (premium)
       getStats() {
-        if (feature("FEAT_PREMIUM")) {
+        if (featureFn("FEAT_PREMIUM")) {
           return {
             size: this.cache.size,
             currentSize: this.currentSize,
@@ -599,5 +649,28 @@ export class ServiceFactory {
   }
 }
 
-// Export the factory
+/**
+ * Factory function for creating ServiceFactory instances
+ * Provides backward compatibility with static API
+ *
+ * @example
+ * // Default factory (uses real feature flags)
+ * const factory = createServiceFactory();
+ *
+ * @example
+ * // Test factory (with mocked feature flags)
+ * const mockFeature = (flag: string) => flag === "FEAT_MOCK_API";
+ * const factory = createServiceFactory(mockFeature);
+ */
+export const createServiceFactory = (featureFn?: FeatureFn): ServiceFactory => {
+  return new ServiceFactory(featureFn);
+};
+
+/**
+ * Default factory instance using real feature flags from bun:bundle
+ * Use this for production code to leverage compile-time optimization
+ */
+export const defaultFactory = new ServiceFactory();
+
+// Export the class as default for backward compatibility
 export default ServiceFactory;

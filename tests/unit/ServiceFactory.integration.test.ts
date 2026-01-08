@@ -1,36 +1,5 @@
 import { beforeEach, describe, expect, mock, test } from "bun:test";
-import { ServiceFactory } from "../../src/services/ServiceFactory";
-
-// Mock the bun:bundle module for feature flag testing
-let mockFeatures: Record<string, boolean> = {};
-
-mock.module("bun:bundle", () => ({
-  feature: (flag: string) => mockFeatures[flag] || false,
-}));
-
-// Mock compile-time constants
-mock.module("../../src/constants/features/compile-time.js", () => ({
-  COMPILE_TIME_CONFIG: {
-    API: {
-      TIMEOUT_MS: 5000,
-      RETRY_ATTEMPTS: 3,
-    },
-    LOGGING: {
-      LEVEL: "info",
-      EXTERNAL_LOGGING: false,
-    },
-    PERFORMANCE: {
-      CACHE_SIZE_MB: 100,
-    },
-    PHONE: {
-      MAX_ACCOUNTS: 5,
-    },
-  },
-  COMPILE_TIME_FEATURES: {
-    ENVIRONMENT: "test",
-    TIER: "test",
-  },
-}));
+import { createServiceFactory, type FeatureFn } from "../../src/services/ServiceFactory";
 
 // Mock fetch for API testing
 let mockFetchCalls: any[] = [];
@@ -50,19 +19,18 @@ global.fetch = mock((url: string, options?: any) => {
 });
 
 beforeEach(() => {
-  mockFeatures = {};
   mockFetchCalls = [];
   console.log = mock(() => {}); // Suppress factory logs during tests
 });
 
 describe("ServiceFactory - Integration Tests", () => {
   test("should integrate API and logging services", async () => {
-    mockFeatures.FEAT_MOCK_API = false;
-    mockFeatures.FEAT_EXTENDED_LOGGING = true;
-    mockFeatures.FEAT_ADVANCED_MONITORING = true;
+    const mockFeature: FeatureFn = (flag) =>
+      ["FEAT_EXTENDED_LOGGING", "FEAT_ADVANCED_MONITORING"].includes(flag);
 
-    const apiService = ServiceFactory.createApiService();
-    const loggingService = ServiceFactory.createLoggingService();
+    const factory = createServiceFactory(mockFeature);
+    const apiService = factory.createApiService();
+    const loggingService = factory.createLoggingService();
 
     // Make API call
     const response = await apiService.request("/api/test");
@@ -79,12 +47,12 @@ describe("ServiceFactory - Integration Tests", () => {
   });
 
   test("should integrate monitoring with API service", async () => {
-    mockFeatures.FEAT_MOCK_API = false;
-    mockFeatures.FEAT_ADVANCED_MONITORING = true;
-    mockFeatures.FEAT_PREMIUM = true;
+    const mockFeature: FeatureFn = (flag) =>
+      ["FEAT_ADVANCED_MONITORING", "FEAT_PREMIUM"].includes(flag);
 
-    const apiService = ServiceFactory.createApiService();
-    const monitoringService = ServiceFactory.createMonitoringService();
+    const factory = createServiceFactory(mockFeature);
+    const apiService = factory.createApiService();
+    const monitoringService = factory.createMonitoringService();
 
     // Track API metrics
     monitoringService.trackMetric("api_calls", 1);
@@ -98,11 +66,11 @@ describe("ServiceFactory - Integration Tests", () => {
   });
 
   test("should integrate cache with API service", async () => {
-    mockFeatures.FEAT_MOCK_API = false;
-    mockFeatures.FEAT_CACHE_OPTIMIZED = true;
+    const mockFeature: FeatureFn = (flag) => flag === "FEAT_CACHE_OPTIMIZED";
 
-    const apiService = ServiceFactory.createApiService();
-    const cacheService = ServiceFactory.createCacheService();
+    const factory = createServiceFactory(mockFeature);
+    const apiService = factory.createApiService();
+    const cacheService = factory.createCacheService();
 
     // Cache API response
     const cacheKey = "/api/cached_data";
@@ -119,14 +87,13 @@ describe("ServiceFactory - Integration Tests", () => {
   });
 
   test("should integrate phone manager with notification service", async () => {
-    mockFeatures.PHONE_MULTI_ACCOUNT = true;
-    mockFeatures.PHONE_AUTOMATION_ENABLED = true;
-    mockFeatures.FEAT_NOTIFICATIONS = true;
-    mockFeatures.INTEGRATION_EMAIL_SERVICE = true;
-    mockFeatures.INTEGRATION_SMS_SERVICE = true;
+    const mockFeature: FeatureFn = (flag) =>
+      ["PHONE_MULTI_ACCOUNT", "PHONE_AUTOMATION_ENABLED", "FEAT_NOTIFICATIONS",
+       "INTEGRATION_EMAIL_SERVICE", "INTEGRATION_SMS_SERVICE"].includes(flag);
 
-    const phoneManager = ServiceFactory.createPhoneManager();
-    const notificationService = ServiceFactory.createNotificationService();
+    const factory = createServiceFactory(mockFeature);
+    const phoneManager = factory.createPhoneManager();
+    const notificationService = factory.createNotificationService();
 
     // Create phone
     const phone = await phoneManager.createPhone({
@@ -136,8 +103,7 @@ describe("ServiceFactory - Integration Tests", () => {
 
     // Send notification about phone creation
     await notificationService.send(
-      `Phone created: ${phone.name} (${phone.id})`,
-      ["email", "sms"]
+      `Phone created: ${phone.name} (${phone.id})`
     );
 
     expect(phone).toBeDefined();
@@ -147,35 +113,20 @@ describe("ServiceFactory - Integration Tests", () => {
 
   test("should integrate all services in complete workflow", async () => {
     // Enable all features for full integration test
-    Object.assign(mockFeatures, {
-      FEAT_MOCK_API: false,
-      FEAT_EXTENDED_LOGGING: true,
-      FEAT_ADVANCED_MONITORING: true,
-      FEAT_PREMIUM: true,
-      FEAT_NOTIFICATIONS: true,
-      FEAT_CACHE_OPTIMIZED: true,
-      PHONE_MULTI_ACCOUNT: true,
-      PHONE_AUTOMATION_ENABLED: true,
-      PHONE_ADVANCED_ANALYTICS: true,
-      PHONE_BULK_OPERATIONS: true,
-      FEAT_RETRY_LOGIC: true,
-      FEAT_AUDIT_LOGGING: true,
-      INTEGRATION_EMAIL_SERVICE: true,
-      INTEGRATION_WEBHOOK: true,
-    });
+    const mockFeature: FeatureFn = () => true;
 
-    // Create all services
-    const apiService = ServiceFactory.createApiService();
-    const loggingService = ServiceFactory.createLoggingService();
-    const monitoringService = ServiceFactory.createMonitoringService();
-    const notificationService = ServiceFactory.createNotificationService();
-    const cacheService = ServiceFactory.createCacheService();
-    const phoneManager = ServiceFactory.createPhoneManager();
+    const factory = createServiceFactory(mockFeature);
+    const apiService = factory.createApiService();
+    const loggingService = factory.createLoggingService();
+    const monitoringService = factory.createMonitoringService();
+    const notificationService = factory.createNotificationService();
+    const cacheService = factory.createCacheService();
+    const phoneManager = factory.createPhoneManager();
 
     // 1. Log system startup
     loggingService.log("System startup initiated", {
       timestamp: new Date().toISOString(),
-      features: Object.keys(mockFeatures).filter(k => mockFeatures[k])
+      features: "all"
     });
 
     // 2. Track system metrics
@@ -205,8 +156,7 @@ describe("ServiceFactory - Integration Tests", () => {
 
     // 7. Send notification about successful setup
     await notificationService.send(
-      `Phone setup completed: ${phone.name}`,
-      ["email", "webhook"]
+      `Phone setup completed: ${phone.name}`
     );
 
     // 8. Verify phone analytics
@@ -232,14 +182,13 @@ describe("ServiceFactory - Integration Tests", () => {
   });
 
   test("should handle service failures gracefully", async () => {
-    mockFeatures.FEAT_MOCK_API = false;
-    mockFeatures.FEAT_EXTENDED_LOGGING = true;
-    mockFeatures.FEAT_RETRY_LOGIC = true;
-    mockFeatures.FEAT_NOTIFICATIONS = true;
+    const mockFeature: FeatureFn = (flag) =>
+      ["FEAT_EXTENDED_LOGGING", "FEAT_RETRY_LOGIC", "FEAT_NOTIFICATIONS"].includes(flag);
 
-    const apiService = ServiceFactory.createApiService();
-    const loggingService = ServiceFactory.createLoggingService();
-    const notificationService = ServiceFactory.createNotificationService();
+    const factory = createServiceFactory(mockFeature);
+    const apiService = factory.createApiService();
+    const loggingService = factory.createLoggingService();
+    const notificationService = factory.createNotificationService();
 
     // Mock API failure
     let failureCount = 0;
@@ -287,29 +236,25 @@ describe("ServiceFactory - Integration Tests", () => {
 
   test("should handle feature flag changes during runtime", () => {
     // Start with minimal features
-    mockFeatures.FEAT_EXTENDED_LOGGING = false;
-    mockFeatures.FEAT_ADVANCED_MONITORING = false;
-    mockFeatures.FEAT_NOTIFICATIONS = false;
+    const minimalFeature: FeatureFn = () => false;
+    const factory1 = createServiceFactory(minimalFeature);
 
-    // Create services with minimal features
-    const loggingService1 = ServiceFactory.createLoggingService();
-    const monitoringService1 = ServiceFactory.createMonitoringService();
-    const notificationService1 = ServiceFactory.createNotificationService();
+    const loggingService1 = factory1.createLoggingService();
+    const monitoringService1 = factory1.createMonitoringService();
+    const notificationService1 = factory1.createNotificationService();
 
     // Verify minimal features
     expect(loggingService1.audit).toBeUndefined();
     expect(monitoringService1.calculateTrends).toBeUndefined();
     expect(notificationService1.sendEmail).toBeUndefined();
 
-    // Enable features
-    mockFeatures.FEAT_EXTENDED_LOGGING = true;
-    mockFeatures.FEAT_ADVANCED_MONITORING = true;
-    mockFeatures.FEAT_NOTIFICATIONS = true;
+    // Enable features - create new factory with full features
+    const fullFeature: FeatureFn = () => true;
+    const factory2 = createServiceFactory(fullFeature);
 
-    // Create services with full features
-    const loggingService2 = ServiceFactory.createLoggingService();
-    const monitoringService2 = ServiceFactory.createMonitoringService();
-    const notificationService2 = ServiceFactory.createNotificationService();
+    const loggingService2 = factory2.createLoggingService();
+    const monitoringService2 = factory2.createMonitoringService();
+    const notificationService2 = factory2.createNotificationService();
 
     // Verify full features
     expect(loggingService2.audit).toBeDefined();
@@ -323,14 +268,16 @@ describe("ServiceFactory - Integration Tests", () => {
   });
 
   test("should maintain service isolation", () => {
-    mockFeatures.FEAT_EXTENDED_LOGGING = true;
-    mockFeatures.FEAT_ADVANCED_MONITORING = true;
+    const mockFeature: FeatureFn = (flag) =>
+      ["FEAT_EXTENDED_LOGGING", "FEAT_ADVANCED_MONITORING"].includes(flag);
+
+    const factory = createServiceFactory(mockFeature);
 
     // Create multiple instances of the same service
-    const loggingService1 = ServiceFactory.createLoggingService();
-    const loggingService2 = ServiceFactory.createLoggingService();
-    const monitoringService1 = ServiceFactory.createMonitoringService();
-    const monitoringService2 = ServiceFactory.createMonitoringService();
+    const loggingService1 = factory.createLoggingService();
+    const loggingService2 = factory.createLoggingService();
+    const monitoringService1 = factory.createMonitoringService();
+    const monitoringService2 = factory.createMonitoringService();
 
     // Test that services are independent
     loggingService1.log("Service 1 message");
@@ -349,13 +296,13 @@ describe("ServiceFactory - Integration Tests", () => {
   });
 
   test("should handle concurrent service operations", async () => {
-    mockFeatures.FEAT_CACHE_OPTIMIZED = true;
-    mockFeatures.FEAT_ADVANCED_MONITORING = true;
-    mockFeatures.PHONE_MULTI_ACCOUNT = true;
+    const mockFeature: FeatureFn = (flag) =>
+      ["FEAT_CACHE_OPTIMIZED", "FEAT_ADVANCED_MONITORING", "PHONE_MULTI_ACCOUNT"].includes(flag);
 
-    const cacheService = ServiceFactory.createCacheService();
-    const monitoringService = ServiceFactory.createMonitoringService();
-    const phoneManager = ServiceFactory.createPhoneManager();
+    const factory = createServiceFactory(mockFeature);
+    const cacheService = factory.createCacheService();
+    const monitoringService = factory.createMonitoringService();
+    const phoneManager = factory.createPhoneManager();
 
     // Perform concurrent operations
     const operations = [
@@ -385,25 +332,15 @@ describe("ServiceFactory - Integration Tests", () => {
 
   test("should validate service contracts and interfaces", () => {
     // Enable all features for comprehensive interface testing
-    Object.assign(mockFeatures, {
-      FEAT_MOCK_API: true,
-      FEAT_EXTENDED_LOGGING: true,
-      FEAT_ADVANCED_MONITORING: true,
-      FEAT_PREMIUM: true,
-      FEAT_NOTIFICATIONS: true,
-      FEAT_CACHE_OPTIMIZED: true,
-      PHONE_MULTI_ACCOUNT: true,
-      PHONE_AUTOMATION_ENABLED: true,
-      PHONE_ADVANCED_ANALYTICS: true,
-      PHONE_BULK_OPERATIONS: true,
-    });
+    const mockFeature: FeatureFn = () => true;
 
-    const apiService = ServiceFactory.createApiService();
-    const loggingService = ServiceFactory.createLoggingService();
-    const monitoringService = ServiceFactory.createMonitoringService();
-    const notificationService = ServiceFactory.createNotificationService();
-    const cacheService = ServiceFactory.createCacheService();
-    const phoneManager = ServiceFactory.createPhoneManager();
+    const factory = createServiceFactory(mockFeature);
+    const apiService = factory.createApiService();
+    const loggingService = factory.createLoggingService();
+    const monitoringService = factory.createMonitoringService();
+    const notificationService = factory.createNotificationService();
+    const cacheService = factory.createCacheService();
+    const phoneManager = factory.createPhoneManager();
 
     // Validate API service interface
     expect(typeof apiService.request).toBe("function");
