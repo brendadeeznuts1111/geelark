@@ -177,7 +177,7 @@ describe("⚡ Bun Transpilation & Language Features Performance", () => {
       ];
 
       const optimized = plugins.filter(([plugin, options]) => {
-        return plugin.includes('react-jsx') &&
+        return typeof plugin === 'string' && plugin.includes('react-jsx') &&
                typeof options === 'object' && options !== null &&
                'runtime' in options && options.runtime === 'automatic';
       });

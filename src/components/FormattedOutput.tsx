@@ -4,6 +4,8 @@
  * Renders formatted CLI output using JSX
  */
 
+import * as React from 'react';
+
 interface OutputProps {
   title?: string;
   status?: "success" | "error" | "warning" | "info";

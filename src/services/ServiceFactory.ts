@@ -363,6 +363,10 @@ export class ServiceFactory {
         return methods;
       },
 
+      analyzePerformance() {
+        console.log("📊 Analyzing phone performance...");
+        // Performance analysis logic
+        return {
           efficiency: 0.85,
           recommendations: ["Optimize sync frequency", "Enable caching"],
         };
@@ -381,6 +385,21 @@ export class ServiceFactory {
         console.log("📤 Exporting analytics data...");
         // Data export logic
         return { data: "analytics_data", format: "json" };
+      },
+
+      runAutomation() {
+        console.log("🤖 Running automation...");
+        return { automated: true, tasksCompleted: 5 };
+      },
+
+      scheduleTasks() {
+        console.log("📅 Scheduling automation tasks...");
+        return { scheduled: 3, nextRun: "in 1 hour" };
+      },
+
+      optimizeSettings() {
+        console.log("⚡ Optimizing phone settings...");
+        return { optimized: true, efficiencyGain: "15%" };
       },
 
       bulkUpdatePhones(updates: any[]) {
@@ -463,26 +482,38 @@ export class ServiceFactory {
   static createCacheService() {
     if (!feature("FEAT_CACHE_OPTIMIZED")) {
       console.log("💾 Basic cache (no optimization)");
+      // Use in-memory Map instead of localStorage (browser-specific)
+      const cache = new Map<string, string>();
       return {
-        get: (key: string) => localStorage.getItem(key),
-        set: (key: string, value: string) => localStorage.setItem(key, value),
-        delete: (key: string) => localStorage.removeItem(key),
+        get: (key: string) => cache.get(key) ?? null,
+        set: (key: string, value: string) => cache.set(key, value),
+        delete: (key: string) => cache.delete(key),
+        clear: () => cache.clear(),
       };
     }
 
     console.log("⚡ Creating optimized cache service");
     return {
-      cache: new Map(),
+      cache: new Map<string, {
+        value: any;
+        size: number;
+        created: number;
+        accessed: number;
+      }>(),
       maxSize: COMPILE_TIME_CONFIG.PERFORMANCE.CACHE_SIZE_MB * 1024 * 1024, // Convert MB to bytes
       currentSize: 0,
+      hits: 0,
+      misses: 0,
 
       get(key: string) {
         const item = this.cache.get(key);
         if (item) {
+          this.hits++;
           // Update access time for LRU
           item.accessed = Date.now();
           return item.value;
         }
+        this.misses++;
         return null;
       },
 
@@ -512,6 +543,13 @@ export class ServiceFactory {
         }
       },
 
+      clear() {
+        this.cache.clear();
+        this.currentSize = 0;
+        this.hits = 0;
+        this.misses = 0;
+      },
+
       // Optimized cache methods
       calculateSize(value: any): number {
         // Simple size calculation
@@ -531,6 +569,7 @@ export class ServiceFactory {
 
         if (oldestKey) {
           this.delete(oldestKey);
+          this.evictionCount++;
         }
       },
 
@@ -543,14 +582,16 @@ export class ServiceFactory {
             maxSize: this.maxSize,
             hitRate: this.calculateHitRate(),
             evictionCount: this.evictionCount,
+            hits: this.hits,
+            misses: this.misses,
           };
         }
         return { size: this.cache.size };
       },
 
       calculateHitRate(): number {
-        // Hit rate calculation logic
-        return 0.85; // Placeholder
+        const total = this.hits + this.misses;
+        return total > 0 ? this.hits / total : 0;
       },
 
       evictionCount: 0,

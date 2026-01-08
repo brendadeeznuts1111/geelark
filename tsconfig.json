@@ -12,16 +12,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["bun-types"],
+    "types": ["bun-types", "@types/react", "@types/react-dom"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    // JSX configuration for React-style components
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    // Decorators support
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

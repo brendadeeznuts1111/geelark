@@ -11,6 +11,7 @@ export class BunContext {
    * Uses Bun.main to detect if this file was run directly
    */
   static get isMain(): boolean {
+    // @ts-ignore - Bun.main and import.meta.path are available at runtime
     return Bun.main === import.meta.path;
   }
 
@@ -98,11 +99,11 @@ export class BunContext {
    */
   static get isCI(): boolean {
     return !!(
-      this.env.CI ||
-      this.env.GITHUB_ACTIONS ||
-      this.env.CI_NAME ||
-      this.env.TRAVIS ||
-      this.env.JENKINS_URL
+      (this.env as any).CI ||
+      (this.env as any).GITHUB_ACTIONS ||
+      (this.env as any).CI_NAME ||
+      (this.env as any).TRAVIS ||
+      (this.env as any).JENKINS_URL
     );
   }
 

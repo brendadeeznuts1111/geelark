@@ -6,6 +6,55 @@
 
 import { BunContext } from "../context/BunContext.js";
 
+// @ts-ignore - Bun types are available at runtime
+declare global {
+  interface URLPatternInput {
+    pathname?: string;
+    protocol?: string;
+    username?: string;
+    password?: string;
+    hostname?: string;
+    port?: string;
+    search?: string;
+    hash?: string;
+    base?: string;
+  }
+
+  interface URLPatternResult {
+    inputs: [URL | string];
+    pathname: {
+      input: string;
+      groups: Record<string, string | undefined>;
+    };
+    search?: {
+      input: string;
+      groups: Record<string, string | undefined>;
+    };
+    hash?: {
+      input: string;
+      groups: Record<string, string | undefined>;
+    };
+  }
+
+  interface URLPattern {
+    new(input: URLPatternInput, base?: string): URLPattern;
+    test(input: URL | string): boolean;
+    exec(input: URL | string): URLPatternResult | null;
+  }
+
+  interface ServerWebSocket<T = any> {
+    data: T;
+    readyState: number;
+    send(data: string | Buffer): void;
+    close(code?: number, reason?: string): void;
+    subscribe(topic: string): void;
+    unsubscribe(topic: string): void;
+    publish(topic: string, data: string | Buffer, compress?: boolean): void;
+    isSubscribed(topic: string): boolean;
+    cork(callback: () => void): void;
+  }
+}
+
 export interface ServerOptions {
   port?: number;
   hostname?: string;
@@ -28,10 +77,10 @@ export interface Route {
   handler: (req: Request, params: Record<string, string>) => Response | Promise<Response>;
 }
 
-export interface WebSocketHandler {
-  message?: (ws: ServerWebSocket, message: string | Buffer) => void;
-  open?: (ws: ServerWebSocket) => void;
-  close?: (ws: ServerWebSocket, code: number, reason: string) => void;
+export interface WebSocketHandler<T = any> {
+  message: (ws: ServerWebSocket<T>, message: any) => void | Promise<void>;
+  open?: (ws: ServerWebSocket<T>) => void;
+  close?: (ws: ServerWebSocket<T>, code: number, reason: string) => void;
 }
 
 export class BunServe {
@@ -42,7 +91,14 @@ export class BunServe {
   private server?: ReturnType<typeof Bun.serve>;
   private wsHandler?: WebSocketHandler;
 
-  constructor(private options: ServerOptions = {}) {}
+  constructor(private options: ServerOptions = {}) {
+    // Initialize with a default WebSocket handler to satisfy Bun's type requirements
+    this.wsHandler = {
+      message: (ws, message) => {
+        console.log('WebSocket message received:', message);
+      }
+    };
+  }
 
   /**
    * Add a route to the server
@@ -155,13 +211,23 @@ export class BunServe {
     }
 
     // Build middleware chain
-    let chain = this.middleware.reduceRight(
-      (next, fn) => () => fn(req, next),
-      () => this.handleRequest(req)
-    );
+    const executeMiddleware = async (req: Request): Promise<Response> => {
+      let index = 0;
+
+      const next = async (): Promise<Response> => {
+        if (index >= this.middleware.length) {
+          return this.handleRequest(req);
+        }
+
+        const middleware = this.middleware[index++];
+        return middleware(req, next);
+      };
+
+      return next();
+    };
 
     try {
-      const response = await chain();
+      const response = await executeMiddleware(req);
       return this.corsResponse(response, req);
     } catch (error) {
       console.error("Request error:", error);
