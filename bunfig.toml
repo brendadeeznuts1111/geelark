@@ -1,18 +1,181 @@
-[workspace]
-# Dev HQ template/workspace support (does not affect current package unless packages/* exists)
-workspace = "packages/*"
+# =============================================================================
+# geelark Bun Configuration
+# https://bun.sh/docs/runtime/bunfig
+# =============================================================================
 
+# -----------------------------------------------------------------------------
+# Workspace Configuration
+# -----------------------------------------------------------------------------
+[workspace]
+# workspace = "packages/*"  # Uncomment for monorepo support
+
+# -----------------------------------------------------------------------------
+# Install Configuration
+# -----------------------------------------------------------------------------
+[install]
+# Behavior: auto (quiet | verbose | shell) - Controls install output
+# default: auto - quiet in CI, verbose otherwise
+verbose = false
+
+# Exact package versions (no ^ or ~ in lockfile)
+exact = true
+
+# Fail if lockfile needs updating
+frozen-lockfile = false
+
+# Optional: cache location
+# cache = "/path/to/cache"
+
+# Optional: global install location
+# globalDir = "/path/to/global"
+# globalBinDir = "/path/to/bin"
+
+# -----------------------------------------------------------------------------
+# Scoped Package Registries
+# -----------------------------------------------------------------------------
+[install.scopes]
+# Example: GitHub Packages
+# "@your-org" = { token = "$GITHUB_TOKEN", url = "https://npm.pkg.github.com" }
+
+# Example: Private npm registry
+# "@your-scope" = { token = "$NPM_TOKEN", url = "https://registry.example.com" }
+
+# Example: Verdaccio
+# "@private" = { token = "$VERDACCIO_TOKEN", url = "http://localhost:4873" }
+
+# Dev-HQ scoped packages (template example, customize as needed)
 [install.scopes."@dev-hq"]
-# Template-friendly: supports env-substituted token
 token = "$DEV_HQ_TOKEN"
-# Replace with your org registry (GitHub Packages example)
 url = "https://npm.pkg.github.com/your-org"
 
-[test]
-# Test configuration for feature elimination tests
-timeout = 30000  # 30 seconds timeout for build operations
-concurrent = false  # Run tests sequentially to avoid build conflicts
+# -----------------------------------------------------------------------------
+# Lockfile Configuration
+# -----------------------------------------------------------------------------
+[lockfile]
+# Lockfile format: yarn | npm (default: yarn for compatibility)
+print = "yarn"
 
+# Save path (default: package.json manifest location)
+# savePath = "package.json"
+
+# -----------------------------------------------------------------------------
+# Test Configuration
+# -----------------------------------------------------------------------------
+[test]
+# Test root directory
+root = "tests"
+
+# Preload scripts (runs before tests)
+preload = ["./src/preload/test-setup.ts"]
+
+# Coverage thresholds (when using --coverage)
+coverage = true
+# coverageThreshold = { statements = 80, branches = 80, functions = 80, lines = 80 }
+
+# Test timeout in milliseconds
+timeout = 30000
+
+# Run tests sequentially (true) or in parallel (false, default)
+concurrent = false
+
+# Prevent repetitive stack traces in test output
+# suppressStackTraces = false
+
+# -----------------------------------------------------------------------------
+# Run Configuration
+# -----------------------------------------------------------------------------
 [run]
-# Default test runner settings
+# Shell to use for bun run commands
+shell = "bun"
+
+# Preload scripts for runtime (not just tests)
+# preload = ["./src/preload/global-polyfills.ts"]
+
+# Enable Bun's built-in test runner for bun test
 bun = true
+
+# -----------------------------------------------------------------------------
+# Build Configuration
+# -----------------------------------------------------------------------------
+# Build-time constants (dead code elimination via bun:bundle feature())
+# [define]
+# DEBUG = "true"
+# VERSION = "\"1.0.0\""
+# API_URL = "\"https://api.example.com\""
+
+# -----------------------------------------------------------------------------
+# Loader Configuration
+# -----------------------------------------------------------------------------
+# Custom file loaders for build time transpilation
+# [loader]
+# ".toml" = "file"
+# ".yaml" = "json"
+# ".md" = "jsx"
+# ".txt" = "text"
+
+# -----------------------------------------------------------------------------
+# Package.json Configuration Override
+# -----------------------------------------------------------------------------
+# [pkg]
+# Override package.json fields for build
+# name = "geelark"
+# version = "1.0.0"
+
+# -----------------------------------------------------------------------------
+# Environment Variables (build-time)
+# -----------------------------------------------------------------------------
+# These can be referenced via process.env or Bun.env
+# [env]
+# NODE_ENV = "development"
+# BUN_DEBUG = "false"
+
+# -----------------------------------------------------------------------------
+# HTTP Client Configuration
+# -----------------------------------------------------------------------------
+[http]
+# User-Agent header for fetch/Bun.fetch
+# user-agent = "geelark/1.0.0"
+
+# Connect timeout in milliseconds
+# connectTimeout = 10000
+
+# Read timeout in milliseconds
+# readTimeout = 30000
+
+# Enable HTTP keep-alive
+# keepAlive = true
+
+# Maximum number of connections to keep alive
+# maxKeepAliveRequests = 100
+
+# Keep-alive timeout in milliseconds
+# keepAliveTimeout = 60000
+
+# DNS preconnection for faster requests
+# preconnect = ["https://api.example.com"]
+
+# -----------------------------------------------------------------------------
+# TLS/HTTPS Configuration
+# -----------------------------------------------------------------------------
+# [tls]
+# Path to CA certificate bundle
+# ca = "/path/to/ca-bundle.crt"
+
+# Reject unauthorized TLS certificates
+# rejectUnauthorized = true
+
+# Client certificate for mTLS
+# cert = "/path/to/client-cert.pem"
+# key = "/path/to/client-key.pem"
+
+# -----------------------------------------------------------------------------
+# TypeScript Configuration Override
+# -----------------------------------------------------------------------------
+# [tsconfig]
+# Path to custom tsconfig
+# path = "./tsconfig.json"
+
+# Override specific compiler options
+# [tsconfig.options]
+# strict = true
+# target = "ES2022"
