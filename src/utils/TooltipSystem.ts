@@ -4,12 +4,8 @@
  */
 
 
-// Access stringWidth from Bun
-const stringWidth = (text: string): number => {
-  // For now, use basic length as fallback
-  // In a real implementation, you might use a library like 'wcwidth'
-  return text.length;
-};
+// Use Bun's native stringWidth for accurate Unicode width calculation
+const stringWidth = (text: string): number => Bun.stringWidth(text);
 
 export interface TooltipData {
   title: string;
@@ -247,7 +243,7 @@ export class TooltipSystem {
       ],
     },
 
-    // Phone management features
+    // Codebase management features
     "PHONE_AUTOMATION_ENABLED": {
       title: "Phone Automation",
       description: "Automated phone management and workflow capabilities",

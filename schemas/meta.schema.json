@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "./meta.schema.json",
-  "title": "Phone Management System Meta Manifest Schema",
-  "description": "JSON Schema for validating meta.json manifest files",
+  "title": "Dev HQ Meta Manifest Schema",
+  "description": "JSON Schema for validating meta.json manifest files for Dev HQ - Advanced codebase analysis and automation platform",
   "type": "object",
 
   "required": [

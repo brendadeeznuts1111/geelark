@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 
 /**
- * Enhanced Phone Management System with Bun 1.1+ Feature Flags
+ * Dev HQ - Advanced Codebase Analysis and Automation Platform
+ * Built with Bun 1.1+ Feature Flags
  * Demonstrates compile-time dead code elimination and improved string width handling
  */
 
@@ -13,7 +14,7 @@ import { TerminalWidth, testStringWidth } from "./utils/TerminalWidth";
 
 // Main application entry point
 async function main() {
-  console.log("📱 Enhanced Phone Management System");
+  console.log("🚀 Dev HQ - Advanced Codebase Analysis Platform");
   console.log("=".repeat(50));
 
   // Show build analysis in development
@@ -221,7 +222,7 @@ async function handleCliArgs(): Promise<boolean> {
 // Show help information
 function showHelp(): void {
   const help = [
-    "📱 Enhanced Phone Management System",
+    "🚀 Dev HQ - Advanced Codebase Analysis Platform",
     "=".repeat(40),
     "",
     "Usage: bun run --features=<FEATURES> src/main.ts [OPTIONS]",

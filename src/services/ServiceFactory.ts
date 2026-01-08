@@ -316,7 +316,7 @@ export class ServiceFactory {
 
   /**
    * Phone Manager Factory
-   * Creates different phone management implementations based on features
+   * Creates different service implementations based on features
    */
   createPhoneManager() {
     console.log("📱 Creating phone manager");

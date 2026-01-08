@@ -105,7 +105,7 @@ export class FeatureFlags {
     return feature("FEAT_AUTO_HEAL") ? true : false;
   }
 
-  // Phone management features
+  // Codebase management features
   static get PHONE_AUTOMATION(): boolean {
     return feature("PHONE_AUTOMATION_ENABLED") ? true : false;
   }

@@ -4,10 +4,10 @@
 import type { Subprocess } from "bun";
 // @ts-ignore - bun:test types are available when running with Bun
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it } from "bun:test";
-import { DevHQAutomation } from "../../../dev-hq/automation.js";
+import { DevHQAutomation } from "../../../dev-hq/core/automation";
 
 // Type augmentation for the methods we added
-declare module "../../../dev-hq/automation.js" {
+declare module "../../../dev-hq/core/automation" {
   interface DevHQAutomation {
     listProcesses(): Array<{ label: string; pid: number; killed: boolean }>;
     getProcessStatus(label: string): { exists: boolean; label: string; pid?: number; killed?: boolean; status: string };

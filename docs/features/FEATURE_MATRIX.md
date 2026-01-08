@@ -195,8 +195,8 @@ Complete reference of feature flags, dashboard components, logging, monitoring, 
 
 ## See Also
 
-- [BUN_CONSTANTS.md](./BUN_CONSTANTS.md) - Bun runtime constants reference
-- [CLI_REFERENCE.md](./api/CLI_REFERENCE.md) - Complete CLI command reference
-- [BUN_RUNTIME_FEATURES.md](./BUN_RUNTIME_FEATURES.md) - Bun runtime features integration
+- [BUN_CONSTANTS.md](../runtime/BUN_CONSTANTS.md) - Bun runtime constants reference
+- [CLI_REFERENCE.md](../api/CLI_REFERENCE.md) - Complete CLI command reference
+- [BUN_RUNTIME_FEATURES.md](../runtime/BUN_RUNTIME_FEATURES.md) - Bun runtime features integration
 - [src/constants/index.ts](../src/constants/index.ts) - TypeScript constants module
 - [src/constants/features/compile-time.ts](../src/constants/features/compile-time.ts) - Compile-time feature flags

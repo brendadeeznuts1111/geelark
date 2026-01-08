@@ -77,14 +77,14 @@ This document describes Bun's process lifecycle state machine for spawned proces
 ### 3. **STARTING**
 - **Description**: Process has been spawned, preparing to execute
 - **Properties**: Process exists, initializing
-- **Transitions**: 
+- **Transitions**:
   - → RUNNING (when process begins executing)
   - → RESTARTING (if restart is requested during startup)
 
 ### 4. **RUNNING**
 - **Description**: Process is actively executing
 - **Properties**: Process is running, handling I/O
-- **Transitions**: 
+- **Transitions**:
   - → KILLED (when `kill()` is called)
   - → RESTARTING (when file change detected in watch mode)
   - → STOPPED (when process exits naturally or calls `process.exit()`)
@@ -217,7 +217,7 @@ const proc = spawn({
 
 try {
   const exitCode = await proc.exited;
-  
+
   if (exitCode === 0) {
     console.log("✅ Build succeeded");
   } else {
@@ -287,10 +287,10 @@ interface ProcessState {
   pid: number;           // Process ID (available after STARTING)
   exitCode: number | null; // Exit code (null until EXITED)
   killed: boolean;       // true if kill() was called (KILLED state)
-  
+
   // State transitions
   exited: Promise<number>; // Resolves when EXITED state reached
-  
+
   // Streams (available during RUNNING → CLEANUP)
   stdin: WritableStream | null;
   stdout: ReadableStream | null;
@@ -310,7 +310,7 @@ try {
   const proc = spawn({
     cmd: ["nonexistent-command"],
   });
-  
+
   // CREATING → STARTING → RUNNING
   await proc.exited;
 } catch (error) {
@@ -461,6 +461,6 @@ for await (const chunk of proc.stdout) {
 
 - [Bun.spawn() API](https://bun.sh/docs/api/spawn)
 - [Process Management](https://bun.com/docs/runtime#runtime-%26-process-control)
-- [Watch Mode](../docs/TESTING_ALIGNMENT.md)
+- [Watch Mode](../guides/TESTING_ALIGNMENT.md)
 - [Benchmarking](./RUNTIME_CONTROLS.md)
 

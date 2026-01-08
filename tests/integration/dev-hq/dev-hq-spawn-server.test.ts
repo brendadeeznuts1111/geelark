@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { afterAll, beforeAll, describe, expect, expectTypeOf, it } from "bun:test";
-import { EnhancedDevHQServer } from "../dev-hq/spawn-server.js";
+import { EnhancedDevHQServer } from "../../../dev-hq/servers/spawn-server";
 
 describe("🌐 Dev HQ Spawn Server", () => {
   let server: EnhancedDevHQServer;

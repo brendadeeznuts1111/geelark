@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // dev-hq - Production-ready CLI with perfect Bun syntax
 
-import { DevHQActions, DevHQAutomation } from "./dev-hq/core/automation.js";
+import { DevHQActions, DevHQAutomation } from "../dev-hq/core/automation.js";
 
 interface CommandConfig {
   json?: boolean;
@@ -296,7 +296,7 @@ class DevHQCLI {
     console.log("🚀 Starting Dev HQ Automation Server...");
 
     // Import and start the server
-    await import("./dev-hq/spawn-server.js");
+    await import("../dev-hq/spawn-server.js");
 
     return {
       status: "server started",

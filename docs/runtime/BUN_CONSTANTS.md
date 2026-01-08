@@ -333,4 +333,4 @@ For Dev HQ specific constants, see:
 - [Bun Runtime Documentation](https://bun.sh/docs/runtime)
 - [Bun CLI Documentation](https://bun.sh/docs/cli)
 - [Bundler Documentation](https://bun.sh/docs/bundler)
-- [Feature Flags Guide](./guides/FEATURE_FLAGS_PRO_TIPS.md)
+- [Feature Flags Guide](../guides/FEATURE_FLAGS_PRO_TIPS.md)

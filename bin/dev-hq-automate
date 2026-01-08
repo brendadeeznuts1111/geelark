@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // cli.js - Dev HQ Automation CLI
 
-import { DevHQAutomation, DevHQActions } from './dev-hq/automation.js';
+import { DevHQAutomation, DevHQActions } from '../dev-hq/core/automation.js';
 
 const [command, ...args] = process.argv.slice(2);
 
@@ -42,7 +42,7 @@ switch (command) {
 
   case 'server':
     console.log('🚀 Starting Dev HQ Automation Server...');
-    await import('./dev-hq/spawn-server.js');
+    await import('../dev-hq/servers/spawn-server.js');
     break;
 
   default:

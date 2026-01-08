@@ -23,32 +23,63 @@ const colors = {
   }
 };
 
-// Function-based chalk replacement
-const chalk = {
-  bold: {
-    cyan: (text: string) => `${colors.bright}${colors.cyan}${text}${colors.reset}`,
-    underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
-    red: (text: string) => `${colors.bright}${colors.red}${text}${colors.reset}`,
-    yellow: (text: string) => `${colors.bright}${colors.yellow}${text}${colors.reset}`,
-    white: (text: string) => `${colors.bright}${colors.white}${text}${colors.reset}`,
-    green: (text: string) => `${colors.bright}${colors.green}${text}${colors.reset}`,
-    blue: (text: string) => `${colors.bright}${colors.blue}${text}${colors.reset}`,
-    gray: (text: string) => `${colors.bright}${colors.gray}${text}${colors.reset}`,
-  },
-  gray: (text: string) => `${colors.gray}${text}${colors.reset}`,
-  green: (text: string) => `${colors.green}${text}${colors.reset}`,
-  red: (text: string) => `${colors.red}${text}${colors.reset}`,
-  yellow: (text: string) => `${colors.yellow}${text}${colors.reset}`,
-  blue: (text: string) => `${colors.blue}${text}${colors.reset}`,
+// Function-based chalk replacement with dynamic color support
+const createColorFn = (colorCode: string) => (text: string) => `${colorCode}${text}${colors.reset}`;
+const createBoldColorFn = (colorCode: string) => (text: string) => `${colors.bright}${colorCode}${text}${colors.reset}`;
+
+// Color mapping for dynamic access
+const colorMap: Record<string, string> = {
+  cyan: colors.cyan,
+  red: colors.red,
+  yellow: colors.yellow,
+  white: colors.white,
+  green: colors.green,
+  blue: colors.blue,
+  gray: colors.gray,
+  magenta: colors.magenta,
+};
+
+// Create bold object with Proxy for dynamic property access
+const boldChalk = new Proxy({
+  cyan: createBoldColorFn(colors.cyan),
   underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
-  hex: (hex: string) => (text: string) => {
-    return `${colors.hex(hex)}${text}${colors.reset}`;
-  },
-  white: (text: string) => `${colors.white}${text}${colors.reset}`
+  red: createBoldColorFn(colors.red),
+  yellow: createBoldColorFn(colors.yellow),
+  white: createBoldColorFn(colors.white),
+  green: createBoldColorFn(colors.green),
+  blue: createBoldColorFn(colors.blue),
+  gray: createBoldColorFn(colors.gray),
+  magenta: createBoldColorFn(colors.magenta),
+}, {
+  get(target, prop: string) {
+    if (prop in target) {
+      return target[prop as keyof typeof target];
+    }
+    // Support dynamic color access
+    if (colorMap[prop]) {
+      return createBoldColorFn(colorMap[prop]);
+    }
+    // Fallback to white if color not found
+    return createBoldColorFn(colors.white);
+  }
+});
+
+const chalk = {
+  bold: boldChalk,
+  gray: createColorFn(colors.gray),
+  green: createColorFn(colors.green),
+  red: createColorFn(colors.red),
+  yellow: createColorFn(colors.yellow),
+  blue: createColorFn(colors.blue),
+  underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
+  hex: (hex: string) => createColorFn(colors.hex(hex)),
+  white: createColorFn(colors.white),
+  cyan: createColorFn(colors.cyan),
+  magenta: createColorFn(colors.magenta),
 };
 import { FeatureRegistry } from "./FeatureRegistry";
 import { Logger } from "./Logger";
-import { StringWidth } from "./StringWidth";
+import { TerminalWidth } from "./utils/TerminalWidth";
 import { ALERT_CONFIGS, DASHBOARD_COMPONENTS } from "./config";
 import {
     AlertSeverity,
@@ -86,6 +117,7 @@ export class Dashboard {
     this.displayHealthStatus();
     this.displayPerformanceMetrics();
     this.displayIntegrationGrid();
+    this.displayDisabledFeatures();
   }
 
   // Full comprehensive dashboard
@@ -270,6 +302,20 @@ export class Dashboard {
     });
 
     console.log();
+  }
+
+  // Display disabled features
+  private displayDisabledFeatures(): void {
+    const disabledFlags = this.featureRegistry.getDisabledFlags();
+    if (disabledFlags.length > 0) {
+      console.log(chalk.bold.underline("\nDisabled Features:"));
+      disabledFlags.forEach((flag) => {
+        const config = this.featureRegistry.getConfig(flag);
+        const badge = config?.badgeDisabled || "❌ DISABLED";
+        console.log(chalk.yellow(`  ${badge} ${flag}`));
+      });
+      console.log();
+    }
   }
 
   // Health Status
@@ -726,7 +772,7 @@ export class Dashboard {
   private padLine(line: string, width: number): string {
     const lineWidth = this.options.ascii
       ? line.length
-      : StringWidth.calculate(line);
+      : Bun.stringWidth(line);
     const padding = Math.max(0, width - lineWidth);
     return line + " ".repeat(padding);
   }

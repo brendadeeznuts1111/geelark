@@ -387,7 +387,7 @@ const filtered = argv.filter(arg => !arg.includes("--table"));
 ## 🔗 Related Documentation
 
 - [Flag Separation Pattern](./flag-separation-pattern.md)
-- [Flags Reference](./flags-reference.md)
-- [Testing Alignment](./TESTING_ALIGNMENT.md)
-- [Bun Runtime Features](./BUN_RUNTIME_FEATURES.md)
+- [Flags Reference](../api/flags-reference.md)
+- [Testing Alignment](../guides/TESTING_ALIGNMENT.md)
+- [Bun Runtime Features](../runtime/BUN_RUNTIME_FEATURES.md)
 

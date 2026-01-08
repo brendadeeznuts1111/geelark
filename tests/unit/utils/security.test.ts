@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
 import { describe, expect, it } from "bun:test";
-import { FeatureRegistry } from "../src/FeatureRegistry";
-import { FeatureFlag, CriticalLevel } from "../src/types";
+import { FeatureRegistry } from "../../../src/FeatureRegistry";
+import { FeatureFlag, CriticalLevel } from "../../../src/types";
 
 describe("Security Tests", () => {
   describe("Feature Flag Security", () => {

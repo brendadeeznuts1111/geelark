@@ -6,7 +6,7 @@
  */
 
 import { bench, describe, expect } from "bun:test";
-import { StringWidth } from "../src/StringWidth";
+// Using Bun's native stringWidth for accurate Unicode width calculation
 import { benchmark, measureNanoseconds } from "./utils";
 
 describe("String Width Calculation Performance", () => {
@@ -25,25 +25,25 @@ describe("String Width Calculation Performance", () => {
 
   describe("Basic String Width Calculations", () => {
     bench("simple ASCII string", () => {
-      StringWidth.calculate(testStrings.simple);
+      Bun.stringWidth(testStrings.simple);
     }, {
       iterations: 10_000,
     });
 
     bench("Unicode string", () => {
-      StringWidth.calculate(testStrings.unicode);
+      Bun.stringWidth(testStrings.unicode);
     }, {
       iterations: 10_000,
     });
 
     bench("emoji string", () => {
-      StringWidth.calculate(testStrings.emoji);
+      Bun.stringWidth(testStrings.emoji);
     }, {
       iterations: 10_000,
     });
 
     bench("flag emoji string", () => {
-      StringWidth.calculate(testStrings.flags);
+      Bun.stringWidth(testStrings.flags);
     }, {
       iterations: 10_000,
     });
@@ -51,14 +51,14 @@ describe("String Width Calculation Performance", () => {
 
   describe("ANSI Escape Sequences", () => {
     bench("ANSI colored string", () => {
-      StringWidth.calculate(testStrings.ansi);
+      Bun.stringWidth(testStrings.ansi);
     }, {
       iterations: 10_000,
     });
 
     bench("string with multiple ANSI codes", () => {
       const complexAnsi = "\x1b[1m\x1b[31mBold Red\x1b[0m \x1b[2m\x1b[32mDim Green\x1b[0m";
-      StringWidth.calculate(complexAnsi);
+      Bun.stringWidth(complexAnsi);
     }, {
       iterations: 10_000,
     });
@@ -66,25 +66,25 @@ describe("String Width Calculation Performance", () => {
 
   describe("East Asian Characters", () => {
     bench("Korean characters", () => {
-      StringWidth.calculate("안녕하세요");
+      Bun.stringWidth("안녕하세요");
     }, {
       iterations: 10_000,
     });
 
     bench("Japanese characters", () => {
-      StringWidth.calculate("こんにちは");
+      Bun.stringWidth("こんにちは");
     }, {
       iterations: 10_000,
     });
 
     bench("Chinese characters", () => {
-      StringWidth.calculate("你好世界");
+      Bun.stringWidth("你好世界");
     }, {
       iterations: 10_000,
     });
 
     bench("mixed East Asian", () => {
-      StringWidth.calculate(testStrings.eastAsian);
+      Bun.stringWidth(testStrings.eastAsian);
     }, {
       iterations: 10_000,
     });
@@ -92,21 +92,21 @@ describe("String Width Calculation Performance", () => {
 
   describe("Complex Mixed Strings", () => {
     bench("mixed ASCII, Unicode, Emoji, ANSI", () => {
-      StringWidth.calculate(testStrings.mixed);
+      Bun.stringWidth(testStrings.mixed);
     }, {
       iterations: 10_000,
     });
 
     bench("dashboard status bar string", () => {
       const statusBar = "🌍 DEV ✅ HEALTHY (12/15 features enabled)";
-      StringWidth.calculate(statusBar);
+      Bun.stringWidth(statusBar);
     }, {
       iterations: 10_000,
     });
 
     bench("performance graph string", () => {
       const graph = "CPU: ▰▰▰▰▰ 80% | MEM: ▰▰▰▰▱ 60% | RES: ▰▰▰▱▱ 40ms";
-      StringWidth.calculate(graph);
+      Bun.stringWidth(graph);
     }, {
       iterations: 10_000,
     });
@@ -114,19 +114,19 @@ describe("String Width Calculation Performance", () => {
 
   describe("Long String Performance", () => {
     bench("long ASCII string (1000 chars)", () => {
-      StringWidth.calculate(testStrings.long);
+      Bun.stringWidth(testStrings.long);
     }, {
       iterations: 1_000,
     });
 
     bench("long Unicode string (1000 chars)", () => {
-      StringWidth.calculate(testStrings.longUnicode);
+      Bun.stringWidth(testStrings.longUnicode);
     }, {
       iterations: 1_000,
     });
 
     bench("long emoji string (100 emojis)", () => {
-      StringWidth.calculate(testStrings.longEmoji);
+      Bun.stringWidth(testStrings.longEmoji);
     }, {
       iterations: 1_000,
     });
@@ -134,25 +134,25 @@ describe("String Width Calculation Performance", () => {
 
   describe("Edge Cases", () => {
     bench("empty string", () => {
-      StringWidth.calculate("");
+      Bun.stringWidth("");
     }, {
       iterations: 10_000,
     });
 
     bench("single character", () => {
-      StringWidth.calculate("A");
+      Bun.stringWidth("A");
     }, {
       iterations: 10_000,
     });
 
     bench("single emoji", () => {
-      StringWidth.calculate("🎉");
+      Bun.stringWidth("🎉");
     }, {
       iterations: 10_000,
     });
 
     bench("zero-width characters", () => {
-      StringWidth.calculate("Hello\u200B\u200C\u200DWorld");
+      Bun.stringWidth("Hello\u200B\u200C\u200DWorld");
     }, {
       iterations: 10_000,
     });
@@ -161,14 +161,14 @@ describe("String Width Calculation Performance", () => {
   describe("Microbenchmarks with Nanosecond Precision", () => {
     it("should measure simple string width with nanosecond precision", () => {
       const { duration } = measureNanoseconds(() => {
-        StringWidth.calculate(testStrings.simple);
+        Bun.stringWidth(testStrings.simple);
       });
       expect(duration).toBeLessThan(0.1); // Should be less than 0.1ms
     });
 
     it("should measure complex string width with nanosecond precision", () => {
       const { duration } = measureNanoseconds(() => {
-        StringWidth.calculate(testStrings.mixed);
+        Bun.stringWidth(testStrings.mixed);
       });
       expect(duration).toBeLessThan(0.5); // Should be less than 0.5ms
     });

@@ -3,7 +3,7 @@
 // @ts-ignore - bun:test types are available when running with Bun
 import { describe, expect, it } from "bun:test";
 // @ts-ignore - test utilities are available when running with Bun
-import { testUtils } from "../../config/test-setup.js";
+import { testUtils } from "../../config/test-setup";
 
 // Note: This file demonstrates Bun's optimized file I/O APIs
 // All Bun globals are available when running with Bun test runner

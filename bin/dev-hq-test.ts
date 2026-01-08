@@ -2,7 +2,7 @@
 // dev-hq-test - Enhanced test command with Dev HQ insights
 
 import { spawn } from "bun";
-import { DevHQAutomation } from "./dev-hq/core/automation.js";
+import { DevHQAutomation } from "../dev-hq/core/automation.js";
 
 interface TestOptions {
   coverage?: boolean;

@@ -944,7 +944,7 @@
     "cliReference": "./docs/api/CLI_REFERENCE.md",
     "serverApi": "./docs/api/SERVER_API.md",
     "deploymentGuide": "./docs/tutorials/DEPLOYMENT.md",
-    "bunFeatures": "./docs/BUN_RUNTIME_FEATURES.md",
-    "architecture": "./docs/ARCHITECTURE.md"
+    "bunFeatures": "./docs/runtime/BUN_RUNTIME_FEATURES.md",
+    "architecture": "./docs/architecture/ARCHITECTURE.md"
   }
 }

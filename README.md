@@ -192,30 +192,60 @@ geelark/
 ├── package.json           # Build configurations and scripts
 ├── tsconfig.json          # TypeScript configuration
 ├── meta.json              # System metadata and manifest
+├── config/                # Configuration files (organized)
+│   ├── README.md          # Configuration documentation
+│   ├── build/             # Build configurations
+│   │   ├── build-defines.json
+│   │   └── custom-loaders.json
+│   ├── security/          # Security configurations
+│   │   ├── security-scanners.json
+│   │   └── security-suppressions.xml
+│   └── tsconfig/          # TypeScript configurations
+│       ├── tsconfig.dev.json
+│       ├── tsconfig.prod.json
+│       └── tsconfig.audit.json
+├── schemas/               # JSON Schema definitions
+│   ├── README.md          # Schema documentation
+│   └── meta.schema.json   # Meta manifest schema
 ├── docs/                  # Documentation suite
 │   ├── README.md          # Documentation index
 │   ├── api/               # API documentation
-│   │   ├── CLI_REFERENCE.md
-│   │   ├── SERVER_API.md
-│   │   └── flags-reference.md
+│   ├── architecture/      # Architecture docs
+│   ├── cli/               # CLI documentation
+│   ├── features/          # Feature documentation
 │   ├── guides/            # Feature guides
-│   │   ├── EXPECTTYPEOF_GUIDE.md
-│   │   ├── FEATURE_FLAGS_PRO_TIPS.md
-│   │   └── TESTING_ALIGNMENT.md
+│   ├── runtime/           # Runtime documentation
+│   ├── testing/           # Testing documentation
 │   └── tutorials/         # Tutorial documents
-│       ├── SETUP.md
-│       ├── USER_GUIDE.md
-│       └── DEPLOYMENT.md
 ├── scripts/               # Automation scripts
+│   ├── analysis/          # Analysis scripts
+│   ├── build/             # Build scripts
+│   ├── dev/               # Development scripts
+│   └── validation/        # Validation scripts
 ├── tests/                 # Test files
+│   ├── config/            # Test configuration
 │   ├── unit/              # Unit tests
 │   ├── integration/       # Integration tests
 │   ├── e2e/               # End-to-end tests
-│   └── performance/       # Performance benchmarks
+│   ├── performance/       # Performance benchmarks
+│   └── cli/               # CLI tests
 ├── bench/                 # Benchmark suite
 ├── examples/              # Example code
+│   ├── feature-flags/     # Feature flag examples
+│   ├── bun-runtime/       # Bun runtime examples
+│   ├── cli-args/          # CLI argument examples
+│   ├── processes/         # Process examples
+│   └── system/            # System examples
+├── packages/              # Package templates
+│   └── create/            # Workspace template generator
 ├── bin/                   # CLI entry points
-│   └── dev-hq-cli.ts     # Dev HQ CLI
+│   ├── dev-hq-cli.ts      # Dev HQ CLI
+│   ├── dev-hq.ts          # Dev HQ main
+│   └── dev-hq-test.ts     # Dev HQ test runner
+├── dev-hq/                # Dev HQ core modules
+│   ├── core/              # Core automation
+│   ├── servers/           # Server implementations
+│   └── docs/              # Dev HQ documentation
 └── src/                   # Source code
     ├── index.ts           # Main entry point
     ├── types.ts           # Type definitions
@@ -239,6 +269,16 @@ geelark/
 ```
 
 ## Configuration
+
+### Configuration Directory
+
+All configuration files are organized in the `config/` directory:
+
+- **`config/build/`** - Build configurations (feature flags, custom loaders)
+- **`config/security/`** - Security scanner configurations and suppressions
+- **`config/tsconfig/`** - TypeScript configurations for different environments
+
+See [`config/README.md`](config/README.md) for detailed configuration documentation.
 
 ### bunfig.toml
 
@@ -426,11 +466,13 @@ for await (const f of new Bun.Glob("**/*.ts").scan(".")) console.log(f)
 | [CLI Reference](docs/api/CLI_REFERENCE.md) | Complete command-line interface reference |
 | [Server API](docs/api/SERVER_API.md) | HTTP/WebSocket server documentation |
 | [Deployment Guide](docs/tutorials/DEPLOYMENT.md) | Platform-specific deployment instructions |
-| [Architecture](docs/ARCHITECTURE.md) | System architecture overview |
-| [Bun Runtime Features](docs/BUN_RUNTIME_FEATURES.md) | Bun feature integration |
-| [Bun Constants](docs/BUN_CONSTANTS.md) | Runtime constants reference |
-| [Feature Matrix](docs/FEATURE_MATRIX.md) | Complete feature flags matrix |
+| [Architecture](docs/architecture/ARCHITECTURE.md) | System architecture overview |
+| [Bun Runtime Features](docs/runtime/BUN_RUNTIME_FEATURES.md) | Bun feature integration |
+| [Bun Constants](docs/runtime/BUN_CONSTANTS.md) | Runtime constants reference |
+| [Feature Matrix](docs/features/FEATURE_MATRIX.md) | Complete feature flags matrix |
 | [expectTypeOf Guide](docs/guides/EXPECTTYPEOF_GUIDE.md) | Type checking guide |
+| [Config Documentation](config/README.md) | Configuration files reference |
+| [Schema Documentation](schemas/README.md) | JSON Schema definitions |
 
 ## Roadmap
 
@@ -456,22 +498,47 @@ for await (const f of new Bun.Glob("**/*.ts").scan(".")) console.log(f)
 ### Phase 3: Enterprise Features 📋
 - 📋 Multi-tenant support
 - 📋 Advanced analytics dashboard
-- 📋 Automated scaling
+- 📋 Automated scaling with load balancing
 - 📋 Advanced monitoring integrations
+- 📋 Enterprise security features
+- 📋 Audit trail compliance
+- 📋 Custom integration APIs
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit changes: `git commit -m 'Add amazing feature'`
-4. Push to branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+We welcome contributions! Here's how to get started:
+
+### Development Workflow
+
+1. **Fork the repository**
+2. **Create a feature branch**: `git checkout -b feature/your-feature-name`
+3. **Make your changes** with proper TypeScript types and tests
+4. **Run the test suite**: `bun test`
+5. **Update documentation** if needed
+6. **Commit your changes**: `git commit -m 'feat: add amazing feature'`
+7. **Push to your branch**: `git push origin feature/your-feature-name`
+8. **Open a Pull Request** with a clear description
 
 ### Development Guidelines
-- Use TypeScript for all new code
-- Follow Bun-Pure standards (no unnecessary dependencies)
-- Add comprehensive tests for new features
-- Update documentation for API changes
+
+- **TypeScript First**: All new code must be written in TypeScript
+- **Bun-Pure Standards**: No unnecessary dependencies - leverage Bun's built-in APIs
+- **Testing**: Add comprehensive tests for new features (unit, integration, and E2E)
+- **Documentation**: Update documentation for any API changes
+- **Code Style**: Follow the existing code patterns and conventions
+- **Performance**: Consider bundle size impact and runtime performance
+- **Security**: Implement proper security measures for new features
+
+### Commit Convention
+
+We follow conventional commits:
+- `feat:` - New features
+- `fix:` - Bug fixes
+- `docs:` - Documentation changes
+- `test:` - Testing changes
+- `refactor:` - Code refactoring
+- `perf:` - Performance improvements
+- `chore:` - Maintenance tasks
 
 ## License
 

@@ -97,7 +97,7 @@ const safe = Buffer.allocUnsafe(1024); // Now zero-filled
 
 ### 5. `--unhandled-rejections`
 
-Control unhandled Promise rejection behavior. See [Unhandled Rejections Guide](./UNHANDLED_REJECTIONS.md) for detailed documentation.
+Control unhandled Promise rejection behavior. See [Unhandled Rejections Guide](../errors/UNHANDLED_REJECTIONS.md) for detailed documentation.
 
 **Options:**
 - `strict` - Treat unhandled rejections as errors (process exits)
@@ -305,5 +305,5 @@ bun = true  # Always use Bun runtime
 - [Bun Runtime Documentation](https://bun.com/docs/runtime#runtime-%26-process-control)
 - [Bun Test Documentation](https://bun.sh/docs/test)
 - [Benchmark Suite README](../bench/README.md)
-- [Testing Alignment Guide](./TESTING_ALIGNMENT.md)
+- [Testing Alignment Guide](../guides/TESTING_ALIGNMENT.md)
 

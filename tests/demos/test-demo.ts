@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 // Test the Dev HQ Test Runner with different options
 
-import { DevHQTestRunner } from "./dev-hq-test.js";
+import { DevHQTestRunner } from "../../bin/dev-hq-test";
 
 const testRunner = new DevHQTestRunner();
 

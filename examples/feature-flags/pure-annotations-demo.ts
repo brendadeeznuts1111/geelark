@@ -5,8 +5,8 @@
  * by allowing Bun to safely remove unused code during the build process.
  */
 
-import { FeatureRegistry } from '../FeatureRegistry';
-import { FeatureFlag, HealthScore } from '../types';
+import { FeatureRegistry } from '../../src/FeatureRegistry';
+import { FeatureFlag, HealthScore } from '../../src/types';
 import {
     formatBytes,
     formatPercentage,
@@ -14,7 +14,7 @@ import {
     getHealthBadge,
     isFeatureEnabled,
     renderFeature
-} from '../utils/PureUtils';
+} from '../../src/utils/PureUtils';
 
 // Example 1: Feature flag checks with @PURE
 function initializeFeatures() {

@@ -12,7 +12,7 @@ import {
     test,
 } from "bun:test";
 // @ts-ignore - Import path resolution issue
-import { getServer } from "../dev-hq/api-server.ts";
+import { getServer } from "../../dev-hq/servers/api-server";
 
 describe("🛠️ Bun APIs - All Fixes Verified", () => {
   let baseURL: string;

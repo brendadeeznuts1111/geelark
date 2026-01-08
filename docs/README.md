@@ -1,6 +1,8 @@
 # Dev HQ Documentation Index
 
-Complete documentation for the Dev HQ codebase analysis and automation platform.
+Complete documentation for the Dev HQ - Advanced Codebase Analysis & Automation Platform.
+
+> **Quick Start**: New to Dev HQ? Start with the [main README](../README.md) for installation and basic usage.
 
 ## Getting Started
 
@@ -23,18 +25,27 @@ Complete documentation for the Dev HQ codebase analysis and automation platform.
 
 | Document | Description |
 |----------|-------------|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture overview |
-| [SPECIFICATION.md](SPECIFICATION.md) | Technical specifications |
-| [ROADMAP.md](ROADMAP.md) | Project roadmap and planning |
-| [BUN_RUNTIME_FEATURES.md](BUN_RUNTIME_FEATURES.md) | Bun runtime features integration |
-| [BUN_DEPENDENCIES_TRANSPIRATION.md](BUN_DEPENDENCIES_TRANSPIRATION.md) | Dependency management and transpilation |
-| [BUN_CONSTANTS.md](BUN_CONSTANTS.md) | Bun runtime constants and defaults reference |
+| [ARCHITECTURE.md](architecture/ARCHITECTURE.md) | System architecture overview |
+| [SPECIFICATION.md](architecture/SPECIFICATION.md) | Technical specifications |
+| [ROADMAP.md](architecture/ROADMAP.md) | Project roadmap and planning |
 
-## Reference & Matrices
+## Runtime & Bun Integration
 
 | Document | Description |
 |----------|-------------|
-| [FEATURE_MATRIX.md](FEATURE_MATRIX.md) | Complete feature flags, dashboard, logging, and build matrices |
+| [BUN_RUNTIME_FEATURES.md](runtime/BUN_RUNTIME_FEATURES.md) | Bun runtime features integration |
+| [BUN_DEPENDENCIES_TRANSPIRATION.md](runtime/BUN_DEPENDENCIES_TRANSPIRATION.md) | Dependency management and transpilation |
+| [BUN_CONSTANTS.md](runtime/BUN_CONSTANTS.md) | Bun runtime constants and defaults reference |
+| [PROCESS_LIFECYCLE.md](runtime/PROCESS_LIFECYCLE.md) | Process lifecycle management |
+| [RUNTIME_CONTROLS.md](runtime/RUNTIME_CONTROLS.md) | Runtime control mechanisms |
+
+## Features & Flags
+
+| Document | Description |
+|----------|-------------|
+| [FEATURE_MATRIX.md](features/FEATURE_MATRIX.md) | Complete feature flags, dashboard, logging, and build matrices |
+| [FLAG_FLOW_DIAGRAM.md](features/FLAG_FLOW_DIAGRAM.md) | Feature flag flow diagrams |
+| [flag-separation-pattern.md](features/flag-separation-pattern.md) | Flag separation patterns |
 | [flags-reference.md](api/flags-reference.md) | Feature flags reference documentation |
 
 ## Feature Guides
@@ -48,28 +59,24 @@ Complete documentation for the Dev HQ codebase analysis and automation platform.
 | [FEATURE_FLAGS_PRO_TIPS.md](guides/FEATURE_FLAGS_PRO_TIPS.md) | Feature flag patterns and best practices |
 | [TESTING_ALIGNMENT.md](guides/TESTING_ALIGNMENT.md) | Testing strategies |
 
-## Process & Runtime
+## CLI Development
 
 | Document | Description |
 |----------|-------------|
-| [PROCESS_LIFECYCLE.md](PROCESS_LIFECYCLE.md) | Process lifecycle management |
-| [RUNTIME_CONTROLS.md](RUNTIME_CONTROLS.md) | Runtime control mechanisms |
-| [FLAG_FLOW_DIAGRAM.md](FLAG_FLOW_DIAGRAM.md) | Feature flag flow diagrams |
-| [flag-separation-pattern.md](flag-separation-pattern.md) | Flag separation patterns |
-
-## Development Tools
-
-| Document | Description |
-|----------|-------------|
-| [CLI_IMPLEMENTATION_SUMMARY.md](CLI_IMPLEMENTATION_SUMMARY.md) | CLI implementation details |
-| [dev-hq-cli-enhanced.md](dev-hq-cli-enhanced.md) | Dev HQ CLI enhancements |
+| [CLI_IMPLEMENTATION_SUMMARY.md](cli/CLI_IMPLEMENTATION_SUMMARY.md) | CLI implementation details |
+| [dev-hq-cli-enhanced.md](cli/dev-hq-cli-enhanced.md) | Dev HQ CLI enhancements |
 
 ## Testing & Quality
 
 | Document | Description |
 |----------|-------------|
-| [test-coverage.md](test-coverage.md) | Test coverage reports |
-| [UNHANDLED_REJECTIONS.md](UNHANDLED_REJECTIONS.md) | Error handling patterns |
+| [test-coverage.md](testing/test-coverage.md) | Test coverage reports |
+
+## Error Handling
+
+| Document | Description |
+|----------|-------------|
+| [UNHANDLED_REJECTIONS.md](errors/UNHANDLED_REJECTIONS.md) | Error handling patterns |
 
 ## Quick Reference
 
@@ -107,8 +114,14 @@ tests/
 
 docs/
 ├── api/              # API documentation
-├── guides/           # Feature guides
-└── tutorials/        # Tutorial documents
+├── architecture/     # Architecture and design docs
+├── runtime/          # Bun runtime and process docs
+├── features/         # Feature flags and matrices
+├── cli/             # CLI development docs
+├── guides/          # Feature guides
+├── tutorials/       # Tutorial documents
+├── testing/         # Testing documentation
+└── errors/          # Error handling docs
 ```
 
 ### Common Commands

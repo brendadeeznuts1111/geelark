@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import { afterAll, beforeAll, describe, expect, expectTypeOf, it } from "bun:test";
-import { getServer } from "../dev-hq/api-server.js";
+import { getServer } from "../../../dev-hq/servers/api-server";
 
 describe("🛠️ Dev HQ API Server", () => {
   let server: ReturnType<typeof getServer>;

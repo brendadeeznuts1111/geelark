@@ -208,10 +208,10 @@ Based on our benchmarks:
 - [Bun Test Documentation](https://bun.sh/docs/test)
 - [Bun Benchmark Examples](https://github.com/oven-sh/bun/tree/main/test)
 - [Bun.spawn() API](https://bun.sh/docs/api/spawn)
-- [Process Lifecycle Guide](docs/PROCESS_LIFECYCLE.md)
-- [Runtime Controls Guide](docs/RUNTIME_CONTROLS.md)
-- [expectTypeOf() Guide](docs/expectTypeOf-pro-tips.md)
-- [Feature Flags Testing](tests/README.md)
+- [Process Lifecycle Guide](../runtime/PROCESS_LIFECYCLE.md)
+- [Runtime Controls Guide](../runtime/RUNTIME_CONTROLS.md)
+- [expectTypeOf() Guide](./expectTypeOf-pro-tips.md)
+- [Feature Flags Testing](../../tests/README.md)
 
 ## 🚀 Next Steps
 

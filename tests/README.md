@@ -1,6 +1,6 @@
 # Tests Directory
 
-This directory contains comprehensive tests for the phone management system and Dev HQ automation suite, organized by test type and functionality.
+This directory contains comprehensive tests for Dev HQ - Advanced Codebase Analysis and Automation Platform, organized by test type and functionality.
 
 ## 📁 Directory Structure
 
@@ -12,6 +12,8 @@ tests/
 │   └── test-setup.ts           # Global test setup and utilities
 ├── unit/                        # Unit tests
 │   ├── feature-elimination/    # Feature elimination unit tests
+│   ├── feature-flags/          # Feature flag pattern tests
+│   ├── bun-runtime/            # Bun runtime API tests
 │   ├── type-testing/          # TypeScript type testing
 │   └── utils/                 # Utility function tests
 ├── integration/                 # Integration tests
@@ -19,8 +21,20 @@ tests/
 │   ├── server/                # Server and networking tests
 │   └── api/                   # API endpoint tests
 ├── e2e/                        # End-to-end tests
-│   └── automation/            # Full automation workflow tests
+│   ├── automation/            # Full automation workflow tests
+│   └── cli/                   # CLI end-to-end tests
+├── performance/                # Performance and benchmark tests
+│   ├── bun-runtime/           # Bun runtime performance
+│   ├── http-server/           # HTTP server benchmarks
+│   ├── networking/            # Networking performance
+│   ├── transpilation/         # Transpilation benchmarks
+│   └── configuration/         # Configuration management
+├── cli/                        # CLI-specific tests
+│   ├── examples/              # CLI example tests
+│   ├── flag-structure/        # Flag structure tests
+│   └── watch-api/             # Watch API tests
 ├── fixtures/                   # Test fixtures and mock data
+├── demos/                      # Demo and example files
 └── __snapshots__/              # Jest/Bun snapshot files
 ```
 
@@ -41,6 +55,19 @@ tests/
 - **expectTypeOf-comprehensive.test.ts**: Comprehensive type validation examples
 - **expectTypeOf-advanced-patterns.test.ts**: Complex nested types with feature gates
 - **expectTypeOf-pro-tips-working.test.ts**: Working examples of advanced type patterns
+
+#### Feature Flag Tests (`unit/feature-flags/`)
+
+- **feature-flag-pro-tips.test.ts**: Feature flag best practices and patterns
+- **flag-flow-diagram.test.ts**: Feature flag flow and processing tests
+- **perfect-flag-pattern.test.ts**: Optimal feature flag patterns
+
+#### Bun Runtime Tests (`unit/bun-runtime/`)
+
+- **bun-file-watching-patterns.test.ts**: File watching patterns with Bun
+- **bun-filter-monorepo.test.ts**: Monorepo filtering tests
+- **bun-run-index-js.test.ts**: Index.js execution tests
+- **bun-specific-flag-combo.test.ts**: Bun-specific flag combinations
 
 #### Utility Tests (`unit/utils/`)
 
@@ -81,6 +108,10 @@ tests/
 - **process-lifecycle.test.ts**: Full process lifecycle management
 - **seeded-testing.test.ts**: Seeded random testing for reproducible results
 - **snapshot-testing.test.ts**: Snapshot testing for feature elimination
+
+#### CLI Tests (`e2e/cli/`)
+
+- **cli-e2e.test.ts**: End-to-end CLI testing
 
 ### Bun-Specific Tests
 
@@ -318,7 +349,7 @@ global.testUtils.cleanupTempDir() // Cleanup temporary directory
 #!/usr/bin/env bun
 
 import { describe, expect, expectTypeOf, it } from "bun:test";
-import { testUtils } from "../config/test-setup";
+import { testUtils } from "./config/test-setup";
 
 describe("Test Category", () => {
   it("should test specific functionality", () => {

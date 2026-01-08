@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "ESNext",
@@ -8,33 +8,35 @@
     "esModuleInterop": true,
     "allowJs": true,
     "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
     "noImplicitOverride": true,
-    "declaration": false,
-    "sourceMap": false,
-    "removeComments": true,
+    "declaration": true,
+    "sourceMap": true,
+    "removeComments": false,
     "importHelpers": false,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "paths": {
+      "@/*": ["../../src/*"],
+      "@/utils/*": ["../../src/utils/*"],
+      "@/types/*": ["../../src/types/*"]
+    }
   },
   "include": [
-    "../src/**/*"
+    "../../src/**/*"
   ],
   "exclude": [
-    "../src/**/*.test.ts",
-    "../src/**/*.spec.ts",
-    "../src/examples/**/*",
-    "../src/**/backup*",
-    "../src/production*.js",
-    "../src/production*.js.map"
+    "../../src/**/backup*",
+    "../../src/production*.js",
+    "../../src/production*.js.map"
   ],
   "ts-node": {
     "compilerOptions": {

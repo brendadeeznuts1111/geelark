@@ -27,7 +27,7 @@ describe("Bundle Size Performance", () => {
     const testCode = `
 import { feature } from "bun:bundle";
 import { FeatureRegistry } from "../src/FeatureRegistry";
-import { StringWidth } from "../src/StringWidth";
+// Using Bun's native stringWidth for accurate Unicode width calculation
 import { Logger } from "../src/Logger";
 
 if (feature("FEAT_PREMIUM")) {
@@ -41,7 +41,7 @@ if (feature("FEAT_PREMIUM")) {
 
 const registry = new FeatureRegistry();
 const logger = new Logger({ level: "INFO" });
-const width = StringWidth.calculate("Hello, World!");
+const width = Bun.stringWidth("Hello, World!");
 
 console.log("Bundle test complete");
 `;

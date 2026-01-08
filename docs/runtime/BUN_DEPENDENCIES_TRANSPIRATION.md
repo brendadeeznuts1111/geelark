@@ -157,10 +157,10 @@ Specify a custom `tsconfig.json` for specific runs.
 
 ```bash
 # Use production TypeScript config
-bun run --tsconfig-override ./configs/tsconfig.prod.json ./src/index.ts
+bun run --tsconfig-override ./config/tsconfig/tsconfig.prod.json ./src/index.ts
 
 # Use test TypeScript config
-bun test --tsconfig-override ./configs/tsconfig.test.json
+bun test --tsconfig-override ./config/tsconfig/tsconfig.test.json
 ```
 
 ### Macro Control (`--no-macros`)
@@ -200,7 +200,7 @@ bun --hot --watch --install=fallback ./src/index.ts
 # Preload test setup, use custom tsconfig
 bun test \
   --preload ./src/preload/test-setup.ts \
-  --tsconfig-override ./configs/tsconfig.test.json
+  --tsconfig-override ./config/tsconfig/tsconfig.test.json
 ```
 
 ### Production Build
@@ -333,7 +333,7 @@ bun run --define DEV_TOOLS:true ./src/index.ts
 ## 🔗 Related Documentation
 
 - [BUN_RUNTIME_FEATURES](./BUN_RUNTIME_FEATURES.md)
-- [ARCHITECTURE](./ARCHITECTURE.md)
-- [CLI_REFERENCE](./CLI_REFERENCE.md)
+- [ARCHITECTURE](../architecture/ARCHITECTURE.md)
+- [CLI_REFERENCE](../api/CLI_REFERENCE.md)
 - [Bun Docs - Dependency Resolution](https://bun.sh/docs/runtime/dependency-resolution)
 - [Bun Docs - Transpilation](https://bun.sh/docs/runtime/transpilation)
