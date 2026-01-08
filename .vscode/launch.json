@@ -1,0 +1,94 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🚀 Debug Dashboard Server",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "--inspect",
+        "--inspect-wait"
+      ],
+      "program": "${workspaceFolder}/dev-hq/servers/dashboard-server.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🔧 Debug Main Process",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "--inspect",
+        "--inspect-wait"
+      ],
+      "program": "${workspaceFolder}/src/index.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🧪 Debug Tests",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "--inspect",
+        "--inspect-brk"
+      ],
+      "program": "${workspaceFolder}/node_modules/bun-test",
+      "args": [
+        "--config",
+        "tests/config/bun-test.config.ts"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "📊 Debug CLI",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "--inspect",
+        "--inspect-wait"
+      ],
+      "program": "${workspaceFolder}/bin/dev-hq-cli.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"],
+      "args": []
+    },
+    {
+      "type": "node",
+      "request": "attach",
+      "name": "🔌 Attach to Bun Process",
+      "port": 9229,
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "🌐 Debug with Hot Reload",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": [
+        "--inspect",
+        "--hot"
+      ],
+      "program": "${workspaceFolder}/dev-hq/servers/dashboard-server.ts",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "skipFiles": ["<node_internals>/**", "node_modules/**"],
+      "restart": true,
+      "sourceMaps": true
+    }
+  ]
+}

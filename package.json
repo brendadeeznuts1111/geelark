@@ -7,6 +7,10 @@
   "bin": {
     "dev-hq": "./dist/cli.js"
   },
+
+  "author": "Dev HQ Team <dev-hq@example.com>",
+  "license": "MIT",
+
   "keywords": [
     "bun",
     "typescript",
@@ -29,12 +33,12 @@
     "dependency-analysis",
     "git-insights"
   ],
-  "author": "Dev HQ Team <dev-hq@example.com>",
-  "license": "MIT",
+
   "engines": {
     "bun": ">=1.3.6",
     "node": ">=18.0.0"
   },
+
   "repository": {
     "type": "git",
     "url": "https://github.com/brendadeeznuts1111/geelark.git"
@@ -43,6 +47,7 @@
     "url": "https://github.com/brendadeeznuts1111/geelark/issues"
   },
   "homepage": "https://github.com/brendadeeznuts1111/geelark#readme",
+
   "files": [
     "dist",
     "bin",
@@ -50,7 +55,25 @@
     "README.md",
     "LICENSE"
   ],
+
+  "dependencies": {},
+
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^20.0.0",
+    "commander": "^11.1.0",
+    "chalk": "^5.3.0",
+    "typescript": "^5.0.0"
+  },
+
   "scripts": {
+    "dev": "bun --watch run src/index.ts",
+    "dev:hot": "bun --hot run src/index.ts",
+    "dev:debug": "bun --inspect --inspect-wait run src/index.ts",
+    "dev:verbose": "bun --console-depth 5 run src/index.ts",
+    "dev:smol": "bun --smol run src/index.ts",
+    "dev:cli": "bun --hot --watch run bin/dev-hq-cli.ts insights --table",
+
     "build:dev": "bun build ./src/index.ts --outdir=./dist/dev --features=ENV_DEVELOPMENT,FEAT_EXTENDED_LOGGING,FEAT_MOCK_API --minify --sourcemap",
     "build:prod-lite": "bun build ./src/index.ts --outdir=./dist/prod-lite --features=ENV_PRODUCTION,FEAT_ENCRYPTION --minify",
     "build:prod-standard": "bun build ./src/index.ts --outdir=./dist/prod-std --features=ENV_PRODUCTION,FEAT_AUTO_HEAL,FEAT_NOTIFICATIONS,FEAT_ENCRYPTION,FEAT_BATCH_PROCESSING --minify",
@@ -58,14 +81,6 @@
     "build:android": "bun build ./src/index.ts --outdir=./dist/android --features=ENV_PRODUCTION,PLATFORM_ANDROID,FEAT_ENCRYPTION --minify",
     "build:ios": "bun build ./src/index.ts --outdir=./dist/ios --features=ENV_PRODUCTION,PLATFORM_IOS,FEAT_ENCRYPTION --minify",
     "build:web": "bun build ./src/index.ts --outdir=./dist/web --features=ENV_PRODUCTION,PLATFORM_WEB,FEAT_ENCRYPTION --minify --target=browser",
-    "test:dev": "bun test --features=ENV_DEVELOPMENT,FEAT_MOCK_API",
-    "test:prod": "bun test --features=ENV_PRODUCTION",
-    "test:premium": "bun test --features=ENV_PRODUCTION,FEAT_PREMIUM,FEAT_ADVANCED_MONITORING",
-    "start:dev": "bun run --features=ENV_DEVELOPMENT,FEAT_MOCK_API ./src/index.ts",
-    "start:prod": "bun run --features=ENV_PRODUCTION ./src/index.ts",
-    "start:premium": "bun run --features=ENV_PRODUCTION,FEAT_PREMIUM ./src/index.ts",
-    "benchmark": "bun run --features=ENV_PRODUCTION ./src/benchmark.ts",
-    "analyze": "bun build --entrypoints=./src/index.ts --outdir=./dist/analyze --features=ENV_PRODUCTION --minify --analyze",
     "build:test": "bun build --tsconfig-override config/tsconfig/tsconfig.dev.json --define ENV_DEVELOPMENT:true --define FEAT_MOCK_API:true src/index.ts --outdir dist/test",
     "build:audit": "bun run scripts/build/build-validation.ts security-audit && bun build --tsconfig-override config/tsconfig/tsconfig.audit.json --define AUDIT_MODE:true --define FEAT_PREMIUM:true --define FEAT_AUTO_HEAL:true --define FEAT_NOTIFICATIONS:true --define FEAT_ENCRYPTION:true --define FEAT_BATCH_PROCESSING:true --define FEAT_ADVANCED_MONITORING:true --define FEAT_EXTENDED_LOGGING:true --define FEAT_VALIDATION_STRICT:true --no-macros --debug src/index.ts --outdir dist/audit",
     "build:compare": "bun run build:prod-lite && bun run build:prod-standard && bun run build:prod-premium && bun run scripts/analysis/analyze-bundle.ts dist && ls -lh dist/prod-*",
@@ -73,22 +88,31 @@
     "build:dce": "bun run scripts/build/build-validation.ts production-lite && bun build --tsconfig-override config/tsconfig/tsconfig.prod.json --define ENV_PRODUCTION:true --define FEAT_ENCRYPTION:true --minify --drop=console --jsx-side-effects src/index.ts --outdir dist/dce-optimized",
     "build:pure": "bun run scripts/build/build-validation.ts production-standard && bun build --tsconfig-override config/tsconfig/tsconfig.prod.json --define ENV_PRODUCTION:true --define FEAT_PREMIUM:true --define FEAT_AUTO_HEAL:true --define FEAT_NOTIFICATIONS:true --define FEAT_ENCRYPTION:true --define FEAT_BATCH_PROCESSING:true --minify --drop=console --jsx-side-effects src/index.ts --outdir dist/pure-optimized",
     "build:security": "bun run scripts/build/build-validation.ts security-audit && bun build --tsconfig-override config/tsconfig/tsconfig.audit.json --define AUDIT_MODE:true --define SECURITY_VALIDATION:true --no-macros --drop=console --jsx-side-effects src/index.ts --outdir dist/security",
-    "test:width": "bun run --features=ENV_DEVELOPMENT ./src/index.ts --test-width",
     "build:report": "bun run --features=ENV_PRODUCTION ./src/index.ts --analyze > build-report.txt",
-    "validate:features": "bun run --features=ENV_PRODUCTION ./src/index.ts --validate-features",
-    "status": "bun run src/index.ts status",
-    "logs": "bun run src/index.ts logs",
-    "health": "bun run src/index.ts health",
-    "audit": "bun run src/index.ts audit",
-    "flags": "bun run src/index.ts flags",
-    "dashboard": "bun run src/index.ts dashboard",
-    "generate:meta": "bun run scripts/generate-meta.ts",
-    "validate:meta": "bun run scripts/validate-meta.ts",
-    "update:checksum": "bun run scripts/update-checksum.ts",
-    "analyze:bundle": "bun run scripts/analysis/analyze-bundle.ts",
+    "build:cli": "bun build bin/dev-hq-cli.ts --outfile dist/cli.js --minify --target bun",
+
+    "dashboard:dev": "cd dashboard-react && bun run dev",
+    "dashboard:build": "cd dashboard-react && bun run build",
+    "dashboard:preview": "cd dashboard-react && bun run preview",
+    "dashboard:serve": "bun run dev-hq/servers/dashboard-server.ts",
+    "dashboard:serve:watch": "bun --watch run dev-hq/servers/dashboard-server.ts",
+    "dashboard:serve:hot": "bun --hot run dev-hq/servers/dashboard-server.ts",
+    "dashboard:serve:debug": "bun --inspect --inspect-wait run dev-hq/servers/dashboard-server.ts",
+    "dev:dashboard": "bun run dashboard:build && bun run dashboard:serve",
+    "build:all": "bun run dashboard:build && bun run build:prod-standard",
+
+    "start:dev": "bun run --features=ENV_DEVELOPMENT,FEAT_MOCK_API ./src/index.ts",
+    "start:prod": "bun run --features=ENV_PRODUCTION ./src/index.ts",
+    "start:premium": "bun run --features=ENV_PRODUCTION,FEAT_PREMIUM ./src/index.ts",
+
     "test": "bun test --config tests/config/bun-test.config.ts",
-    "test:watch": "bun test --config tests/config/bun-test.config.ts --watch",
+    "test:watch": "bun --watch test --config tests/config/bun-test.config.ts",
+    "test:hot": "bun --hot test --config tests/config/bun-test.config.ts",
+    "test:debug": "bun --inspect --inspect-brk test --config tests/config/bun-test.config.ts",
     "test:coverage": "bun test --config tests/config/bun-test.config.ts --coverage",
+    "test:dev": "bun test --features=ENV_DEVELOPMENT,FEAT_MOCK_API",
+    "test:prod": "bun test --features=ENV_PRODUCTION",
+    "test:premium": "bun test --features=ENV_PRODUCTION,FEAT_PREMIUM,FEAT_ADVANCED_MONITORING",
     "test:unit": "bun test --config tests/config/bun-test.config.ts tests/unit/**/*.test.ts",
     "test:integration": "bun test --config tests/config/bun-test.config.ts tests/integration/**/*.test.ts",
     "test:e2e": "bun test --config tests/config/bun-test.config.ts tests/e2e/**/*.test.ts",
@@ -100,11 +124,17 @@
     "test:api": "bun test --config tests/config/bun-test.config.ts --user-agent \"geelark-api-tests/1.0\" tests/integration/api/",
     "test:server": "bun test --config tests/config/bun-test.config.ts --user-agent \"geelark-server-tests/1.0\" tests/integration/server/",
     "test:dev-hq-api": "bun test --config tests/config/bun-test.config.ts --user-agent \"geelark-dev-hq-tests/1.0\" tests/integration/dev-hq/",
+    "test:geelark-api": "bun run scripts/test-geelark-api.ts",
+    "test:geelark-api:dry": "bun run scripts/test-geelark-api.ts --dry-run",
     "test:mobile": "bun test --config tests/config/bun-test.config.ts --user-agent \"Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15\" tests/integration/api/",
     "test:desktop": "bun test --config tests/config/bun-test.config.ts --user-agent \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36\" tests/integration/api/",
     "test:file-io": "bun test --config tests/config/bun-test.config.ts tests/unit/utils/bun-file-io.test.ts",
     "test:cli": "bun test --config tests/config/bun-test.config.ts tests/cli/**/*.test.ts tests/e2e/cli/**/*.test.ts",
     "test:cli:watch": "bun --watch test --config tests/config/bun-test.config.ts tests/cli/**/*.test.ts",
+    "test:cli:debug": "bun --inspect --inspect-brk test --config tests/config/bun-test.config.ts tests/cli/**/*.test.ts",
+    "test:dashboard": "bun test tests/unit/dashboard/",
+    "test:dashboard:integration": "bun test tests/integration/dashboard/",
+    "test:dashboard:all": "bun test tests/unit/dashboard/ && bun test tests/integration/dashboard/",
     "test:feature-flags": "bun test --config tests/config/bun-test.config.ts tests/unit/feature-flags/**/*.test.ts",
     "test:bun-runtime": "bun test --config tests/config/bun-test.config.ts tests/unit/bun-runtime/**/*.test.ts",
     "test:performance": "bun test tests/performance/**/*.test.ts",
@@ -112,6 +142,8 @@
     "test:transpilation": "bun test tests/performance/transpilation/**/*.test.ts",
     "test:configuration": "bun test tests/performance/configuration/**/*.test.ts",
     "test:benchmark": "bun test tests/performance/benchmark-utils.test.ts",
+    "test:width": "bun run --features=ENV_DEVELOPMENT ./src/index.ts --test-width",
+
     "bench": "bun run src/cli/benchmark-cli.ts",
     "bench:time": "bun run src/cli/benchmark-cli.ts time",
     "bench:memory": "bun run src/cli/benchmark-cli.ts memory",
@@ -121,61 +153,37 @@
     "bench:transpilation": "bun run src/cli/benchmark-cli.ts transpilation",
     "bench:configuration": "bun run src/cli/benchmark-cli.ts configuration",
     "bench:profile": "bun --cpu-prof --cpu-prof-dir ./profiles run src/cli/benchmark-cli.ts time",
-    "lint": "bun run scripts/lint.ts",
-    "lint:fix": "bun run scripts/lint.ts --fix",
-    "type-check": "bun run scripts/type-check.ts",
-    "clean": "rm -rf dist/*",
-    "clean:all": "rm -rf dist/* node_modules/.cache",
-    "dev": "bun --watch src/index.ts",
-    "dev:debug": "bun --inspect --watch src/index.ts",
     "bench:runtime:expose-gc": "bun --expose-gc test bench/runtime-controls.bench.ts",
     "bench:process-lifecycle": "bun test bench/process-lifecycle.bench.ts",
     "bench:features": "bun test bench/bun-runtime-features.bench.ts",
+    "benchmark": "bun run --features=ENV_PRODUCTION ./src/benchmark.ts",
+
+    "lint": "bun run scripts/lint.ts",
+    "lint:fix": "bun run scripts/lint.ts --fix",
+    "type-check": "bun run scripts/type-check.ts",
+
+    "clean": "rm -rf dist/*",
+    "clean:all": "rm -rf dist/* node_modules/.cache",
+
+    "analyze": "bun build --entrypoints=./src/index.ts --outdir=./dist/analyze --features=ENV_PRODUCTION --minify --analyze",
+    "analyze:bundle": "bun run scripts/analysis/analyze-bundle.ts",
+
+    "validate:features": "bun run --features=ENV_PRODUCTION ./src/index.ts --validate-features",
+    "generate:meta": "bun run scripts/generate-meta.ts",
+    "validate:meta": "bun run scripts/validate-meta.ts",
+    "update:checksum": "bun run scripts/update-checksum.ts",
+
+    "status": "bun run src/index.ts status",
+    "logs": "bun run src/index.ts logs",
+    "health": "bun run src/index.ts health",
+    "audit": "bun run src/index.ts audit",
+    "flags": "bun run src/index.ts flags",
+    "dashboard": "bun run src/index.ts dashboard",
+
     "hq": "bun bin/dev-hq-cli.ts",
     "insights": "bun bin/dev-hq-cli.ts insights",
     "insights:table": "bun bin/dev-hq-cli.ts insights --table",
     "insights:json": "bun bin/dev-hq-cli.ts insights --json",
-    "health:watch": "bun --watch bin/dev-hq-cli.ts health",
-    "build:cli": "bun build bin/dev-hq-cli.ts --outfile dist/cli.js --minify --target bun",
-    "dev:cli": "bun --hot --watch bin/dev-hq-cli.ts insights --table"
-  },
-  "keywords": [
-    "bun",
-    "codebase-analysis",
-    "developer-tools",
-    "cli",
-    "automation",
-    "feature-flags",
-    "dashboard",
-    "monitoring",
-    "performance",
-    "testing",
-    "transpilation",
-    "typescript",
-    "jsx",
-    "websocket",
-    "http-server"
-  ],
-  "author": "Dev HQ",
-  "license": "MIT",
-  "engines": {
-    "bun": ">=1.3.6"
-  },
-  "dependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/brendadeeznuts1111/geelark.git"
-  },
-  "bugs": {
-    "url": "https://github.com/brendadeeznuts1111/geelark/issues"
-  },
-  "homepage": "https://github.com/brendadeeznuts1111/geelark#readme",
-  "files": [
-    "src",
-    "bin",
-    "docs",
-    "bunfig.toml",
-    "tsconfig.json",
-    "schemas"
-  ]
+    "health:watch": "bun --watch run bin/dev-hq-cli.ts health"
+  }
 }
