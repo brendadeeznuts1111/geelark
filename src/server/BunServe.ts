@@ -69,6 +69,9 @@ export interface ServerOptions {
     headers?: string[];
     credentials?: boolean;
   };
+  hotReload?: boolean;
+  gracefulShutdown?: boolean;
+  defaultTimeout?: number;
 }
 
 export interface Route {
@@ -90,6 +93,8 @@ export class BunServe {
   > = [];
   private server?: ReturnType<typeof Bun.serve>;
   private wsHandler?: WebSocketHandler;
+  private hotReloadEnabled: boolean = false;
+  private gracefulShutdown: boolean = true;
 
   constructor(private options: ServerOptions = {}) {
     // Initialize with a default WebSocket handler to satisfy Bun's type requirements
@@ -98,6 +103,10 @@ export class BunServe {
         console.log('WebSocket message received:', message);
       }
     };
+
+    // Enable hot reload if specified
+    this.hotReloadEnabled = options.hotReload ?? false;
+    this.gracefulShutdown = options.gracefulShutdown ?? true;
   }
 
   /**
@@ -171,7 +180,7 @@ export class BunServe {
       port,
       hostname,
       fetch: this.fetch.bind(this),
-      websocket: this.wsHandler,
+      websocket: this.wsHandler!, // Non-null assertion since we initialize it in constructor
       tls: this.options.tls
         ? {
             certFile: this.options.tls.cert,
@@ -184,11 +193,133 @@ export class BunServe {
   }
 
   /**
-   * Stop the server
+   * Stop the server with graceful or force shutdown
    */
-  stop(): void {
-    this.server?.stop();
-    console.log("🛑 Server stopped");
+  async stop(force?: boolean): Promise<void> {
+    if (!this.server) {
+      console.log("⚠️ Server not running");
+      return;
+    }
+
+    if (force) {
+      // Force stop and close all active connections immediately
+      await this.server.stop(true);
+      console.log("🛑 Server force stopped (all connections terminated)");
+    } else {
+      // Gracefully stop the server (waits for in-flight requests)
+      await this.server.stop();
+      console.log("🛑 Server gracefully stopped (in-flight requests completed)");
+    }
+  }
+
+  /**
+   * Control whether the server keeps the Bun process alive
+   */
+  unref(): void {
+    if (!this.server) {
+      console.log("⚠️ Server not running");
+      return;
+    }
+
+    // Don't keep process alive if server is the only thing running
+    // @ts-ignore - server.unref is available at runtime
+    this.server.unref();
+    console.log("🔓 Server unref'd (process can exit without server)");
+  }
+
+  ref(): void {
+    if (!this.server) {
+      console.log("⚠️ Server not running");
+      return;
+    }
+
+    // Restore default behavior - keep process alive
+    // @ts-ignore - server.ref is available at runtime
+    this.server.ref();
+    console.log("🔗 Server ref'd (process kept alive by server)");
+  }
+
+  /**
+   * Hot reload server configuration without downtime
+   */
+  reload(newOptions?: Partial<ServerOptions>): void {
+    if (!this.server) {
+      console.log("⚠️ Server not running, cannot reload");
+      return;
+    }
+
+    if (!this.hotReloadEnabled) {
+      console.log("⚠️ Hot reload is not enabled");
+      return;
+    }
+
+    console.log("🔄 Hot reloading server configuration...");
+
+    // Preserve existing connections
+    const existingConnections = this.server.pendingWebSockets || 0;
+
+    // Update options
+    if (newOptions) {
+      this.options = { ...this.options, ...newOptions };
+    }
+
+    // Reload the server with new configuration
+    // @ts-ignore - Bun server reload is available at runtime
+    if (this.server.reload) {
+      this.server.reload({
+        fetch: this.fetch.bind(this),
+        websocket: this.wsHandler!,
+        tls: this.options.tls
+          ? {
+              certFile: this.options.tls.cert,
+              keyFile: this.options.tls.key,
+            }
+          : undefined,
+      });
+
+      console.log(`✅ Server reloaded successfully (${existingConnections} connections preserved)`);
+    } else {
+      console.log("⚠️ Server reload not available in this Bun version");
+    }
+  }
+
+  /**
+   * Create export default configuration for Bun
+   */
+  toExportDefault(): any {
+    return {
+      fetch: this.fetch.bind(this),
+      websocket: this.wsHandler!,
+      port: this.options.port ?? 3000,
+      hostname: this.options.hostname ?? "localhost",
+      tls: this.options.tls
+        ? {
+            certFile: this.options.tls.cert,
+            keyFile: this.options.tls.key,
+          }
+        : undefined,
+    };
+  }
+
+  /**
+   * Generate export default syntax with type safety
+   */
+  toExportDefaultWithTypeSafety(): string {
+    const config = this.toExportDefault();
+
+    return `
+import type { Serve } from "bun";
+
+export default {
+  fetch(req: Request) {
+    ${config.fetch.toString().replace('this.fetch.bind(this)', 'handleRequest')}
+  },
+  websocket: ${JSON.stringify(config.websocket, null, 2)},
+  port: ${config.port},
+  hostname: "${config.hostname}",
+  ${config.tls ? `tls: ${JSON.stringify(config.tls, null, 2)},` : ''}
+} satisfies Serve.Options<undefined>;
+    `.trim();
   }
 
   /**
@@ -196,6 +327,89 @@ export class BunServe {
    */
   getPort(): number {
     return this.server?.port ?? 0;
+  }
+
+  /**
+   * Set custom timeout for individual requests
+   */
+  setTimeout(req: Request, seconds: number): void {
+    if (!this.server) {
+      console.log("⚠️ Server not running");
+      return;
+    }
+
+    // @ts-ignore - server.timeout is available at runtime
+    this.server.timeout(req, seconds);
+  }
+
+  /**
+   * Get client IP and port information
+   */
+  getRequestIP(req: Request): { address: string; port: number } | null {
+    if (!this.server) {
+      console.log("⚠️ Server not running");
+      return null;
+    }
+
+    // @ts-ignore - server.requestIP is available at runtime
+    return this.server.requestIP(req);
+  }
+
+  /**
+   * Get count of active requests
+   */
+  getPendingRequests(): number {
+    if (!this.server) {
+      return 0;
+    }
+
+    // @ts-ignore - server.pendingRequests is available at runtime
+    return this.server.pendingRequests || 0;
+  }
+
+  /**
+   * Get count of active WebSocket connections
+   */
+  getPendingWebSockets(): number {
+    if (!this.server) {
+      return 0;
+    }
+
+    // @ts-ignore - server.pendingWebSockets is available at runtime
+    return this.server.pendingWebSockets || 0;
+  }
+
+  /**
+   * Get count of subscribers for a WebSocket topic
+   */
+  getSubscriberCount(topic: string): number {
+    if (!this.server) {
+      return 0;
+    }
+
+    // @ts-ignore - server.subscriberCount is available at runtime
+    return this.server.subscriberCount(topic) || 0;
+  }
+
+  /**
+   * Get comprehensive server metrics
+   */
+  getMetrics(): {
+    port: number;
+    pendingRequests: number;
+    pendingWebSockets: number;
+    uptime: number;
+    memoryUsage: NodeJS.MemoryUsage;
+  } {
+    const memUsage = process.memoryUsage();
+
+    return {
+      port: this.getPort(),
+      pendingRequests: this.getPendingRequests(),
+      pendingWebSockets: this.getPendingWebSockets(),
+      uptime: process.uptime(),
+      memoryUsage: memUsage
+    };
   }
 
   /**
@@ -254,7 +468,10 @@ export class BunServe {
 
       const match = route.pattern.exec(url);
       if (match) {
-        const params = match.pathname.groups;
+        // Filter out undefined values to match expected type
+        const params = Object.fromEntries(
+          Object.entries(match.pathname.groups).filter(([_, value]) => value !== undefined)
+        ) as Record<string, string>;
         return route.handler(req, params);
       }
     }
