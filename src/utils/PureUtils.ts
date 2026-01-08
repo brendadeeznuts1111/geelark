@@ -111,3 +111,117 @@ export const renderFeature = /*@__PURE__*/ <T>(
 ): T | undefined => {
   return isFeatureEnabled(flag) ? enabled : disabled;
 };
+
+// Comparison utilities
+
+// Bun.deepEquals exists at runtime but may be missing from types
+const bunDeepEquals = (a: unknown, b: unknown, strict = false): boolean => {
+  return (Bun as any).deepEquals(a, b, strict);
+};
+
+export const deepEquals = /*@__PURE__*/ (a: unknown, b: unknown, strict = false): boolean => {
+  return bunDeepEquals(a, b, strict);
+};
+
+export interface DiffResult {
+  equal: boolean;
+  path: string;
+  reason?: string;
+  actual?: unknown;
+  expected?: unknown;
+}
+
+export const deepEqualsWithDiff = /*@__PURE__*/ (
+  a: unknown,
+  b: unknown,
+  strict = false,
+  path = ''
+): DiffResult => {
+  // Fast path: use Bun's native check first
+  if (bunDeepEquals(a, b, strict)) {
+    return { equal: true, path };
+  }
+
+  const typeA = typeof a;
+  const typeB = typeof b;
+
+  if (typeA !== typeB) {
+    return {
+      equal: false,
+      path,
+      reason: 'type mismatch',
+      actual: typeA,
+      expected: typeB
+    };
+  }
+
+  if (a === null || b === null) {
+    return {
+      equal: false,
+      path,
+      reason: 'null mismatch',
+      actual: a,
+      expected: b
+    };
+  }
+
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      return {
+        equal: false,
+        path,
+        reason: 'array length',
+        actual: a.length,
+        expected: b.length
+      };
+    }
+    for (let i = 0; i < a.length; i++) {
+      const result = deepEqualsWithDiff(a[i], b[i], strict, `${path}[${i}]`);
+      if (!result.equal) return result;
+    }
+  }
+
+  if (typeof a === 'object' && typeof b === 'object') {
+    const keysA = Object.keys(a as object);
+    const keysB = Object.keys(b as object);
+
+    const missing = keysB.filter(k => !keysA.includes(k));
+    const extra = keysA.filter(k => !keysB.includes(k));
+
+    if (missing.length > 0) {
+      return {
+        equal: false,
+        path,
+        reason: `missing keys: ${missing.join(', ')}`
+      };
+    }
+    if (extra.length > 0 && strict) {
+      return {
+        equal: false,
+        path,
+        reason: `extra keys: ${extra.join(', ')}`
+      };
+    }
+
+    for (const key of keysA) {
+      if (key in (b as object)) {
+        const result = deepEqualsWithDiff(
+          (a as Record<string, unknown>)[key],
+          (b as Record<string, unknown>)[key],
+          strict,
+          path ? `${path}.${key}` : key
+        );
+        if (!result.equal) return result;
+      }
+    }
+  }
+
+  // Primitive mismatch
+  return {
+    equal: false,
+    path,
+    reason: 'value mismatch',
+    actual: a,
+    expected: b
+  };
+};

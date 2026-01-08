@@ -1,12 +1,55 @@
 {
   "name": "geelark",
   "version": "1.0.0",
-  "description": "Dev HQ - Advanced codebase analysis and automation platform built with Bun",
+  "description": "Dev HQ - Advanced codebase analysis and automation platform built with Bun. Comprehensive developer toolkit with real-time monitoring, feature flags, and performance optimization.",
   "type": "module",
   "main": "src/index.ts",
   "bin": {
     "dev-hq": "./dist/cli.js"
   },
+  "keywords": [
+    "bun",
+    "typescript",
+    "codebase-analysis",
+    "automation",
+    "developer-tools",
+    "feature-flags",
+    "performance-monitoring",
+    "cli",
+    "build-optimization",
+    "dead-code-elimination",
+    "real-time-dashboard",
+    "web-socket",
+    "http-server",
+    "security-scanning",
+    "bundle-analysis",
+    "testing-framework",
+    "runtime-features",
+    "transpilation",
+    "dependency-analysis",
+    "git-insights"
+  ],
+  "author": "Dev HQ Team <dev-hq@example.com>",
+  "license": "MIT",
+  "engines": {
+    "bun": ">=1.3.6",
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/brendadeeznuts1111/geelark.git"
+  },
+  "bugs": {
+    "url": "https://github.com/brendadeeznuts1111/geelark/issues"
+  },
+  "homepage": "https://github.com/brendadeeznuts1111/geelark#readme",
+  "files": [
+    "dist",
+    "bin",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build:dev": "bun build ./src/index.ts --outdir=./dist/dev --features=ENV_DEVELOPMENT,FEAT_EXTENDED_LOGGING,FEAT_MOCK_API --minify --sourcemap",
     "build:prod-lite": "bun build ./src/index.ts --outdir=./dist/prod-lite --features=ENV_PRODUCTION,FEAT_ENCRYPTION --minify",
