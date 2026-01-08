@@ -4,22 +4,22 @@
  * Renders formatted CLI output using JSX
  */
 
-import * as React from 'react';
+// Bun has built-in JSX support - no React import needed
 
 interface OutputProps {
   title?: string;
   status?: "success" | "error" | "warning" | "info";
-  children: React.ReactNode;
+  children: any; // Using any since we're not using React types
 }
 
 interface TableProps {
   headers: string[];
-  rows: React.ReactNode[][];
+  rows: any[][]; // Using any since we're not using React types
   maxWidth?: number;
 }
 
 interface BadgeProps {
-  children: React.ReactNode;
+  children: any; // Using any since we're not using React types
   variant?: "success" | "error" | "warning" | "info";
 }
 

@@ -53,6 +53,7 @@ bunx dev-hq insights --markdown > README.md
 - Top files by lines of code
 - Performance metrics (with `--perf`)
 - Dependency analysis (with `--check-deps`)
+- Bundle analysis (with `--analyze`)
 
 ### `health` - System Health Check
 

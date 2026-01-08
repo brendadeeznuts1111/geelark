@@ -24,7 +24,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
     "downlevelIteration": true,
-    "types": ["node"]
+    "types": []
   },
   "include": [
     "./*.ts",

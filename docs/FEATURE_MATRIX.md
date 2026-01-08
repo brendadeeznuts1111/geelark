@@ -30,9 +30,11 @@ Complete reference of feature flags, dashboard components, logging, monitoring, 
 | **Monitoring** | `FEAT_NOTIFICATIONS` | `🔔 ACTIVE` | `🔕 SILENT` | Medium | `NOTIFY_CHANGE` | Notification Panel | +8% size |
 | **Security** | `FEAT_ENCRYPTION` | `🔐 ENCRYPTED` | `⚠️ PLAINTEXT` | Critical | `SECURITY_CHANGE` | Security Section | +5% size |
 | **Testing** | `FEAT_MOCK_API` | `🧪 MOCK` | `🚀 REAL` | Critical | `TESTING_CHANGE` | Testing Section | -20% size |
+| **A/B Testing** | `FEAT_VARIANT_A` | `🧪 VARIANT A` | `🧪 CONTROL` | Low | `VARIANT_CHANGE` | Testing Section | neutral |
+| **A/B Testing** | `FEAT_VARIANT_B` | `🧪 VARIANT B` | `🧪 CONTROL` | Low | `VARIANT_CHANGE` | Testing Section | neutral |
 | **Logging** | `FEAT_EXTENDED_LOGGING` | `📝 VERBOSE` | `📋 NORMAL` | Low | `LOGGING_CHANGE` | Logging Section | +12% size |
 | **Monitoring** | `FEAT_ADVANCED_MONITORING` | `📈 ADVANCED` | `📊 BASIC` | Medium | `MONITOR_CHANGE` | Metrics Panel | +7% size |
-| **Performance** | `FEAT_BATCH_PROCESSING` | `⚡ BATCH` | `🐌 SEQUENTIAL` | Low | `PERF_CHANGE` | Performance Section | +8% size |
+| **Performance** | `FEAT_BATCH_PROCESSING` | `⚡ BATCH` | `🐌 SEQUENTIAL` | Low | `PERF_CHANGE` | Performance Section | +8% size, -5% perf |
 | **Validation** | `FEAT_VALIDATION_STRICT` | `✅ STRICT` | `⚠️ LENIENT` | High | `VALIDATION_CHANGE` | Security Section | +5% size |
 | **Platform** | `PLATFORM_ANDROID` | `🤖 ANDROID` | `🍎 IOS` | Critical | `PLATFORM_CHANGE` | Platform Badge | +10% size |
 | **Integration** | `INTEGRATION_GEELARK_API` | `🔌 GEELARK API` | `🔌 NO API` | Critical | `INTEGRATION_CHANGE` | Integration Grid | +20% size |
@@ -75,7 +77,7 @@ Complete reference of feature flags, dashboard components, logging, monitoring, 
 |--------------|--------------|--------------|------------|-------------|--------------|-------------------|
 | **Extended Logging** | `FEAT_EXTENDED_LOGGING` | +15% | +5% | +12% | +200ms | <50 accounts |
 | **Advanced Monitoring** | `FEAT_ADVANCED_MONITORING` | +25% | +10% | +7% | +500ms | All scales |
-| **Batch Processing** | `FEAT_BATCH_PROCESSING` | +5% | -20% | +8% | +100ms | >10 accounts |
+| **Batch Processing** | `FEAT_BATCH_PROCESSING` | +5% | -5% | +8% | +100ms | >10 accounts |
 | **Encryption** | `FEAT_ENCRYPTION` | +10% | +8% | +5% | +300ms | All scales |
 | **Auto-healing** | `FEAT_AUTO_HEAL` | +8% | +3% | +10% | +150ms | Production only |
 | **Notifications** | `FEAT_NOTIFICATIONS` | +3% | +2% | +8% | +50ms | All scales |
@@ -90,7 +92,7 @@ Complete reference of feature flags, dashboard components, logging, monitoring, 
 | **Development** | `bun run build:dev` | ENV_DEVELOPMENT, FEAT_EXTENDED_LOGGING, FEAT_MOCK_API | 450KB | 0% | No | Local Development |
 | **Production Lite** | `bun run build:prod-lite` | ENV_PRODUCTION, FEAT_ENCRYPTION | 320KB | 29% | Yes | Minimal Deployment |
 | **Production Standard** | `bun run build:prod-standard` | ENV_PRODUCTION, FEAT_AUTO_HEAL, FEAT_NOTIFICATIONS, FEAT_ENCRYPTION, FEAT_BATCH_PROCESSING | 280KB | 38% | Yes | Standard Deployment |
-| **Production Premium** | `bun run build:prod-premium` | All FEAT_* flags | 340KB | 24% | Yes | Premium Deployment |
+| **Premium** | `bun run build:prod-premium` | All FEAT_* flags | 340KB | 24% | Yes | Premium Deployment |
 | **Test Build** | `bun run build:test` | ENV_DEVELOPMENT, FEAT_MOCK_API | 180KB | 60% | No | CI/CD Testing |
 | **Audit Build** | `bun run build:audit` | All flags + debug symbols | 600KB | 0% | No | Security Audit |
 

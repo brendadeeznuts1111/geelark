@@ -106,6 +106,7 @@ bunx dev-hq insights --table            # Table format
 bunx dev-hq insights --json             # JSON format
 bunx dev-hq insights --csv > analysis.csv
 bunx dev-hq insights --markdown > README.md
+bunx dev-hq insights --perf --analyze   # Performance + bundle analysis
 
 # System health checks
 bunx dev-hq health                      # Basic health
@@ -160,6 +161,7 @@ bunx dev-hq run "npm test" --metrics     # Execute with metrics
 | `--timeout` | Command timeout in milliseconds |
 | `--bun` | Bun-themed ASCII output |
 | `--check-deps` | Validate package.json dependencies |
+| `--analyze` | Bundle analysis with `bun build --analyze` |
 | `--output` | Save output to file |
 
 ### Flag Separation Pattern
@@ -177,7 +179,7 @@ bun --hot --watch dev-hq-cli.ts insights --table --json
 | **Development** | `bun run build:dev` | ENV_DEVELOPMENT + Extended Logging + Mock API | 450KB | 0% | Local Development |
 | **Production Lite** | `bun run build:prod-lite` | ENV_PRODUCTION + Encryption | 320KB | 29% | Minimal Deployment |
 | **Production Standard** | `bun run build:prod-standard` | PROD + Auto-heal + Notifications + Encryption + Batch | 280KB | 38% | Standard Deployment |
-| **Production Premium** | `bun run build:prod-premium` | All PROD + Premium + Advanced Monitoring | 340KB | 24% | Premium Deployment |
+| **Premium** | `bun run build:prod-premium` | All PROD + Premium + Advanced Monitoring | 340KB | 24% | Premium Deployment |
 | **Test Build** | `bun run build:test` | ENV_DEVELOPMENT + Mock API | 180KB | 60% | CI/CD Testing |
 | **Audit Build** | `bun run build:audit` | All features + Debug symbols | 600KB | 0% | Security Audit |
 

@@ -84,7 +84,7 @@ export class BunContext {
    * Current platform
    */
   static get platform(): NodeJS.Platform {
-    return process.platform;
+    return process.platform as NodeJS.Platform;
   }
 
   /**

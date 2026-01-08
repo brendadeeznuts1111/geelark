@@ -79,21 +79,21 @@ export const JSX = {
     CLASSIC: 'classic',     // React.createElement transform
   } as const,
 
-  /** Default JSX factory (classic runtime) */
-  DEFAULT_FACTORY: 'React.createElement',
+  /** Default JSX factory (Bun runtime) */
+  DEFAULT_FACTORY: 'createElement',
 
-  /** Default JSX fragment (classic runtime) */
-  DEFAULT_FRAGMENT: 'React.Fragment',
+  /** Default JSX fragment (Bun runtime) */
+  DEFAULT_FRAGMENT: 'Fragment',
 
-  /** Default JSX import source (automatic runtime) */
-  DEFAULT_IMPORT_SOURCE: 'react',
+  /** Default JSX import source (Bun automatic runtime) */
+  DEFAULT_IMPORT_SOURCE: 'bun',
 
   /** JSX compiler options */
   COMPILER_OPTIONS: {
     JSX: 'react-jsx',
-    JSX_IMPORT_SOURCE: 'react',
-    JSX_FACTORY: 'React.createElement',
-    JSX_FRAGMENT_FACTORY: 'React.Fragment',
+    JSX_IMPORT_SOURCE: 'bun',
+    JSX_FACTORY: 'createElement',
+    JSX_FRAGMENT_FACTORY: 'Fragment',
   } as const,
 } as const;
 
@@ -316,7 +316,7 @@ export const VERSION = {
   },
 
   /** Check if Bun version meets minimum */
-  satisfiesBun: (minimum = VERSION.MINIMUM_BUN): boolean => {
+  satisfiesBun: (minimum = '1.3.6'): boolean => {
     const [major, minor, patch = 0] = minimum.split('.').map(Number);
     const [currentMajor, currentMinor, currentPatch = 0] = Bun.version.split('.').map(Number);
 
@@ -374,8 +374,8 @@ export type DeprecationMode = typeof SECURITY.DEPRECATION_MODE[keyof typeof SECU
 // Re-export Template & Feature Constants
 // =============================================================================
 
-export * from './templates.js';
 export * from './features/compile-time.js';
+export * from './templates.js';
 
 // =============================================================================
 // Default Exports

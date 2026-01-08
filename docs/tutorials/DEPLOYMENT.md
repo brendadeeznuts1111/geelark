@@ -124,7 +124,15 @@ bun run build:prod-premium
 
 ## Deployment Platforms
 
-### Vercel
+> **Note:** Dev HQ uses Bun's compile-time flags and optimizations. For best compatibility and performance, we recommend using deployment platforms that support Bun directly.
+
+### Supported Platforms
+
+| Platform | Bun Support | Recommended For | Setup Complexity |
+|----------|-------------|-----------------|-----------------|
+| **Vercel** | ✅ Native | Serverless/Edge | Low |
+| **Docker** | ✅ Full | Self-hosted/Cloud | Medium |
+| **Railway** | ⚠️ Limited | Small apps | Medium |
 
 1. **Install Vercel CLI**
 
@@ -237,78 +245,46 @@ docker build -t geelark .
 docker run -p 3000:3000 --env-file .env geelark
 ```
 
-### PM2
+### Bun Run Direct (Recommended)
 
-1. **Install PM2**
-
-```bash
-bun install -g pm2
-```
-
-2. **ecosystem.config.js**
-
-```javascript
-module.exports = {
-  apps: [{
-    name: 'geelark',
-    script: 'src/index.ts',
-    interpreter: 'bun',
-    instances: 'max',
-    exec_mode: 'cluster',
-    env: {
-      NODE_ENV: 'production',
-      PORT: 3000
-    },
-    error_file: './logs/err.log',
-    out_file: './logs/out.log',
-    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
-    merge_logs: true,
-    autorestart: true,
-    max_restarts: 10,
-    min_uptime: '10s'
-  }]
-};
-```
-
-3. **Start**
+For maximum compatibility with Bun's compile-time flags, we recommend running directly:
 
 ```bash
-pm2 start ecosystem.config.js
-pm2 save
-pm2 startup
+# Production build and run
+bun run build:prod-standard
+bun run dist/prod-standard/index.js
+
+# With environment file
+bun --env-file .env.prod run dist/prod-standard/index.js
+
+# With process manager (optional)
+npm install -g nodemon
+nodemon --exec "bun run dist/prod-standard/index.js" --watch src
 ```
 
-### systemd Service
+**Benefits:**
+- Full Bun compile-time flag support
+- Maximum performance
+- Direct access to Bun APIs
+- No compatibility layer overhead
 
-**/etc/systemd/system/geelark.service**
+### Process Manager Options
 
-```ini
-[Unit]
-Description=Dev HQ Application
-After=network.target
+While PM2 and systemd don't fully support Bun's compile-time flags, you can still use them for basic process management:
 
-[Service]
-Type=simple
-User=www-data
-WorkingDirectory=/var/www/geelark
-Environment="NODE_ENV=production"
-Environment="PORT=3000"
-EnvironmentFile=/var/www/geelark/.env
-ExecStart=/usr/bin/bun run src/index.ts
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-```
-
-**Enable and Start**
-
+#### Using nodemon (Recommended)
 ```bash
-sudo systemctl enable geelark
-sudo systemctl start geelark
-sudo systemctl status geelark
+npm install -g nodemon
+nodemon --exec "bun run dist/prod-standard/index.js" --ext ts,js
 ```
+
+#### Using forever
+```bash
+npm install -g forever
+forever start -c "bun" dist/prod-standard/index.js
+```
+
+> **Important:** When using process managers, compile-time flags must be set during build time, not runtime.
 
 ## Production Checklist
 

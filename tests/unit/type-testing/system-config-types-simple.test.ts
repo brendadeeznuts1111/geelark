@@ -258,7 +258,7 @@ type PlatformTransformer = ConfigTransformer<SystemConfiguration, PlatformType>;
 expectTypeOf<ConfigTransformer<SystemConfiguration, BuildConfiguration>>().toBeFunction();
 expectTypeOf<BuildTypeTransformer>().toBeFunction();
 expectTypeOf<BuildTypeTransformer>().parameters.toBeArray();
-expectTypeOf<BuildTypeTransformer>().returns.toBeObject();
+expectTypeOf<BuildTypeTransformer>().returns.toBeObject;
 
 // ===== CONFIGURATION WATCHERS =====
 

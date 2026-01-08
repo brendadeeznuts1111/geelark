@@ -68,7 +68,7 @@ if (!Date.prototype.format) {
 // Global utility for inspecting values
 if (!globalThis.inspect) {
   globalThis.inspect = (value: unknown, depth = 2): string => {
-    return Bun.inspect(value, { depth, colors: true });
+    return Bun.inspect(value);
   };
 }
 
@@ -108,4 +108,4 @@ declare global {
   var measure: <T>(name: string, fn: () => T | Promise<T>) => Promise<T>;
 }
 
-export {};
+export { };

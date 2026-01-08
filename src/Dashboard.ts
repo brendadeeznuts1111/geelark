@@ -1,13 +1,60 @@
-import chalk from "chalk";
+// Using Bun's built-in color support instead of chalk
+
+// Simple color utility using ANSI escape codes
+const colors = {
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
+  gray: "\x1b[90m",
+  hex: (hex: string) => {
+    // Simple hex to ANSI conversion (limited support)
+    const hexCode = hex.replace("#", "");
+    const r = parseInt(hexCode.substr(0, 2), 16);
+    const g = parseInt(hexCode.substr(2, 2), 16);
+    const b = parseInt(hexCode.substr(4, 2), 16);
+    return `\x1b[38;2;${r};${g};${b}m`;
+  }
+};
+
+// Function-based chalk replacement
+const chalk = {
+  bold: {
+    cyan: (text: string) => `${colors.bright}${colors.cyan}${text}${colors.reset}`,
+    underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
+    red: (text: string) => `${colors.bright}${colors.red}${text}${colors.reset}`,
+    yellow: (text: string) => `${colors.bright}${colors.yellow}${text}${colors.reset}`,
+    white: (text: string) => `${colors.bright}${colors.white}${text}${colors.reset}`,
+    green: (text: string) => `${colors.bright}${colors.green}${text}${colors.reset}`,
+    blue: (text: string) => `${colors.bright}${colors.blue}${text}${colors.reset}`,
+    gray: (text: string) => `${colors.bright}${colors.gray}${text}${colors.reset}`,
+  },
+  gray: (text: string) => `${colors.gray}${text}${colors.reset}`,
+  green: (text: string) => `${colors.green}${text}${colors.reset}`,
+  red: (text: string) => `${colors.red}${text}${colors.reset}`,
+  yellow: (text: string) => `${colors.yellow}${text}${colors.reset}`,
+  blue: (text: string) => `${colors.blue}${text}${colors.reset}`,
+  underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
+  hex: (hex: string) => (text: string) => {
+    return `${colors.hex(hex)}${text}${colors.reset}`;
+  },
+  white: (text: string) => `${colors.white}${text}${colors.reset}`
+};
 import { FeatureRegistry } from "./FeatureRegistry";
 import { Logger } from "./Logger";
 import { StringWidth } from "./StringWidth";
 import { ALERT_CONFIGS, DASHBOARD_COMPONENTS } from "./config";
 import {
-  AlertSeverity,
-  FeatureFlag,
-  HealthScore,
-  PerformanceMetrics
+    AlertSeverity,
+    FeatureFlag,
+    HealthScore,
+    PerformanceMetrics
 } from "./types";
 
 export interface DashboardOptions {
@@ -134,7 +181,7 @@ export class Dashboard {
         : "⚠️ Security features disabled";
     const paddedLine = this.padLine(line, 80);
 
-    console.log(chalk.red.bold(paddedLine));
+    console.log(chalk.bold.red(paddedLine));
     console.log();
   }
 
@@ -228,9 +275,9 @@ export class Dashboard {
   // Health Status
   displayHealthStatus(detailed: boolean = false): void {
     const healthStatus = this.calculateHealthStatus();
-    const color = this.getHealthColor(healthStatus.status);
+    const colorName = this.getHealthColorName(healthStatus.status);
 
-    console.log(color.bold(`Health Status: ${healthStatus.badge}`));
+    console.log((chalk.bold as any)[colorName](`Health Status: ${healthStatus.badge}`));
     console.log(
       chalk.gray(
         `Score: ${
@@ -271,7 +318,7 @@ export class Dashboard {
       console.log(chalk.green("✅ No active alerts"));
     } else {
       console.log(
-        chalk.yellow.bold(`⚠️ ${activeAlerts.length} Active Alerts:`)
+        chalk.bold.yellow(`⚠️ ${activeAlerts.length} Active Alerts:`)
       );
       activeAlerts.forEach((alert) => {
         const color = this.getAlertColor(alert.severity);
@@ -345,7 +392,7 @@ export class Dashboard {
       return;
     }
 
-    console.log(chalk.bold(`Component: ${component.name}`));
+    console.log(chalk.bold.white(`Component: ${component.name}`));
     console.log(chalk.gray(`Type: ${component.displayType}`));
     console.log(chalk.gray(`Update: ${component.updateFrequency}`));
     console.log(chalk.gray(`Source: ${component.dataSource}`));
@@ -381,7 +428,7 @@ export class Dashboard {
 
   // Integration health check
   async checkIntegrationHealth(): Promise<void> {
-    console.log(chalk.bold("🔍 Checking Integration Health..."));
+    console.log(chalk.bold.white("🔍 Checking Integration Health..."));
 
     const integrations = [
       {
@@ -422,7 +469,7 @@ export class Dashboard {
 
   // Security audit
   async runSecurityAudit(): Promise<void> {
-    console.log(chalk.bold("🔒 Running Security Audit..."));
+    console.log(chalk.bold.white("🔒 Running Security Audit..."));
 
     const securityChecks = [
       { flag: FeatureFlag.FEAT_ENCRYPTION, name: "Encryption", critical: true },
@@ -458,17 +505,17 @@ export class Dashboard {
 
     console.log();
     if (allCriticalPassed) {
-      console.log(chalk.green.bold("✅ Security Audit PASSED"));
+      console.log(chalk.bold.green("✅ Security Audit PASSED"));
     } else {
       console.log(
-        chalk.red.bold("❌ Security Audit FAILED - Critical issues detected")
+        chalk.bold.red("❌ Security Audit FAILED - Critical issues detected")
       );
     }
   }
 
   // Full audit
   async runFullAudit(debugSymbols: boolean = false): Promise<void> {
-    console.log(chalk.bold("🔍 Running Full System Audit..."));
+    console.log(chalk.bold.white("🔍 Running Full System Audit..."));
 
     // Run security and integration audits concurrently
     await Promise.all([
@@ -476,7 +523,7 @@ export class Dashboard {
       this.checkIntegrationHealth()
     ]);
 
-    console.log(chalk.bold("\n📊 Feature Flag Audit:"));
+    console.log(chalk.bold.white("\n📊 Feature Flag Audit:"));
     const allFlags = this.featureRegistry.getAllFlags();
 
     // Process flags concurrently in batches
@@ -495,7 +542,7 @@ export class Dashboard {
     }
 
     if (debugSymbols) {
-      console.log(chalk.bold("\n🐛 Debug Information:"));
+      console.log(chalk.bold.white("\n🐛 Debug Information:"));
       console.log(
         chalk.gray(`  Total Features: ${this.featureRegistry.getTotalCount()}`)
       );
@@ -512,13 +559,13 @@ export class Dashboard {
 
   // Performance review
   async reviewPerformance(optimize: boolean = false): Promise<void> {
-    console.log(chalk.bold("📈 Performance Review..."));
+    console.log(chalk.bold.white("📈 Performance Review..."));
 
     this.updatePerformanceMetrics();
     this.displayPerformanceMetrics();
 
     if (optimize) {
-      console.log(chalk.bold("\n💡 Optimization Suggestions:"));
+      console.log(chalk.bold.white("\n💡 Optimization Suggestions:"));
 
       if (this.performanceMetrics.memoryUsage > 80) {
         console.log(
@@ -558,7 +605,7 @@ export class Dashboard {
 
   // System review
   async runSystemReview(): Promise<void> {
-    console.log(chalk.bold("🔍 System Review..."));
+    console.log(chalk.bold.white("🔍 System Review..."));
 
     // Run all review components concurrently
     await Promise.all([
@@ -569,13 +616,13 @@ export class Dashboard {
 
     const healthStatus = this.calculateHealthStatus();
     console.log(
-      chalk.bold(`\n📊 Overall System Health: ${healthStatus.badge}`)
+      chalk.bold.white(`\n📊 Overall System Health: ${healthStatus.badge}`)
     );
   }
 
   // Build optimization
   async optimizeBuild(): Promise<void> {
-    console.log(chalk.bold("🔨 Optimizing Build..."));
+    console.log(chalk.bold.white("🔨 Optimizing Build..."));
 
     const currentFlags = this.featureRegistry.getEnabledFlags();
     const optimizations: string[] = [];
@@ -615,7 +662,7 @@ export class Dashboard {
 
   // Build analysis
   async analyzeBuild(): Promise<void> {
-    console.log(chalk.bold("📊 Analyzing Build Composition..."));
+    console.log(chalk.bold.white("📊 Analyzing Build Composition..."));
 
     const enabledFlags = this.featureRegistry.getEnabledFlags();
     const totalSize = this.calculateBundleSize(enabledFlags);
@@ -624,7 +671,7 @@ export class Dashboard {
     console.log(chalk.blue(`Estimated Bundle Size: ${totalSize}`));
     console.log(chalk.blue(`Dead Code Elimination: ${deadCodePercentage}%`));
 
-    console.log(chalk.bold("\n📦 Feature Breakdown:"));
+    console.log(chalk.bold.white("\n📦 Feature Breakdown:"));
     enabledFlags.forEach((flag) => {
       const config = this.featureRegistry.getFlagConfig(flag);
       const impact = config?.buildTimeImpact || "Unknown";
@@ -751,17 +798,30 @@ export class Dashboard {
         return /*@__PURE__*/ chalk.hex("#fd7e14");
       case HealthScore.CRITICAL:
         return /*@__PURE__*/ chalk.red;
-      case HealthScore.OFFLINE:
-        return /*@__PURE__*/ chalk.gray;
       default:
-        return /*@__PURE__*/ chalk.white;
+        return /*@__PURE__*/ chalk.gray;
+    }
+  }
+
+  private getHealthColorName(status: HealthScore): string {
+    switch (status) {
+      case HealthScore.HEALTHY:
+        return "green";
+      case HealthScore.DEGRADED:
+        return "yellow";
+      case HealthScore.IMPAIRED:
+        return "white";
+      case HealthScore.CRITICAL:
+        return "red";
+      default:
+        return "gray";
     }
   }
 
   private getAlertColor(severity: AlertSeverity): any {
     switch (severity) {
       case AlertSeverity.CRITICAL:
-        return /*@__PURE__*/ chalk.red.bold;
+        return /*@__PURE__*/ chalk.bold.red;
       case AlertSeverity.HIGH:
         return /*@__PURE__*/ chalk.red;
       case AlertSeverity.MEDIUM:

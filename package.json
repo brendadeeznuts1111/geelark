@@ -8,13 +8,13 @@
     "dev-hq": "./dist/cli.js"
   },
   "scripts": {
-    "build:dev": "bun build --entrypoints=./src/index.ts --outdir=./dist/dev --features=ENV_DEVELOPMENT,FEAT_EXTENDED_LOGGING,FEAT_MOCK_API --minify --sourcemap",
-    "build:prod-lite": "bun build --entrypoints=./src/index.ts --outdir=./dist/prod-lite --features=ENV_PRODUCTION,FEAT_ENCRYPTION --minify",
-    "build:prod-standard": "bun build --entrypoints=./src/index.ts --outdir=./dist/prod-std --features=ENV_PRODUCTION,FEAT_AUTO_HEAL,FEAT_NOTIFICATIONS,FEAT_ENCRYPTION,FEAT_BATCH_PROCESSING --minify",
-    "build:prod-premium": "bun build --entrypoints=./src/index.ts --outdir=./dist/prod-premium --features=ENV_PRODUCTION,FEAT_PREMIUM,FEAT_AUTO_HEAL,FEAT_NOTIFICATIONS,FEAT_ENCRYPTION,FEAT_BATCH_PROCESSING,FEAT_ADVANCED_MONITORING,FEAT_VALIDATION_STRICT --minify",
-    "build:android": "bun build --entrypoints=./src/index.ts --outdir=./dist/android --features=ENV_PRODUCTION,PLATFORM_ANDROID,FEAT_ENCRYPTION --minify",
-    "build:ios": "bun build --entrypoints=./src/index.ts --outdir=./dist/ios --features=ENV_PRODUCTION,PLATFORM_IOS,FEAT_ENCRYPTION --minify",
-    "build:web": "bun build --entrypoints=./src/index.ts --outdir=./dist/web --features=ENV_PRODUCTION,PLATFORM_WEB,FEAT_ENCRYPTION --minify --target=browser",
+    "build:dev": "bun build ./src/index.ts --outdir=./dist/dev --features=ENV_DEVELOPMENT,FEAT_EXTENDED_LOGGING,FEAT_MOCK_API --minify --sourcemap",
+    "build:prod-lite": "bun build ./src/index.ts --outdir=./dist/prod-lite --features=ENV_PRODUCTION,FEAT_ENCRYPTION --minify",
+    "build:prod-standard": "bun build ./src/index.ts --outdir=./dist/prod-std --features=ENV_PRODUCTION,FEAT_AUTO_HEAL,FEAT_NOTIFICATIONS,FEAT_ENCRYPTION,FEAT_BATCH_PROCESSING --minify",
+    "build:prod-premium": "bun build ./src/index.ts --outdir=./dist/prod-premium --features=ENV_PRODUCTION,FEAT_PREMIUM,FEAT_AUTO_HEAL,FEAT_NOTIFICATIONS,FEAT_ENCRYPTION,FEAT_BATCH_PROCESSING,FEAT_ADVANCED_MONITORING,FEAT_VALIDATION_STRICT --minify",
+    "build:android": "bun build ./src/index.ts --outdir=./dist/android --features=ENV_PRODUCTION,PLATFORM_ANDROID,FEAT_ENCRYPTION --minify",
+    "build:ios": "bun build ./src/index.ts --outdir=./dist/ios --features=ENV_PRODUCTION,PLATFORM_IOS,FEAT_ENCRYPTION --minify",
+    "build:web": "bun build ./src/index.ts --outdir=./dist/web --features=ENV_PRODUCTION,PLATFORM_WEB,FEAT_ENCRYPTION --minify --target=browser",
     "test:dev": "bun test --features=ENV_DEVELOPMENT,FEAT_MOCK_API",
     "test:prod": "bun test --features=ENV_PRODUCTION",
     "test:premium": "bun test --features=ENV_PRODUCTION,FEAT_PREMIUM,FEAT_ADVANCED_MONITORING",
@@ -114,21 +114,9 @@
   "author": "Dev HQ",
   "license": "MIT",
   "engines": {
-    "bun": ">=1.3.6",
-    "node": ">=18.0.0"
+    "bun": ">=1.3.6"
   },
-  "dependencies": {
-    "commander": "^11.1.0",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
-  },
-  "devDependencies": {
-    "@types/bun": "^1.3.5",
-    "@types/node": "^20.10.0",
-    "@types/react": "^19.2.7",
-    "@types/react-dom": "^19.2.3",
-    "bun-types": "^1.0.0"
-  },
+  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/brendadeeznuts1111/geelark.git"
