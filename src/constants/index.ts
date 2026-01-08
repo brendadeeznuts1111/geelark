@@ -371,6 +371,13 @@ export type JsxRuntime = typeof JSX.RUNTIME[keyof typeof JSX.RUNTIME];
 export type DeprecationMode = typeof SECURITY.DEPRECATION_MODE[keyof typeof SECURITY.DEPRECATION_MODE];
 
 // =============================================================================
+// Re-export Template & Feature Constants
+// =============================================================================
+
+export * from './templates.js';
+export * from './features/compile-time.js';
+
+// =============================================================================
 // Default Exports
 // =============================================================================
 

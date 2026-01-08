@@ -30,6 +30,13 @@ Complete documentation for the Dev HQ codebase analysis and automation platform.
 | [BUN_DEPENDENCIES_TRANSPIRATION.md](BUN_DEPENDENCIES_TRANSPIRATION.md) | Dependency management and transpilation |
 | [BUN_CONSTANTS.md](BUN_CONSTANTS.md) | Bun runtime constants and defaults reference |
 
+## Reference & Matrices
+
+| Document | Description |
+|----------|-------------|
+| [FEATURE_MATRIX.md](FEATURE_MATRIX.md) | Complete feature flags, dashboard, logging, and build matrices |
+| [flags-reference.md](api/flags-reference.md) | Feature flags reference documentation |
+
 ## Feature Guides
 
 | Document | Description |
