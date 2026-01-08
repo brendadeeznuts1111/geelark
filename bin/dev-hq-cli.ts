@@ -737,8 +737,9 @@ async function checkCommand(cmd: string, args: string[]): Promise<boolean> {
 
 async function checkNodeModules(): Promise<boolean> {
   try {
-    const nodeModules = Bun.file("node_modules");
-    return await nodeModules.exists();
+    // Use stat() to properly check if directory exists
+    const stat = await Bun.file("node_modules").stat();
+    return stat.isDirectory();
   } catch {
     return false;
   }
