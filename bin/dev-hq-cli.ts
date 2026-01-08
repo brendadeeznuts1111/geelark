@@ -22,7 +22,7 @@ import {
   theme,
 } from "./errors.js";
 
-// Set up global error handling
+// Add structured error handling
 setBunErrorHandler({
   onBunError: (error) => {
     console.error(`${theme.error}🚨 Bun Runtime Error:${theme.reset}`);

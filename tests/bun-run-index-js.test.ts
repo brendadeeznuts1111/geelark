@@ -1,7 +1,6 @@
 #!/usr/bin/env bun
 
 import { describe, expect, test } from "bun:test";
-
 describe("🎯 Bun Run - File Execution Verification", () => {
   test("✅ bun run index.js - creates and runs index.js", async () => {
     // Create index.js file
@@ -19,7 +18,7 @@ console.log('Doubled numbers:', doubled);
     await Bun.write("/tmp/index.js", jsContent);
 
     // Execute: bun run index.js
-    const result = await Bun.spawn(["bun", "run", "index.js"], {
+    const result = await Bun.spawn([process.argv[0], "run", "index.js"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -30,8 +29,9 @@ console.log('Doubled numbers:', doubled);
 
   test("✅ bun run index.js - error handling for missing file", async () => {
     // Test with non-existent index.js in current directory
-    const result = await Bun.spawn(["bun", "run", "index.js"], {
-      cwd: "/tmp/nonexistent",
+    await Bun.mkdir("/tmp/test-error", { recursive: true });
+    const result = await Bun.spawn([process.argv[0], "run", "index.js"], {
+      cwd: "/tmp/test-error",
       stdout: "pipe",
       stderr: "pipe",
     }).exited;
@@ -47,7 +47,7 @@ console.log('Doubled numbers:', doubled);
     );
 
     // Execute with relative path
-    const result = await Bun.spawn(["bun", "run", "./subdir/index.js"], {
+    const result = await Bun.spawn([process.execPath, "run", "./subdir/index.js"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -81,7 +81,7 @@ main().catch(console.error);
     await Bun.write("/tmp/index-esm.js", esmContent);
 
     // Execute ES module
-    const result = await Bun.spawn(["bun", "run", "index-esm.js"], {
+    const result = await Bun.spawn([process.execPath, "run", "index-esm.js"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -114,7 +114,7 @@ module.exports = utils;
     await Bun.write("/tmp/index-cjs.js", cjsContent);
 
     // Execute CommonJS module
-    const result = await Bun.spawn(["bun", "run", "index-cjs.js"], {
+    const result = await Bun.spawn([process.execPath, "run", "index-cjs.js"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -140,7 +140,7 @@ module.exports = utils;
     );
 
     // Test that package.json script takes precedence
-    const result = await Bun.spawn(["bun", "run", "index"], {
+    const result = await Bun.spawn([process.execPath, "run", "index"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -149,7 +149,7 @@ module.exports = utils;
     expect(result).toBe(0);
 
     // Test direct file execution
-    const fileResult = await Bun.spawn(["bun", "run", "index.js"], {
+    const fileResult = await Bun.spawn([process.execPath, "run", "index.js"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -185,7 +185,7 @@ console.log('API URL:', config?.api?.url);
     await Bun.write("/tmp/index-ts-like.js", tsLikeContent);
 
     // Execute TypeScript-like JavaScript
-    const result = await Bun.spawn(["bun", "run", "index-ts-like.js"], {
+    const result = await Bun.spawn([process.execPath, "run", "index-ts-like.js"], {
       cwd: "/tmp",
       stdout: "pipe",
       stderr: "pipe",
@@ -209,7 +209,7 @@ console.log('Bun version:', typeof Bun !== 'undefined' ? Bun.version : 'N/A');
     await Bun.write("/tmp/index-env.js", envContent);
 
     // Execute with environment variables
-    const result = await Bun.spawn(["bun", "run", "index-env.js"], {
+    const result = await Bun.spawn([process.execPath, "run", "index-env.js"], {
       cwd: "/tmp",
       env: {
         ...process.env,
@@ -221,5 +221,39 @@ console.log('Bun version:', typeof Bun !== 'undefined' ? Bun.version : 'N/A');
     }).exited;
 
     expect(result).toBe(0);
+  });
+
+  test("✅ Bun.spawn - child process spawning", async () => {
+    // Basic child process spawning
+    const proc = Bun.spawn(["echo", "hello"]);
+
+    // await completion
+    await proc.exited;
+
+    expect(proc.exitCode).toBe(0);
+
+    // Spawning with configuration object
+    const procWithConfig = Bun.spawn(["echo", "Hello, world!"], {
+      cwd: "/tmp",
+      env: { FOO: "bar" },
+      onExit(proc, exitCode, signalCode, error) {
+        // exit handler
+        expect(exitCode).toBe(0);
+        expect(signalCode).toBeNull();
+        expect(error).toBeUndefined();
+      },
+    });
+
+    await procWithConfig.exited;
+
+    expect(procWithConfig.exitCode).toBe(0);
+
+    // Consuming stdout as ReadableStream
+    const procOutput = Bun.spawn(["echo", "hello"]);
+
+    const output = await procOutput.stdout.text();
+    expect(output).toBe("hello\n");
+
+    await procOutput.exited;
   });
 });
