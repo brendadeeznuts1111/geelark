@@ -1,16 +1,11 @@
-# 🚀 Dev HQ CLI - Complete Command Reference
+# Dev HQ CLI - Complete Command Reference
 
-## 📋 Overview
+Version 2.0.0 | Built with Bun runtime
 
-Dev HQ CLI is a powerful codebase analysis tool built with Bun-native features, providing comprehensive insights into your project's health, performance, and structure.
-
-**Version:** 2.0.0
-**Built with:** Bun runtime for maximum performance
-
-## 🎯 Quick Start
+## Quick Start
 
 ```bash
-# Install and run
+# Using bunx (recommended)
 bunx dev-hq --help
 
 # Basic usage
@@ -18,14 +13,18 @@ bunx dev-hq insights                    # Analyze codebase
 bunx dev-hq insights --table            # Table format
 bunx dev-hq insights --json             # JSON format
 bunx dev-hq health                      # System health check
+
+# Local development
+bun bin/dev-hq-cli.ts insights --table
 ```
 
-## 📚 Commands Reference
+## Commands
 
-### 🔍 `insights` - Comprehensive Codebase Analysis
+### `insights` - Comprehensive Codebase Analysis
 
 **Aliases:** `analyze`, `i`
-**Description:** Analyzes your entire codebase and provides detailed insights
+
+Analyzes your entire codebase and provides detailed insights.
 
 ```bash
 bunx dev-hq insights [options]
@@ -34,23 +33,75 @@ bunx dev-hq i [options]
 ```
 
 **Output Formats:**
-- `--table` - Table format using Bun.inspect.table (default)
+- `--table` - Table format using `Bun.inspect.table` (default)
 - `--json` - JSON format for programmatic use
 - `--csv` - CSV format for spreadsheet analysis
 - `--markdown` - Markdown format for documentation
 
 **Examples:**
 ```bash
-bunx dev-hq insights --table > insights.txt
-bunx dev-hq insights --json > insights.json
-bunx dev-hq insights --csv > insights.csv
+bunx dev-hq insights --table
+bunx dev-hq insights --json > report.json
+bunx dev-hq insights --csv > analysis.csv
 bunx dev-hq insights --markdown > README.md
 ```
 
-### 📊 `git` - Git Repository Analysis
+**Output includes:**
+- Total files, lines, and size
+- Language breakdown
+- Health score (0-100%)
+- Top files by lines of code
+- Performance metrics (with `--perf`)
+- Dependency analysis (with `--check-deps`)
+
+### `health` - System Health Check
+
+**Aliases:** `h`
+
+Comprehensive system health analysis.
+
+```bash
+bunx dev-hq health [options]
+bunx dev-hq h [options]
+```
+
+**Checks:**
+- Bun runtime availability
+- Git installation
+- Docker installation
+- Node.js modules status
+- System resources (memory, uptime)
+
+**Example:**
+```bash
+bunx dev-hq health --verbose
+```
+
+### `test` - Run Tests
+
+**Aliases:** `t`
+
+Execute tests with optional coverage.
+
+```bash
+bunx dev-hq test [options]
+bunx dev-hq t [options]
+```
+
+**Options:**
+- `--coverage` - Run tests with coverage report
+- `--watch` - Enable watch mode for continuous testing
+
+**Example:**
+```bash
+bunx dev-hq test --coverage
+```
+
+### `git` - Git Repository Analysis
 
 **Aliases:** `g`
-**Description:** Provides comprehensive Git repository insights
+
+Provides comprehensive Git repository insights.
 
 ```bash
 bunx dev-hq git [options]
@@ -63,10 +114,11 @@ bunx dev-hq g [options]
 - Repository size and statistics
 - Contributor insights
 
-### 🔢 `cloc` - Count Lines of Code
+### `cloc` - Count Lines of Code
 
 **Aliases:** `c`
-**Description:** Counts lines of code across your project
+
+Counts lines of code across your project.
 
 ```bash
 bunx dev-hq cloc [options]
@@ -79,24 +131,11 @@ bunx dev-hq c [options]
 - File count by type
 - Code vs comments ratio
 
-### 🧪 `test` - Run Tests
-
-**Aliases:** `t`
-**Description:** Execute tests with optional coverage
-
-```bash
-bunx dev-hq test [options]
-bunx dev-hq t [options]
-```
-
-**Options:**
-- `--coverage` - Run tests with coverage report
-- `--watch` - Enable watch mode for continuous testing
-
-### 🐳 `docker` - Docker Container Insights
+### `docker` - Docker Container Insights
 
 **Aliases:** `d`
-**Description:** Analyze Docker containers and images
+
+Analyze Docker containers and images.
 
 ```bash
 bunx dev-hq docker [options]
@@ -109,27 +148,11 @@ bunx dev-hq d [options]
 - Resource usage metrics
 - Container health checks
 
-### ❤️ `health` - System Health Check
-
-**Aliases:** `h`
-**Description:** Comprehensive system health analysis
-
-```bash
-bunx dev-hq health [options]
-bunx dev-hq h [options]
-```
-
-**Checks:**
-- Bun runtime availability
-- Git installation
-- Docker installation
-- Node.js modules status
-- System resources
-
-### 🚀 `serve` - Start Dev HQ Server
+### `serve` - Start Dev HQ Server
 
 **Aliases:** `s`
-**Description:** Start the Dev HQ web server
+
+Start the Dev HQ web server.
 
 ```bash
 bunx dev-hq serve [options]
@@ -139,16 +162,16 @@ bunx dev-hq s [options]
 **Options:**
 - `--port <port>` - Specify port number (default: 3000)
 
-**Examples:**
+**Example:**
 ```bash
 bunx dev-hq serve --port 8080
-bunx dev-hq serve --port 3000
 ```
 
-### 🏃 `run` - Execute Commands
+### `run` - Execute Commands
 
 **Aliases:** `r`
-**Description:** Execute any command with Dev HQ monitoring
+
+Execute any command with Dev HQ monitoring.
 
 ```bash
 bunx dev-hq run <command> [options]
@@ -162,23 +185,22 @@ bunx dev-hq r <command> [options]
 ```bash
 bunx dev-hq run "npm run build" --metrics
 bunx dev-hq run "bun test" --metrics
-bunx dev-hq run "ls -la"
 ```
 
-## 🌍 Global Options
+## Global Options
 
 These options can be used with any command:
 
 ### Output Formatting
 - `--json` - Output in JSON format
-- `--table` - Output in table format (Bun.inspect.table)
-- `--format <format>` - Specify format: `json|table|pretty` (default: pretty)
+- `--table` - Output in table format
+- `--format <format>` - Specify format: `json|table|pretty`
 
 ### Performance & Debugging
 - `--perf` - Show Bun execution timing
 - `--verbose` - Enable verbose logging
 - `--quiet` - Quiet mode (minimal output)
-- `--timeout <ms>` - Command timeout in milliseconds (default: 30000)
+- `--timeout <ms>` - Command timeout (default: 30000)
 
 ### Bun-Specific Features
 - `--bun` - Enable Bun-themed ASCII output
@@ -189,7 +211,51 @@ These options can be used with any command:
 - `--help` - Show help information
 - `--version` - Show version information
 
-## 🎨 Usage Examples
+## Flag Separation Pattern
+
+The CLI follows Bun's flag separation pattern:
+
+```bash
+# Bun flags (before script) | Script | CLI flags (after command)
+bun --hot --watch dev-hq-cli.ts insights --table --json
+#    └────Bun Flags────┘ └──Script──┘ └─Cmd─┘ └──CLI Flags───┘
+```
+
+**Bun Flags:**
+- `--hot` - Enable hot module replacement
+- `--watch` - Watch mode for file changes
+- `--smol` - Smaller binary footprint
+- `--dump` - Dump AST for debugging
+
+**CLI Flags:**
+- `--table`, `--json`, `--csv`, `--markdown`
+- `--perf`, `--verbose`, `--quiet`
+- `--check-deps`, `--output`
+
+## Command Aliases
+
+| Command | Aliases |
+|---------|---------|
+| `insights` | `analyze`, `i` |
+| `health` | `h` |
+| `test` | `t` |
+| `git` | `g` |
+| `cloc` | `c` |
+| `docker` | `d` |
+| `serve` | `s` |
+| `run` | `r` |
+
+## Auto-Correction
+
+The CLI auto-corrects common typos:
+
+```bash
+bunx dev-hq insight    # Corrects to "insights"
+bunx dev-hq helth      # Corrects to "health"
+bunx dev-hq teste      # Corrects to "test"
+```
+
+## Usage Examples
 
 ### Basic Analysis
 ```bash
@@ -244,20 +310,34 @@ bunx dev-hq git --json --timeout 60000 --output git-analysis.json
 bunx dev-hq run "npm run test" --metrics --quiet
 ```
 
-## 🔧 Configuration
+## Environment Variables
 
-### Environment Variables
-- `NODE_ENV` - Environment (development/production)
-- `DEV_HQ_TIMEOUT` - Default timeout override
-- `DEV_HQ_OUTPUT_DIR` - Default output directory
+| Variable | Description |
+|----------|-------------|
+| `NODE_ENV` | Environment (development/production) |
+| `DEV_HQ_TIMEOUT` | Default timeout override |
+| `DEV_HQ_OUTPUT_DIR` | Default output directory |
+| `DEV_HQ_DEBUG` | Enable debug mode |
+
+## Exit Codes
+
+- `0` - Success
+- `1` - General error
+- `2` - Invalid arguments
+- `3` - Command timeout
+- `4` - System check failed
+
+## Configuration
 
 ### Configuration Files
+
 The CLI looks for configuration in:
 1. `devhq.config.json` in project root
 2. `devhq` section in `package.json`
 3. Environment variables
 
 ### Example Configuration
+
 ```json
 {
   "devhq": {
@@ -269,66 +349,7 @@ The CLI looks for configuration in:
 }
 ```
 
-## 🚨 Exit Codes
-
-- `0` - Success
-- `1` - General error
-- `2` - Invalid arguments
-- `3` - Command timeout
-- `4` - System check failed
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-**Command not found:**
-```bash
-# Install globally
-npm install -g @dev-hq/cli
-
-# Or use npx
-npx dev-hq --help
-```
-
-**Permission denied:**
-```bash
-# Make executable
-chmod +x bin/dev-hq-cli.ts
-
-# Or use bun directly
-bun bin/dev-hq-cli.ts --help
-```
-
-**Timeout errors:**
-```bash
-# Increase timeout
-bunx dev-hq insights --timeout 60000
-
-# Or disable timeout
-bunx dev-hq insights --timeout 0
-```
-
-### Debug Mode
-```bash
-# Enable verbose output
-bunx dev-hq insights --verbose
-
-# Check system health
-bunx dev-hq health --verbose
-
-# Performance analysis
-bunx dev-hq insights --perf --verbose
-```
-
-## 📊 Performance Tips
-
-1. **Use JSON format** for programmatic processing
-2. **Enable quiet mode** in CI/CD pipelines
-3. **Adjust timeout** for large codebases
-4. **Use specific commands** instead of general analysis when possible
-5. **Cache results** for repeated analysis
-
-## 🔗 Integration Examples
+## Integration Examples
 
 ### GitHub Actions
 ```yaml
@@ -362,13 +383,40 @@ ci:
 	dev-hq insights --json --quiet > ci-report.json
 ```
 
-## 📚 Additional Resources
+## Troubleshooting
 
-- **GitHub Repository:** [Dev HQ Source](https://github.com/your-org/dev-hq)
-- **Bun Documentation:** [bun.sh](https://bun.sh)
-- **Issue Tracker:** [GitHub Issues](https://github.com/your-org/dev-hq/issues)
-- **Discord Community:** [Join our Discord](https://discord.gg/dev-hq)
+### Command Not Found
+```bash
+# Use npx/bunx instead of global install
+bunx dev-hq --help
+```
+
+### Permission Denied
+```bash
+# Make executable
+chmod +x bin/dev-hq-cli.ts
+
+# Or use bun directly
+bun bin/dev-hq-cli.ts --help
+```
+
+### Timeout Errors
+```bash
+# Increase timeout
+bunx dev-hq insights --timeout 60000
+
+# Or disable timeout
+bunx dev-hq insights --timeout 0
+```
+
+## Performance Tips
+
+1. **Use JSON format** for programmatic processing
+2. **Enable quiet mode** in CI/CD pipelines
+3. **Adjust timeout** for large codebases
+4. **Use specific commands** instead of general analysis
+5. **Cache results** for repeated analysis
 
 ---
 
-*Dev HQ CLI - Built with ❤️ and Bun for maximum performance*
+Built with [Bun](https://bun.sh) for maximum performance.
