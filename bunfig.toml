@@ -1,0 +1,18 @@
+[workspace]
+# Dev HQ template/workspace support (does not affect current package unless packages/* exists)
+workspace = "packages/*"
+
+[install.scopes."@dev-hq"]
+# Template-friendly: supports env-substituted token
+token = "$DEV_HQ_TOKEN"
+# Replace with your org registry (GitHub Packages example)
+url = "https://npm.pkg.github.com/your-org"
+
+[test]
+# Test configuration for feature elimination tests
+timeout = 30000  # 30 seconds timeout for build operations
+concurrent = false  # Run tests sequentially to avoid build conflicts
+
+[run]
+# Default test runner settings
+bun = true

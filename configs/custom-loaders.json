@@ -1,0 +1,53 @@
+{
+  "loaders": {
+    "development": {
+      ".js": "jsx",
+      ".jsx": "jsx",
+      ".ts": "tsx",
+      ".tsx": "tsx",
+      ".json": "json",
+      ".toml": "toml",
+      ".env": "text",
+      ".md": "text"
+    },
+    "production": {
+      ".js": "js",
+      ".jsx": "jsx",
+      ".ts": "ts",
+      ".tsx": "tsx",
+      ".json": "json",
+      ".toml": "toml",
+      ".env": "text"
+    },
+    "optimized": {
+      ".js": "js",
+      ".jsx": "jsx",
+      ".ts": "ts",
+      ".tsx": "tsx",
+      ".json": "json",
+      ".config": "json",
+      ".env": "text",
+      ".md": "text"
+    }
+  },
+  "jsxConfig": {
+    "development": {
+      "runtime": "automatic",
+      "importSource": "react",
+      "factory": "React.createElement",
+      "fragment": "React.Fragment"
+    },
+    "production": {
+      "runtime": "automatic",
+      "importSource": "react",
+      "factory": "h",
+      "fragment": "Fragment"
+    },
+    "optimized": {
+      "runtime": "automatic",
+      "importSource": "preact",
+      "factory": "h",
+      "fragment": "Fragment"
+    }
+  }
+}

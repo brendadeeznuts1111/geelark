@@ -1,0 +1,44 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "declaration": false,
+    "sourceMap": false,
+    "removeComments": true,
+    "importHelpers": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+    "downlevelIteration": true
+  },
+  "include": [
+    "../src/**/*"
+  ],
+  "exclude": [
+    "../src/**/*.test.ts",
+    "../src/**/*.spec.ts",
+    "../src/examples/**/*",
+    "../src/**/backup*",
+    "../src/production*.js",
+    "../src/production*.js.map"
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext"
+    }
+  }
+}

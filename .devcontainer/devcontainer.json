@@ -1,0 +1,137 @@
+{
+  "name": "Geelark Feature Flag Development",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          }
+        },
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "typescript.preferences.importModuleSpecifier": "relative",
+        "javascript.preferences.importModuleSpecifier": "relative",
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000
+      },
+      "extensions": [
+        "ms-vscode.vscode-typescript-next",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "github.vscode-github-actions",
+        "github.copilot",
+        "github.copilot-chat",
+        "bierner.github-markdown-preview",
+        "ms-vscode.test-adapter-converter",
+        "ms-vscode.vscode-js-profile-flame",
+        "orta.vscode-jest",
+        "firsttris.vscode-jest-runner",
+        "pomdtr.excalidraw-editor",
+        "redhat.vscode-yaml",
+        "ms-vscode-remote.remote-ssh",
+        "ms-vscode-remote.remote-ssh-edit",
+        "tamasfe.even-better-toml",
+        "ms-vscode.makefile-tools",
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "wix.vscode-import-cost",
+        "kisstkondoros.vscode-gutter-preview",
+        "ms-vscode.live-server",
+        "rangav.vscode-thunder-client",
+        "humao.rest-client",
+        "ms-vscode-remote.remote-wsl",
+        "ms-vscode-remote.vscode-remote-extensionpack",
+        "ms-vscode.remote-explorer",
+        "ms-vscode.remote-server"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20",
+      "nodeGypDependencies": true
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": false
+    },
+    "ghcr.io/devcontainers/features/git-lfs:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "moby": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/sshd:1": {
+      "version": "latest"
+    }
+  },
+  "remoteUser": "developer",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "postCreateCommand": "bun install && bun run build:dev",
+  "postStartCommand": "echo '🚀 Development environment ready!' && echo '📚 Run bun run to see available commands'",
+  "forwardPorts": [
+    3000,
+    8080,
+    9229
+  ],
+  "portsAttributes": {
+    "3000": {
+      "label": "Application",
+      "onAutoForward": "openPreview"
+    },
+    "8080": {
+      "label": "Dev HQ Automation Server",
+      "onAutoForward": "openPreview"
+    },
+    "9229": {
+      "label": "Debugger",
+      "onAutoForward": "silent"
+    }
+  },
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "BUN_ENV": "development",
+    "CI": "false",
+    "FORCE_COLOR": "1",
+    "START_SERVICES": "true"
+  },
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  "overrideCommand": false,
+  "shutdownAction": "stopContainer",
+  "updateRemoteUserUID": true,
+  "containerEnv": {
+    "DEVCONTAINER": "true",
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/go/bin:/home/developer/.local/bin"
+  },
+  "runArgs": [
+    "--cap-add=SYS_PTRACE",
+    "--security-opt",
+    "seccomp=unconfined",
+    "--security-opt",
+    "apparmor=unconfined"
+  ]
+}
