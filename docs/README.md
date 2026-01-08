@@ -28,6 +28,7 @@ Complete documentation for the Dev HQ codebase analysis and automation platform.
 | [ROADMAP.md](ROADMAP.md) | Project roadmap and planning |
 | [BUN_RUNTIME_FEATURES.md](BUN_RUNTIME_FEATURES.md) | Bun runtime features integration |
 | [BUN_DEPENDENCIES_TRANSPIRATION.md](BUN_DEPENDENCIES_TRANSPIRATION.md) | Dependency management and transpilation |
+| [BUN_CONSTANTS.md](BUN_CONSTANTS.md) | Bun runtime constants and defaults reference |
 
 ## Feature Guides
 
@@ -84,6 +85,7 @@ Complete documentation for the Dev HQ codebase analysis and automation platform.
 src/
 ├── context/          # Bun runtime wrappers (Bun.main, Bun.env)
 ├── config/           # Configuration loading with Bun.file()
+├── constants/        # Bun runtime constants and feature flags
 ├── server/           # HTTP/WebSocket server
 ├── security/         # Security headers and TLS
 ├── decorators/       # HTTP route decorators
