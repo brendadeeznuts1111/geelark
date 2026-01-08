@@ -3,36 +3,34 @@
   "meta": {
     "version": "1.0.0",
     "manifestVersion": "2.0",
-    "generatedAt": "2026-01-07T21:30:37.956Z",
+    "generatedAt": "2026-01-08T00:00:00.000Z",
     "generator": "bun-meta-generator",
     "checksum": "sha256:placeholder"
   },
   "system": {
-    "name": "Geelark Phone Management System",
-    "type": "multi-account-automation",
-    "architecture": "microservices",
+    "name": "Dev HQ",
+    "type": "codebase-analysis-automation",
+    "architecture": "bun-runtime",
     "targetPlatforms": [
-      "android",
-      "ios"
+      "bun",
+      "node"
     ],
     "deploymentTargets": [
-      "aws",
-      "gcp",
-      "azure",
-      "on-premise"
+      "vercel",
+      "railway",
+      "docker",
+      "pm2",
+      "systemd"
     ],
     "compliance": [
-      "gdpr",
-      "ccpa",
-      "soc2",
-      "hipaa-ready"
+      "mit-license"
     ],
-    "license": "proprietary",
-    "maintainer": "operations@yourcompany.com"
+    "license": "MIT",
+    "maintainer": "dev-hq"
   },
   "build": {
     "runtime": {
-      "bunVersion": ">=1.0.0",
+      "bunVersion": ">=1.3.6",
       "nodeCompatibility": ">=18.0.0",
       "typescriptVersion": "5.0.0",
       "esm": true,
@@ -54,50 +52,106 @@
         "deadCodeElimination": "0%"
       },
       {
-        "name": "production",
-        "description": "Production deployment",
-        "cliCommand": "bun run build:prod",
+        "name": "production-lite",
+        "description": "Production deployment - minimal",
+        "cliCommand": "bun run build:prod-lite",
+        "features": [
+          "ENV_PRODUCTION",
+          "FEAT_ENCRYPTION"
+        ],
+        "optimizations": [
+          "minify",
+          "drop-console",
+          "jsx-side-effects"
+        ],
+        "output": "./dist/prod-lite",
+        "sizeEstimate": "320KB",
+        "deadCodeElimination": "29%"
+      },
+      {
+        "name": "production-standard",
+        "description": "Production deployment - standard",
+        "cliCommand": "bun run build:prod-standard",
         "features": [
           "ENV_PRODUCTION",
           "FEAT_AUTO_HEAL",
+          "FEAT_NOTIFICATIONS",
           "FEAT_ENCRYPTION",
           "FEAT_BATCH_PROCESSING"
         ],
         "optimizations": [
           "minify",
-          "tree-shake",
-          "compress"
+          "drop-console",
+          "jsx-side-effects"
         ],
-        "output": "./dist/prod",
+        "output": "./dist/prod-standard",
         "sizeEstimate": "280KB",
         "deadCodeElimination": "38%"
       },
       {
-        "name": "premium",
-        "description": "Premium tier build",
-        "cliCommand": "bun run build:premium",
+        "name": "production-premium",
+        "description": "Production deployment - premium",
+        "cliCommand": "bun run build:prod-premium",
         "features": [
           "ENV_PRODUCTION",
           "FEAT_PREMIUM",
           "FEAT_AUTO_HEAL",
-          "FEAT_ADVANCED_MONITORING"
+          "FEAT_NOTIFICATIONS",
+          "FEAT_ENCRYPTION",
+          "FEAT_BATCH_PROCESSING",
+          "FEAT_ADVANCED_MONITORING",
+          "FEAT_EXTENDED_LOGGING",
+          "FEAT_VALIDATION_STRICT"
         ],
         "optimizations": [
           "minify",
-          "tree-shake",
-          "compress",
-          "advanced"
+          "drop-console",
+          "jsx-side-effects"
         ],
-        "output": "./dist/premium",
+        "output": "./dist/prod-premium",
         "sizeEstimate": "340KB",
         "deadCodeElimination": "24%"
+      },
+      {
+        "name": "test",
+        "description": "CI/CD testing build",
+        "cliCommand": "bun run build:test",
+        "features": [
+          "ENV_DEVELOPMENT",
+          "FEAT_MOCK_API"
+        ],
+        "optimizations": [],
+        "output": "./dist/test",
+        "sizeEstimate": "180KB",
+        "deadCodeElimination": "60%"
+      },
+      {
+        "name": "audit",
+        "description": "Security audit build",
+        "cliCommand": "bun run build:audit",
+        "features": [
+          "AUDIT_MODE",
+          "FEAT_PREMIUM",
+          "FEAT_AUTO_HEAL",
+          "FEAT_NOTIFICATIONS",
+          "FEAT_ENCRYPTION",
+          "FEAT_BATCH_PROCESSING",
+          "FEAT_ADVANCED_MONITORING",
+          "FEAT_EXTENDED_LOGGING",
+          "FEAT_VALIDATION_STRICT"
+        ],
+        "optimizations": [
+          "debug"
+        ],
+        "output": "./dist/audit",
+        "sizeEstimate": "600KB",
+        "deadCodeElimination": "0%"
       }
     ],
     "entryPoints": {
       "main": "./src/index.ts",
-      "dashboard": "./src/dashboard.ts",
-      "cli": "./src/cli.ts",
-      "api": "./src/api/server.ts"
+      "cli": "./bin/dev-hq-cli.ts",
+      "server": "./src/server/BunServe.ts"
     }
   },
   "featureFlags": {
@@ -110,7 +164,8 @@
         "flags": [
           "ENV_DEVELOPMENT",
           "ENV_PRODUCTION",
-          "ENV_STAGING"
+          "ENV_STAGING",
+          "ENV_TEST"
         ]
       },
       {
@@ -129,7 +184,9 @@
         "description": "Error handling and recovery features",
         "priority": 80,
         "flags": [
-          "FEAT_AUTO_HEAL"
+          "FEAT_AUTO_HEAL",
+          "FEAT_CIRCUIT_BREAKER",
+          "FEAT_RETRY_LOGIC"
         ]
       },
       {
@@ -139,7 +196,9 @@
         "priority": 70,
         "flags": [
           "FEAT_NOTIFICATIONS",
-          "FEAT_ADVANCED_MONITORING"
+          "FEAT_ADVANCED_MONITORING",
+          "FEAT_REAL_TIME_DASHBOARD",
+          "FEAT_PERFORMANCE_TRACKING"
         ]
       },
       {
@@ -148,7 +207,10 @@
         "description": "Performance optimization features",
         "priority": 60,
         "flags": [
-          "FEAT_BATCH_PROCESSING"
+          "FEAT_BATCH_PROCESSING",
+          "FEAT_CACHE_OPTIMIZED",
+          "FEAT_COMPRESSION",
+          "FEAT_ASYNC_OPERATIONS"
         ]
       },
       {
@@ -157,7 +219,9 @@
         "description": "Logging and debugging features",
         "priority": 50,
         "flags": [
-          "FEAT_EXTENDED_LOGGING"
+          "FEAT_EXTENDED_LOGGING",
+          "FEAT_DEBUG_TOOLS",
+          "FEAT_VERBOSE_OUTPUT"
         ]
       },
       {
@@ -175,17 +239,9 @@
         "description": "Product tier features",
         "priority": 30,
         "flags": [
-          "FEAT_PREMIUM"
-        ]
-      },
-      {
-        "id": "platform",
-        "name": "Platform",
-        "description": "Target platform configuration",
-        "priority": 20,
-        "flags": [
-          "PLATFORM_ANDROID",
-          "PLATFORM_IOS"
+          "FEAT_PREMIUM",
+          "FEAT_FREE",
+          "FEAT_ENTERPRISE"
         ]
       },
       {
@@ -196,14 +252,16 @@
         "flags": [
           "INTEGRATION_GEELARK_API",
           "INTEGRATION_PROXY_SERVICE",
-          "INTEGRATION_EMAIL_SERVICE"
+          "INTEGRATION_EMAIL_SERVICE",
+          "INTEGRATION_SMS_SERVICE",
+          "INTEGRATION_WEBHOOK"
         ]
       }
     ],
     "flags": {
       "ENV_DEVELOPMENT": {
         "name": "DEV",
-        "description": "Feature flag for env development",
+        "description": "Development environment features",
         "category": "environment",
         "critical": true,
         "default": false,
@@ -213,14 +271,14 @@
           "disabled": "🌍 PROD"
         },
         "impact": {
-          "bundleSize": "+15% size",
+          "bundleSize": "+15%",
           "performance": "neutral",
           "security": "neutral"
         }
       },
       "ENV_PRODUCTION": {
         "name": "PROD",
-        "description": "Feature flag for env production",
+        "description": "Production environment optimizations",
         "category": "environment",
         "critical": true,
         "default": true,
@@ -230,14 +288,14 @@
           "disabled": "🌍 DEV"
         },
         "impact": {
-          "bundleSize": "-25% size",
+          "bundleSize": "-25%",
           "performance": "neutral",
           "security": "neutral"
         }
       },
       "FEAT_PREMIUM": {
         "name": "PREMIUM",
-        "description": "Feature flag for feat premium",
+        "description": "Premium tier features",
         "category": "tier",
         "critical": false,
         "default": true,
@@ -247,14 +305,31 @@
           "disabled": "🔓 FREE"
         },
         "impact": {
-          "bundleSize": "+15% size",
+          "bundleSize": "+15%",
           "performance": "+5%",
+          "security": "neutral"
+        }
+      },
+      "FEAT_ENTERPRISE": {
+        "name": "ENTERPRISE",
+        "description": "Enterprise tier features",
+        "category": "tier",
+        "critical": false,
+        "default": false,
+        "runtimeOverride": true,
+        "badge": {
+          "enabled": "🏢 ENTERPRISE",
+          "disabled": "🔓 STANDARD"
+        },
+        "impact": {
+          "bundleSize": "+25%",
+          "performance": "+8%",
           "security": "neutral"
         }
       },
       "FEAT_AUTO_HEAL": {
         "name": "AUTOHEAL",
-        "description": "Feature flag for feat auto heal",
+        "description": "Auto-healing capabilities",
         "category": "resilience",
         "critical": false,
         "default": true,
@@ -264,14 +339,14 @@
           "disabled": "⚠️ MANUAL"
         },
         "impact": {
-          "bundleSize": "+10% size",
+          "bundleSize": "+10%",
           "performance": "+3%",
           "security": "neutral"
         }
       },
       "FEAT_NOTIFICATIONS": {
         "name": "ACTIVE",
-        "description": "Feature flag for feat notifications",
+        "description": "Notification system",
         "category": "monitoring",
         "critical": false,
         "default": true,
@@ -281,14 +356,14 @@
           "disabled": "🔕 SILENT"
         },
         "impact": {
-          "bundleSize": "+8% size",
+          "bundleSize": "+8%",
           "performance": "+2%",
           "security": "neutral"
         }
       },
       "FEAT_ENCRYPTION": {
         "name": "ENCRYPTED",
-        "description": "Feature flag for feat encryption",
+        "description": "End-to-end encryption",
         "category": "security",
         "critical": true,
         "default": true,
@@ -298,48 +373,48 @@
           "disabled": "⚠️ PLAINTEXT"
         },
         "impact": {
-          "bundleSize": "+5% size",
+          "bundleSize": "+5%",
           "performance": "+8%",
           "security": "enhanced"
         }
       },
       "FEAT_MOCK_API": {
         "name": "MOCK",
-        "description": "Feature flag for feat mock api",
+        "description": "Mock API for testing",
         "category": "testing",
         "critical": true,
-        "default": true,
+        "default": false,
         "runtimeOverride": true,
         "badge": {
           "enabled": "🧪 MOCK",
           "disabled": "🚀 REAL"
         },
         "impact": {
-          "bundleSize": "-20% size",
+          "bundleSize": "-20%",
           "performance": "-40%",
           "security": "neutral"
         }
       },
       "FEAT_EXTENDED_LOGGING": {
         "name": "VERBOSE",
-        "description": "Feature flag for feat extended logging",
+        "description": "Extended logging output",
         "category": "logging",
         "critical": false,
-        "default": true,
+        "default": false,
         "runtimeOverride": true,
         "badge": {
           "enabled": "📝 VERBOSE",
           "disabled": "📋 NORMAL"
         },
         "impact": {
-          "bundleSize": "+12% size",
+          "bundleSize": "+12%",
           "performance": "+5%",
           "security": "neutral"
         }
       },
       "FEAT_ADVANCED_MONITORING": {
         "name": "ADVANCED",
-        "description": "Feature flag for feat advanced monitoring",
+        "description": "Advanced monitoring features",
         "category": "monitoring",
         "critical": false,
         "default": true,
@@ -349,14 +424,14 @@
           "disabled": "📊 BASIC"
         },
         "impact": {
-          "bundleSize": "+7% size",
+          "bundleSize": "+7%",
           "performance": "+10%",
           "security": "neutral"
         }
       },
       "FEAT_BATCH_PROCESSING": {
         "name": "BATCH",
-        "description": "Feature flag for feat batch processing",
+        "description": "Batch processing optimization",
         "category": "performance",
         "critical": false,
         "default": true,
@@ -366,14 +441,14 @@
           "disabled": "🐌 SEQUENTIAL"
         },
         "impact": {
-          "bundleSize": "+8% size",
+          "bundleSize": "+8%",
           "performance": "-20%",
           "security": "neutral"
         }
       },
       "FEAT_VALIDATION_STRICT": {
         "name": "STRICT",
-        "description": "Feature flag for feat validation strict",
+        "description": "Strict input validation",
         "category": "security",
         "critical": false,
         "default": true,
@@ -383,31 +458,14 @@
           "disabled": "⚠️ LENIENT"
         },
         "impact": {
-          "bundleSize": "+5% size",
+          "bundleSize": "+5%",
           "performance": "+3%",
-          "security": "neutral"
-        }
-      },
-      "PLATFORM_ANDROID": {
-        "name": "ANDROID",
-        "description": "Feature flag for platform android",
-        "category": "platform",
-        "critical": true,
-        "default": true,
-        "runtimeOverride": false,
-        "badge": {
-          "enabled": "🤖 ANDROID",
-          "disabled": "🍎 IOS"
-        },
-        "impact": {
-          "bundleSize": "+10% size",
-          "performance": "neutral",
           "security": "neutral"
         }
       },
       "INTEGRATION_GEELARK_API": {
         "name": "GEELARK API",
-        "description": "Feature flag for integration geelark api",
+        "description": "GeeLark API integration",
         "category": "integration",
         "critical": true,
         "default": true,
@@ -417,14 +475,14 @@
           "disabled": "🔌 NO API"
         },
         "impact": {
-          "bundleSize": "+20% size",
+          "bundleSize": "+20%",
           "performance": "neutral",
           "security": "neutral"
         }
       },
       "INTEGRATION_PROXY_SERVICE": {
         "name": "PROXY",
-        "description": "Feature flag for integration proxy service",
+        "description": "Proxy service integration",
         "category": "integration",
         "critical": false,
         "default": true,
@@ -434,14 +492,14 @@
           "disabled": "🚫 NO PROXY"
         },
         "impact": {
-          "bundleSize": "+5% size",
+          "bundleSize": "+5%",
           "performance": "neutral",
           "security": "neutral"
         }
       },
       "INTEGRATION_EMAIL_SERVICE": {
         "name": "EMAIL",
-        "description": "Feature flag for integration email service",
+        "description": "Email service integration",
         "category": "integration",
         "critical": false,
         "default": true,
@@ -451,14 +509,14 @@
           "disabled": "🚫 NO EMAIL"
         },
         "impact": {
-          "bundleSize": "+3% size",
+          "bundleSize": "+3%",
           "performance": "neutral",
           "security": "neutral"
         }
       },
       "INTEGRATION_SMS_SERVICE": {
         "name": "SMS",
-        "description": "Feature flag for integration sms service",
+        "description": "SMS service integration",
         "category": "integration",
         "critical": false,
         "default": true,
@@ -468,7 +526,7 @@
           "disabled": "🚫 NO SMS"
         },
         "impact": {
-          "bundleSize": "+3% size",
+          "bundleSize": "+3%",
           "performance": "neutral",
           "security": "neutral"
         }
@@ -500,30 +558,6 @@
           "performanceChart"
         ],
         "accessLevel": "operator"
-      },
-      {
-        "id": "security",
-        "name": "Security",
-        "description": "Security status and audit trail",
-        "refreshRate": 30000,
-        "components": [
-          "securityStatus",
-          "auditLog",
-          "complianceCheck"
-        ],
-        "accessLevel": "admin"
-      },
-      {
-        "id": "operations",
-        "name": "Operations",
-        "description": "Daily operations and management",
-        "refreshRate": 60000,
-        "components": [
-          "accountGrid",
-          "phoneStatus",
-          "workflowMonitor"
-        ],
-        "accessLevel": "operator"
       }
     ],
     "components": {
@@ -550,457 +584,86 @@
           "priority"
         ],
         "filterable": true
-      },
-      "metricsGraph": {
-        "type": "graph",
-        "width": "full",
-        "height": 10,
-        "dataSource": "monitoring",
-        "refresh": 2000,
-        "metrics": [
-          "successRate",
-          "latency",
-          "errorRate"
-        ]
       }
-    }
-  },
-  "logging": {
-    "systems": [
-      {
-        "name": "featureLogging",
-        "type": "structured",
-        "level": "DEBUG",
-        "format": "json",
-        "retention": "7d",
-        "destination": "file://logs/features",
-        "compression": "gzip"
-      },
-      {
-        "name": "securityAudit",
-        "type": "audit",
-        "level": "INFO",
-        "format": "encrypted-json",
-        "retention": "90d",
-        "destination": "s3://audit-logs",
-        "compression": "none",
-        "immutable": true
-      },
-      {
-        "name": "performanceMetrics",
-        "type": "metrics",
-        "level": "INFO",
-        "format": "csv",
-        "retention": "30d",
-        "destination": "prometheus://metrics",
-        "aggregation": "5m"
-      }
-    ],
-    "events": {
-      "featureChange": {
-        "triggers": [
-          "flag.enabled",
-          "flag.disabled"
-        ],
-        "level": "INFO",
-        "data": [
-          "flag",
-          "from",
-          "to",
-          "timestamp",
-          "source"
-        ],
-        "notify": [
-          "dashboard",
-          "slack"
-        ]
-      },
-      "securityEvent": {
-        "triggers": [
-          "encryption.disabled",
-          "auth.failed",
-          "access.violation"
-        ],
-        "level": "CRITICAL",
-        "data": [
-          "event",
-          "severity",
-          "user",
-          "ip",
-          "timestamp"
-        ],
-        "notify": [
-          "pagerduty",
-          "sms",
-          "email"
-        ]
-      },
-      "performanceAlert": {
-        "triggers": [
-          "latency > 5000ms",
-          "errorRate > 5%",
-          "memory > 85%"
-        ],
-        "level": "WARN",
-        "data": [
-          "metric",
-          "value",
-          "threshold",
-          "timestamp"
-        ],
-        "notify": [
-          "dashboard",
-          "email"
-        ]
-      }
-    }
-  },
-  "monitoring": {
-    "healthChecks": [
-      {
-        "name": "apiConnectivity",
-        "description": "GeeLark API connectivity",
-        "interval": 30000,
-        "timeout": 10000,
-        "threshold": 3,
-        "action": "autoHeal",
-        "severity": "critical"
-      },
-      {
-        "name": "proxyPool",
-        "description": "Proxy service health",
-        "interval": 60000,
-        "timeout": 5000,
-        "threshold": 5,
-        "action": "rotate",
-        "severity": "high"
-      },
-      {
-        "name": "phoneHealth",
-        "description": "Phone agent health",
-        "interval": 15000,
-        "timeout": 3000,
-        "threshold": 10,
-        "action": "restart",
-        "severity": "medium"
-      }
-    ],
-    "metrics": {
-      "collectionInterval": 60000,
-      "retention": "30d",
-      "aggregation": {
-        "1m": true,
-        "5m": true,
-        "1h": true,
-        "1d": true
-      },
-      "exporters": [
-        "prometheus",
-        "cloudwatch",
-        "datadog"
-      ]
-    },
-    "alerts": {
-      "levels": [
-        {
-          "level": "critical",
-          "conditions": [
-            "encryption.disabled",
-            "api.unreachable > 5m"
-          ],
-          "notifications": [
-            "sms",
-            "pagerduty",
-            "slack"
-          ],
-          "responseTime": "5m"
-        },
-        {
-          "level": "warning",
-          "conditions": [
-            "errorRate > 5%",
-            "latency > 3000ms"
-          ],
-          "notifications": [
-            "email",
-            "slack"
-          ],
-          "responseTime": "30m"
-        },
-        {
-          "level": "info",
-          "conditions": [
-            "feature.disabled",
-            "maintenance.scheduled"
-          ],
-          "notifications": [
-            "dashboard"
-          ],
-          "responseTime": "2h"
-        }
-      ]
-    }
-  },
-  "integrations": {
-    "services": [
-      {
-        "name": "geelark",
-        "type": "api",
-        "endpoint": "https://api.geelark.com/v1",
-        "authentication": "bearer-token",
-        "timeout": 30000,
-        "retryPolicy": {
-          "attempts": 3,
-          "backoff": "exponential",
-          "maxDelay": 10000
-        },
-        "healthCheck": "/health",
-        "mockEnabled": true
-      },
-      {
-        "name": "proxyService",
-        "type": "proxy",
-        "endpoint": "https://api.proxyprovider.com/v2",
-        "authentication": "api-key",
-        "timeout": 10000,
-        "poolSize": 25,
-        "rotationPolicy": "per-request",
-        "healthCheck": "connectivity-test"
-      },
-      {
-        "name": "emailService",
-        "type": "smtp",
-        "endpoint": "smtp.gmail.com:587",
-        "authentication": "oauth2",
-        "timeout": 15000,
-        "retryPolicy": {
-          "attempts": 2,
-          "backoff": "linear",
-          "maxDelay": 5000
-        }
-      }
-    ]
-  },
-  "scaling": {
-    "limits": {
-      "maxAccounts": 1000,
-      "maxConcurrent": 50,
-      "maxBatchSize": 20,
-      "maxPhoneAgeDays": 90
-    },
-    "profiles": [
-      {
-        "name": "small",
-        "accounts": 20,
-        "concurrent": 5,
-        "batchSize": 5,
-        "resources": {
-          "memory": "512MB",
-          "cpu": "0.5"
-        }
-      },
-      {
-        "name": "medium",
-        "accounts": 100,
-        "concurrent": 10,
-        "batchSize": 10,
-        "resources": {
-          "memory": "1GB",
-          "cpu": "1"
-        }
-      },
-      {
-        "name": "large",
-        "accounts": 500,
-        "concurrent": 25,
-        "batchSize": 15,
-        "resources": {
-          "memory": "2GB",
-          "cpu": "2"
-        }
-      },
-      {
-        "name": "enterprise",
-        "accounts": 1000,
-        "concurrent": 50,
-        "batchSize": 20,
-        "resources": {
-          "memory": "4GB",
-          "cpu": "4"
-        }
-      }
-    ]
-  },
-  "operations": {
-    "maintenanceWindows": [
-      {
-        "day": "sunday",
-        "time": "02:00-04:00",
-        "timezone": "UTC",
-        "tasks": [
-          "logRotation",
-          "backup",
-          "cleanup"
-        ],
-        "impact": "degraded"
-      }
-    ],
-    "backup": {
-      "strategy": "incremental",
-      "schedule": "daily",
-      "retention": "30d",
-      "locations": [
-        "s3://backups",
-        "local://backups"
-      ],
-      "encryption": "aes-256-gcm"
-    },
-    "disasterRecovery": {
-      "rto": "4h",
-      "rpo": "1h",
-      "backupFrequency": "1h",
-      "recoveryPoints": 24
-    }
-  },
-  "security": {
-    "authentication": {
-      "methods": [
-        "jwt",
-        "api-key",
-        "oauth2"
-      ],
-      "sessionTimeout": 3600,
-      "mfa": "optional"
-    },
-    "encryption": {
-      "atRest": "aes-256-gcm",
-      "inTransit": "tls-1.3",
-      "keyRotation": "30d",
-      "keyStorage": "aws-kms"
-    },
-    "compliance": {
-      "gdpr": {
-        "dataRetention": "30d",
-        "rightToErasure": true,
-        "dataPortability": true
-      },
-      "hipaa": {
-        "auditLogging": true,
-        "accessControls": true,
-        "encryption": true
-      }
-    }
-  },
-  "api": {
-    "endpoints": [
-      {
-        "path": "/api/v1/status",
-        "method": "GET",
-        "description": "Get system status",
-        "authentication": "none",
-        "rateLimit": "100/1m",
-        "responseSchema": "StatusResponse"
-      },
-      {
-        "path": "/api/v1/accounts",
-        "method": "POST",
-        "description": "Create new accounts",
-        "authentication": "bearer",
-        "rateLimit": "10/1m",
-        "requestSchema": "CreateAccountRequest",
-        "responseSchema": "AccountResponse"
-      },
-      {
-        "path": "/api/v1/phones/:id/actions",
-        "method": "POST",
-        "description": "Execute action on phone",
-        "authentication": "bearer",
-        "rateLimit": "50/1m",
-        "requestSchema": "PhoneActionRequest",
-        "responseSchema": "ActionResponse"
-      }
-    ],
-    "rateLimiting": {
-      "strategy": "token-bucket",
-      "default": "100/1m",
-      "perEndpoint": true,
-      "burst": 150
     }
   },
   "cli": {
     "commands": [
       {
-        "name": "start",
-        "description": "Start the system",
-        "usage": "bun start [options]",
+        "name": "insights",
+        "description": "Comprehensive codebase analysis",
+        "usage": "bunx dev-hq insights [options]",
         "options": [
-          "--dry-run",
-          "--config",
-          "--log-level"
-        ],
-        "examples": [
-          "bun start --dry-run",
-          "bun start --log-level=debug"
-        ]
-      },
-      {
-        "name": "status",
-        "description": "Show system status",
-        "usage": "bun run status [options]",
-        "options": [
-          "--live",
+          "--table",
           "--json",
-          "--export"
+          "--csv",
+          "--markdown",
+          "--perf",
+          "--check-deps",
+          "--output"
         ],
         "examples": [
-          "bun run status",
-          "bun run status --live",
-          "bun run status --json"
+          "bunx dev-hq insights --table",
+          "bunx dev-hq insights --json > report.json"
         ]
       },
       {
-        "name": "build",
-        "description": "Build the system",
-        "usage": "bun run build:<target>",
-        "targets": [
-          "dev",
-          "prod",
-          "premium",
-          "test"
-        ],
-        "examples": [
-          "bun run build:dev",
-          "bun run build:prod"
-        ]
-      },
-      {
-        "name": "logs",
-        "description": "View system logs",
-        "usage": "bun run logs [type] [options]",
-        "types": [
-          "features",
-          "security",
-          "performance",
-          "errors"
-        ],
+        "name": "health",
+        "description": "System health check",
+        "usage": "bunx dev-hq health [options]",
         "options": [
-          "--tail",
-          "--follow",
-          "--export"
+          "--verbose",
+          "--json"
         ],
         "examples": [
-          "bun run logs security --tail=100",
-          "bun run logs --follow"
+          "bunx dev-hq health",
+          "bunx dev-hq health --verbose"
+        ]
+      },
+      {
+        "name": "test",
+        "description": "Run tests",
+        "usage": "bunx dev-hq test [options]",
+        "options": [
+          "--coverage",
+          "--watch"
+        ],
+        "examples": [
+          "bunx dev-hq test --coverage"
+        ]
+      },
+      {
+        "name": "serve",
+        "description": "Start development server",
+        "usage": "bunx dev-hq serve [options]",
+        "options": [
+          "--port"
+        ],
+        "examples": [
+          "bunx dev-hq serve --port 3000"
+        ]
+      },
+      {
+        "name": "git",
+        "description": "Git repository analysis",
+        "usage": "bunx dev-hq git [options]",
+        "options": [
+          "--json",
+          "--table"
+        ],
+        "examples": [
+          "bunx dev-hq git --json"
         ]
       }
     ]
   },
   "documentation": {
     "readme": "./README.md",
-    "apiDocs": "./docs/api.md",
-    "deploymentGuide": "./docs/deployment.md",
-    "troubleshooting": "./docs/troubleshooting.md",
-    "changelog": "./CHANGELOG.md",
-    "support": "support@yourcompany.com"
+    "docsIndex": "./docs/README.md",
+    "cliReference": "./docs/api/CLI_REFERENCE.md",
+    "serverApi": "./docs/api/SERVER_API.md",
+    "deploymentGuide": "./docs/tutorials/DEPLOYMENT.md",
+    "bunFeatures": "./docs/BUN_RUNTIME_FEATURES.md",
+    "architecture": "./docs/ARCHITECTURE.md"
   }
 }
