@@ -12,10 +12,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["bun-types", "@types/react", "@types/react-dom"],
+    "types": ["bun-types", "@types/bun", "@types/react", "@types/react-dom"],
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@bin/*": ["bin/*"],
+      "@tests/*": ["tests/*"]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react",
@@ -25,11 +27,17 @@
   },
   "include": [
     "src/**/*",
+    "bin/**/*",
+    "scripts/**/*",
+    "tests/**/*",
+    "dev-hq/**/*",
+    "bench/**/*",
     "*.ts",
     "*.tsx"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "coverage"
   ]
 }
