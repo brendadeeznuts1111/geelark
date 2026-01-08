@@ -72,27 +72,42 @@ A powerful developer toolkit built with Bun, featuring comprehensive codebase in
 
 ## Quick Start
 
+### Installation
+
 ```bash
-# Clone and install
+# Clone the repository
 git clone https://github.com/brendadeeznuts1111/geelark.git
 cd geelark
+
+# Install dependencies with Bun
 bun install
 
-# Run codebase analysis
-bun insights                    # Default output
-bun insights --table            # Table format
-bun insights --json > report.json
+# Verify installation
+bun --version  # Should be >= 1.3.6
+```
 
-# Check system health
-bun health
+### First Usage
+
+```bash
+# Run comprehensive codebase analysis
+bun insights                    # Default output with insights
+bun insights --table            # Table format for terminals
+bun insights --json > analysis.json  # JSON export for tools
+bun insights --csv > analysis.csv    # CSV export for spreadsheets
+
+# Check system health and monitoring
+bun health                      # System health check
+bun health --verbose            # Detailed health report
 
 # Start development server
-bun serve                       # Port 3000
-bun serve --port 8080           # Custom port
+bun serve                       # HTTP/WebSocket server on port 3000
+bun serve --port 8080           # Custom port configuration
 
-# Run tests
-bun test
-bun test --coverage
+# Run comprehensive test suite
+bun test                        # Run all tests
+bun test --coverage             # With coverage reporting
+bun test:unit                   # Unit tests only
+bun test:integration            # Integration tests only
 ```
 
 ## CLI Commands
@@ -414,8 +429,15 @@ expectTypeOf(fn).returns.toBeVoid();
 ## Development
 
 ### Prerequisites
-- [Bun](https://bun.sh) >= 1.3.6
-- Node.js >= 18.0.0
+
+**Required:**
+- **[Bun](https://bun.sh) >= 1.3.6** - Primary runtime and build tool
+- **Node.js >= 18.0.0** - Fallback compatibility
+
+**Recommended:**
+- **Git >= 2.30** - For repository analysis features
+- **Docker** - For container analysis features
+- **Unix-like environment** - macOS, Linux, or WSL on Windows
 
 ### Setup
 
@@ -474,35 +496,39 @@ for await (const f of new Bun.Glob("**/*.ts").scan(".")) console.log(f)
 | [Config Documentation](config/README.md) | Configuration files reference |
 | [Schema Documentation](schemas/README.md) | JSON Schema definitions |
 
-## Roadmap
+## 🗺️ Roadmap & Vision
 
-### Phase 1: Core System ✅
-- ✅ Feature flag system
-- ✅ Unicode-aware string width calculations
-- ✅ Comprehensive logging system
-- ✅ Dashboard components
-- ✅ CLI interface
-- ✅ Health monitoring
-- ✅ HTTP/WebSocket server
-- ✅ Security headers & TLS
-- ✅ Route decorators
-- ✅ JSX components
+### ✅ Phase 1: Core Platform (v1.0.0 - COMPLETED)
+- ✅ **Feature Flag System** - Compile-time and runtime feature management
+- ✅ **Unicode-Aware Dashboard** - Terminal UI with emoji and internationalization
+- ✅ **Comprehensive Logging** - Structured logging with multiple transports
+- ✅ **HTTP/WebSocket Server** - Built-in server with automatic TLS
+- ✅ **CLI Framework** - 15+ commands with multiple output formats
+- ✅ **Health Monitoring** - Real-time system health and performance metrics
+- ✅ **Security Headers** - Automatic security headers and CORS
+- ✅ **Build Optimization** - Dead code elimination and bundle analysis
+- ✅ **Testing Framework** - Integrated test runner with coverage
+- ✅ **Package Templates** - Workspace generation for monorepos
 
-### Phase 2: Advanced Features 🔄
-- 🔄 Real-time dashboard with live updates
-- 🔄 Advanced security features
-- 🔄 Performance optimization
-- 🔄 Notification system
-- 🔄 Automated scaling
+### 🚀 Phase 2: Advanced Features (v1.1.x - In Progress)
+- 🚀 **Real-time Dashboard** - Live updates with WebSocket connections
+- 🚀 **Advanced Security** - OAuth2, JWT, and enterprise authentication
+- 🚀 **Performance Profiling** - Memory leak detection and optimization
+- 🚀 **Notification System** - Email, Slack, and webhook integrations
+- 🚀 **Automated Scaling** - Horizontal pod autoscaling for containers
+- 🚀 **API Rate Limiting** - Advanced rate limiting with Redis
+- 🚀 **Database Integration** - PostgreSQL, MySQL, and SQLite support
+- 🚀 **Caching Layer** - Redis and in-memory caching strategies
 
-### Phase 3: Enterprise Features 📋
-- 📋 Multi-tenant support
-- 📋 Advanced analytics dashboard
-- 📋 Automated scaling with load balancing
-- 📋 Advanced monitoring integrations
-- 📋 Enterprise security features
-- 📋 Audit trail compliance
-- 📋 Custom integration APIs
+### 🏢 Phase 3: Enterprise Platform (v2.0.x - Planned)
+- 🏢 **Multi-tenant Architecture** - Isolated tenant environments
+- 🏢 **Advanced Analytics** - Business intelligence and reporting
+- 🏢 **Load Balancing** - Global load balancing with CDN integration
+- 🏢 **Audit Compliance** - SOC2, HIPAA, and GDPR compliance tools
+- 🏢 **Custom Integrations** - REST APIs and webhook frameworks
+- 🏢 **Enterprise SSO** - SAML, LDAP, and Active Directory
+- 🏢 **Backup & Recovery** - Automated backups with point-in-time recovery
+- 🏢 **Disaster Recovery** - Multi-region failover and redundancy
 
 ## Contributing
 
@@ -552,4 +578,30 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ---
 
-Built with [Bun](https://bun.sh) for exceptional performance.
+## 🌟 Why Dev HQ?
+
+**Dev HQ** represents the next evolution of developer tooling:
+
+- **🚀 Performance First** - Built with Bun for exceptional speed
+- **🛡️ Enterprise Ready** - Production-grade security and monitoring
+- **🔧 Developer Experience** - Intuitive CLI and comprehensive tooling
+- **📊 Data-Driven** - Analytics and insights for informed decisions
+- **🔄 Future Proof** - Modern architecture with extensibility in mind
+
+## 🤝 Community & Support
+
+- **📖 Documentation** - Comprehensive guides and API references
+- **🐛 Issue Tracker** - Bug reports and feature requests welcome
+- **💬 Discussions** - Community Q&A and general discussion
+- **📧 Email** - dev-hq@example.com for support inquiries
+
+## 📄 License
+
+**MIT License** - See [LICENSE](LICENSE) for full terms.
+
+---
+
+<div align="center">
+  <p><strong>Built with ❤️ using <a href="https://bun.sh">Bun</a></strong></p>
+  <p><em>Exceptional performance meets developer experience</em></p>
+</div>
