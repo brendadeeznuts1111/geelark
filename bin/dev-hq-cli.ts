@@ -16,6 +16,25 @@
 import { inspect, spawn } from "bun";
 import { Command } from "commander";
 import { DevHQActions, DevHQAutomation } from "../dev-hq/core/automation.js";
+import {
+  setBunErrorHandler,
+  handleCommandError,
+  theme,
+} from "./errors.js";
+
+// Set up global error handling
+setBunErrorHandler({
+  onBunError: (error) => {
+    console.error(`${theme.error}🚨 Bun Runtime Error:${theme.reset}`);
+    console.error(error.message);
+
+    if (process.env.DEV_HQ_DEBUG) {
+      console.error(inspect(error, { depth: 3, colors: true }));
+    }
+
+    process.exit(1);
+  },
+});
 
 // Enhanced CLI configuration
 const CONFIG = {
@@ -752,10 +771,21 @@ if (command) {
   }
 }
 
-// Parse arguments
+// Parse arguments with error recovery
 // Note: Bun flags (--hot, --watch, --smol, etc.) are handled by Bun runtime
 // This CLI only processes its own flags via Commander.js
-program.parse(process.argv);
+try {
+  program.parse(process.argv);
+} catch (error: unknown) {
+  const err = error as Error & { code?: string };
+  if (err.code === "ENOENT") {
+    console.log(`${theme.warning}⚠️  Project not initialized${theme.reset}`);
+    console.log(`${theme.info}Run: dev-hq init${theme.reset}`);
+  } else {
+    handleCommandError(err);
+  }
+  process.exit(1);
+}
 
 // Export for testing
 export { analyzeCodebase, checkDependencies, program };
