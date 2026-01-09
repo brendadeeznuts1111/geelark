@@ -385,6 +385,6 @@ export const auth = async (req: Request, next: () => Promise<Response>) => {
 ## 🔗 Related Documentation
 
 - [BUN_RUNTIME_FEATURES](../runtime/BUN_RUNTIME_FEATURES.md)
-- [EXPECTTYPEOF_GUIDE](../guides/EXPECTTYPEOF_GUIDE.md)
+- [EXPECTTYPEOF_GUIDE](../guides/type-checking/EXPECTTYPEOF_GUIDE.md)
 - [CLI_REFERENCE](../api/CLI_REFERENCE.md)
 - [RUNTIME_CONTROLS](../runtime/RUNTIME_CONTROLS.md)

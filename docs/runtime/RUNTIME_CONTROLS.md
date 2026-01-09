@@ -304,6 +304,5 @@ bun = true  # Always use Bun runtime
 
 - [Bun Runtime Documentation](https://bun.com/docs/runtime#runtime-%26-process-control)
 - [Bun Test Documentation](https://bun.sh/docs/test)
-- [Benchmark Suite README](../bench/README.md)
-- [Testing Alignment Guide](../guides/TESTING_ALIGNMENT.md)
+- [Testing Alignment Guide](../guides/testing/TESTING_ALIGNMENT.md)
 

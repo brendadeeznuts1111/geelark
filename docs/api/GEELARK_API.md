@@ -616,6 +616,6 @@ For complete API reference, endpoint details, and the latest updates, refer to:
 
 - [Server API Documentation](./SERVER_API.md) - Internal server API
 - [CLI Reference](./CLI_REFERENCE.md) - Command-line interface
-- [Feature Flags](../features/FEATURE_MATRIX.md) - Feature flag system
-- [Configuration Guide](../tutorials/SETUP.md) - Setup and configuration
+- [Feature Flags](../guides/features/FEATURE_MATRIX.md) - Feature flag system
+- [Configuration Guide](../getting-started/SETUP.md) - Setup and configuration
 

@@ -524,5 +524,5 @@ bun test --verbose tests/unit/type-testing/
 
 - [Bun Test Reference](https://bun.com/reference/bun/test)
 - [Bun Test expect](https://bun.com/reference/bun/test/expect)
-- [Testing Alignment](./TESTING_ALIGNMENT.md)
+- [Testing Alignment](./testing/TESTING_ALIGNMENT.md)
 - [BUN_RUNTIME_FEATURES](../runtime/BUN_RUNTIME_FEATURES.md)

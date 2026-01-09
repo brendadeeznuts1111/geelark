@@ -6,6 +6,8 @@ import { FeatureRegistry } from "./FeatureRegistry";
 import { Logger } from "./Logger";
 import { memoryManager } from "./MemoryManager";
 import { BUILD_CONFIGS } from "./config";
+import { MetricsCollector, type MetricsSnapshot, type APIMetric, type PerformanceMetric, type ErrorMetric, type HealthMetric } from "./services/MetricsCollector";
+import { ErrorTracker, CustomApplicationError, type ApplicationError, type ErrorReport, type ErrorStats } from "./services/ErrorTracker";
 import {
   BuildType,
   FeatureFlag,

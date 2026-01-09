@@ -67,7 +67,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ---
 
-### 3. [Testing Guide](./TESTING_GUIDE.md)
+### 3. [Testing Guide](../testing/TESTING_GUIDE.md)
 **855 lines** - Complete testing documentation.
 
 **Contents**:
@@ -261,7 +261,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ## 📁 File I/O
 
-### [Bun File I/O Guide](./BUN_FILE_IO.md)
+### [Bun File I/O Guide](../runtime/bun/BUN_FILE_IO.md)
 **715 lines** - Complete file I/O patterns with Bun.
 
 **Contents**:
@@ -277,7 +277,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ---
 
-### [Bun File Integration](./BUN_FILE_INTEGRATION.md)
+### [Bun File Integration](../runtime/bun/BUN_FILE_INTEGRATION.md)
 **650+ lines** - Advanced file integration patterns.
 
 **Contents**:
@@ -482,7 +482,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ## 🧪 Testing
 
-### [Testing Guide](./TESTING_GUIDE.md)
+### [Testing Guide](../testing/TESTING_GUIDE.md)
 **855 lines** - Complete testing documentation.
 
 **Contents**:
@@ -509,7 +509,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ## 🚀 Deployment
 
-### [Deployment Guide](./tutorials/DEPLOYMENT.md)
+### [Deployment Guide](./getting-started/DEPLOYMENT.md)
 **497 lines** - Platform-specific deployment instructions.
 
 **Contents**:
@@ -646,7 +646,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ---
 
-### [User Guide](./tutorials/USER_GUIDE.md)
+### [User Guide](./getting-started/USER_GUIDE.md)
 **749 lines** - End-user documentation.
 
 **Best For**: End users of Geelark
@@ -678,7 +678,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 1. **[Complete Feature Guide](./GEELARK_COMPLETE_GUIDE.md)** - Start here
 2. **[README.md](../README.md)** - Project overview
 3. **[Dashboard & Frontend Guide](./DASHBOARD_FRONTEND_GUIDE.md)** - React dashboard documentation
-4. **[Testing Guide](./TESTING_GUIDE.md)** - Running tests
+4. **[Testing Guide](../testing/TESTING_GUIDE.md)** - Running tests
 
 ### For API Integration
 
@@ -690,7 +690,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 1. **[Performance Stress Test](./BUN_PERFORMANCE_STRESS_TEST.md)** - Benchmarks
 2. **[DCE Annotations](./BUN_DCE_ANNOTATIONS.md)** - Code elimination
-3. **[Bun File I/O](./BUN_FILE_IO.md)** - Efficient file handling
+3. **[Bun File I/O](../runtime/bun/BUN_FILE_IO.md)** - Efficient file handling
 
 ### For Feature Flags
 
@@ -700,13 +700,13 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 ### For Testing
 
-1. **[Testing Guide](./TESTING_GUIDE.md)** - Complete testing docs
+1. **[Testing Guide](../testing/TESTING_GUIDE.md)** - Complete testing docs
 2. **[expectTypeOf Pro Tips](./guides/expectTypeOf-pro-tips.md)** - Type testing
 3. **[Test Examples](./TESTING_GUIDE.md#writing-tests)** - Code examples
 
 ### For Deployment
 
-1. **[Deployment Guide](./tutorials/DEPLOYMENT.md)** - Deployment instructions
+1. **[Deployment Guide](./getting-started/DEPLOYMENT.md)** - Deployment instructions
 2. **[Environment Configuration](./ENV_CONFIGURATION.md)** - Environment setup
 3. **[Complete Feature Guide - Deployment](./GEELARK_COMPLETE_GUIDE.md#deployment)** - Deployment section
 
@@ -766,9 +766,9 @@ This index provides a complete overview of all Geelark documentation, organized 
 | Task | Document | Section |
 |------|----------|---------|
 | Upload a file | [API Reference](./API_REFERENCE.md) | UploadService API |
-| Run tests | [Testing Guide](./TESTING_GUIDE.md) | Running Tests |
+| Run tests | [Testing Guide](../testing/TESTING_GUIDE.md) | Running Tests |
 | Use feature flags | [Feature Flags Verification](./FEATURE_FLAGS_VERIFICATION.md) | Feature Flag System |
-| Deploy to production | [Deployment Guide](./tutorials/DEPLOYMENT.md) | Deployment |
+| Deploy to production | [Deployment Guide](./getting-started/DEPLOYMENT.md) | Deployment |
 | Debug DCE issues | [DCE Annotations](./BUN_DCE_ANNOTATIONS.md) | Troubleshooting |
 | Check performance | [Performance Stress Test](./BUN_PERFORMANCE_STRESS_TEST.md) | Results |
 
@@ -800,7 +800,7 @@ This index provides a complete overview of all Geelark documentation, organized 
 
 1. [Complete Feature Guide](./GEELARK_COMPLETE_GUIDE.md) - Overview
 2. [README.md](../README.md) - Installation
-3. [Testing Guide](./TESTING_GUIDE.md) - Run tests
+3. [Testing Guide](../testing/TESTING_GUIDE.md) - Run tests
 4. [API Reference](./API_REFERENCE.md) - API basics
 
 ### Advanced Path
@@ -808,14 +808,14 @@ This index provides a complete overview of all Geelark documentation, organized 
 1. [Performance Stress Test](./BUN_PERFORMANCE_STRESS_TEST.md) - Performance
 2. [DCE Annotations](./BUN_DCE_ANNOTATIONS.md) - Code elimination
 3. [Feature Flags Verification](./FEATURE_FLAGS_VERIFICATION.md) - Feature system
-4. [Bun File I/O](./BUN_FILE_IO.md) - File patterns
+4. [Bun File I/O](../runtime/bun/BUN_FILE_IO.md) - File patterns
 
 ### Integration Path
 
 1. [API Reference](./API_REFERENCE.md) - Complete API
 2. [Server API](./api/SERVER_API.md) - Server setup
 3. [WebSocket Examples](./API_REFERENCE.md#websocket-api) - Real-time updates
-4. [Deployment Guide](./tutorials/DEPLOYMENT.md) - Deploy
+4. [Deployment Guide](./getting-started/DEPLOYMENT.md) - Deploy
 
 ---
 

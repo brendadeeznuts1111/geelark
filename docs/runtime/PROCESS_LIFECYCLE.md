@@ -461,6 +461,6 @@ for await (const chunk of proc.stdout) {
 
 - [Bun.spawn() API](https://bun.sh/docs/api/spawn)
 - [Process Management](https://bun.com/docs/runtime#runtime-%26-process-control)
-- [Watch Mode](../guides/TESTING_ALIGNMENT.md)
+- [Watch Mode](../guides/testing/TESTING_ALIGNMENT.md)
 - [Benchmarking](./RUNTIME_CONTROLS.md)
 

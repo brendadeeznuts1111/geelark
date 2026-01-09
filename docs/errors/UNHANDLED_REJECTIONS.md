@@ -472,5 +472,5 @@ const rejectionMode = process.env.NODE_ENV === "production"
 - [Bun Runtime - Unhandled Rejections](https://bun.com/docs/runtime#param-unhandled-rejections)
 - [Runtime Controls Guide](../runtime/RUNTIME_CONTROLS.md)
 - [Process Lifecycle](../runtime/PROCESS_LIFECYCLE.md)
-- [Testing Alignment](../guides/TESTING_ALIGNMENT.md)
+- [Testing Alignment](../guides/testing/TESTING_ALIGNMENT.md)
 
