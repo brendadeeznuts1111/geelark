@@ -34,7 +34,7 @@ export function getMiddleware(target: any): MiddlewareFunction[] {
 /**
  * Common middleware functions
  */
-export const middleware = {
+export const MIDDLEWARE = {
   /**
    * Log all requests
    */

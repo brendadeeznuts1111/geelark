@@ -276,18 +276,11 @@ export class FeatureRegistry {
     });
   }
 
-  // Additional methods for CLI compatibility
-  enableFeature(flag: FeatureFlag): void {
-    this.enable(flag);
-  }
-
-  disableFeature(flag: FeatureFlag): void {
-    this.disable(flag);
-  }
-
-  toggleFeature(flag: FeatureFlag): void {
-    this.toggle(flag);
-  }
+  // Removed CLI compatibility aliases - use main methods instead:
+  // enableFeature → use enable()
+  // disableFeature → use disable()
+  // toggleFeature → use toggle()
+  // getFlagConfig → use getConfig()
 
   getEnabledCount(): number {
     return this.getEnabledFlags().length;
@@ -295,10 +288,6 @@ export class FeatureRegistry {
 
   getTotalCount(): number {
     return this.getAllFlags().length;
-  }
-
-  getFlagConfig(flag: FeatureFlag): FeatureFlagConfig | undefined {
-    return this.getConfig(flag);
   }
 
   rotateFlags(): void {

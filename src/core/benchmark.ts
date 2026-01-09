@@ -225,7 +225,7 @@ function runCriticalPathBenchmarks() {
 }
 
 // Export for use in tests
-export const benchmarkUtils = {
+export const BENCHMARK_UTILS = {
   PerformanceTracker,
   MemoryAnalyzer,
   measureWithGC,

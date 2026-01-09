@@ -86,6 +86,35 @@ export interface WebSocketHandler<T = any> {
   close?: (ws: ServerWebSocket<T>, code: number, reason: string) => void;
 }
 
+/**
+ * WebSocket protocol options type
+ * Reference: https://bun.sh/reference/bun/WebSocketOptionsProtocolsOrProtocol
+ */
+export type WebSocketProtocolOptions =
+  | { protocol: string }
+  | { protocols: string | string[] };
+
+  /**
+   * Upgrade HTTP request to WebSocket with protocol support
+   */
+  upgrade(
+    request: Request,
+    protocolOptions?: WebSocketProtocolOptions
+  ): boolean {
+    if (!this.server) {
+      console.error("❌ Server not running, cannot upgrade WebSocket");
+      return false;
+    }
+
+    try {
+      // @ts-ignore - server.upgrade is available at runtime
+      return this.server.upgrade(request, protocolOptions);
+    } catch (error) {
+      console.error("❌ WebSocket upgrade failed:", error);
+      return false;
+    }
+  }
+
 export class BunServe {
   private routes: Route[] = [];
   private middleware: Array<
@@ -167,6 +196,28 @@ export class BunServe {
   websocket(handler: WebSocketHandler): this {
     this.wsHandler = handler;
     return this;
+  }
+
+  /**
+   * Upgrade HTTP request to WebSocket with protocol support
+   * Reference: https://bun.sh/reference/bun/WebSocketOptionsProtocolsOrProtocol
+   */
+  upgrade(
+    request: Request,
+    protocolOptions?: WebSocketProtocolOptions
+  ): boolean {
+    if (!this.server) {
+      console.error("❌ Server not running, cannot upgrade WebSocket");
+      return false;
+    }
+
+    try {
+      // @ts-ignore - server.upgrade is available at runtime
+      return this.server.upgrade(request, protocolOptions);
+    } catch (error) {
+      console.error("❌ WebSocket upgrade failed:", error);
+      return false;
+    }
   }
 
   /**
@@ -520,6 +571,19 @@ export default {
       headers,
     });
   }
+
+  /**
+   * Publish a message to all WebSocket subscribers of a topic
+   */
+  publish(topic: string, data: string | Buffer, compress?: boolean): void {
+    if (!this.server) {
+      console.log("⚠️ Server not running");
+      return;
+    }
+
+    // @ts-ignore - server.publish is available at runtime in Bun
+    this.server.publish(topic, data, compress);
+  }
 }
 
 /**
@@ -536,3 +600,4 @@ export function createServer(options: ServerOptions, setup: (server: BunServe) =
  * Re-export types for convenience
  */
 export type { WebSocketHandler as BunWebSocketHandler, ServerWebSocket };
+export type { WebSocketProtocolOptions };

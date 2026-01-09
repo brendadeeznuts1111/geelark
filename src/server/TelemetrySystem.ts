@@ -4,13 +4,18 @@
  * Real-time alerts, performance tracing, and automated snapshots
  */
 
-import { MonitoringSystem } from "./MonitoringSystem";
 import path from "node:path";
+import { MonitoringSystem } from "./MonitoringSystem";
+import {
+    DATABASE_PATHS,
+    DIR_PATHS,
+    TELEMETRY_THRESHOLDS
+} from "./ServerConstants.js";
 
 const __dirname = import.meta.dir;
 const ROOT_DIR = path.resolve(__dirname, "../..");
-const TELEMETRY_DB_PATH = path.join(ROOT_DIR, "monitoring-telemetry.db");
-const SNAPSHOTS_DIR = path.join(ROOT_DIR, "snapshots");
+const TELEMETRY_DB_PATH = path.join(ROOT_DIR, DATABASE_PATHS.TELEMETRY);
+const SNAPSHOTS_DIR = path.join(ROOT_DIR, DIR_PATHS.SNAPSHOTS);
 
 export interface TelemetryAlert {
   id?: number;
@@ -39,6 +44,18 @@ export interface PerformanceTrace {
   result?: any;
   environment: string;
   metadata?: Record<string, any>;
+}
+
+export interface UploadTelemetry {
+  uploadId: string;
+  filename: string;
+  fileSize: number;
+  duration: number;
+  status: "success" | "failure";
+  provider: "s3" | "r2" | "local";
+  timestamp: number;
+  errorMessage?: string;
+  uploadSpeed?: number; // bytes per second
 }
 
 export interface SystemSnapshot {
@@ -110,14 +127,14 @@ export class TelemetrySystem {
 
     this.config = {
       alertThresholds: {
-        cpu: config.alertThresholds?.cpu || 90,
-        memory: config.alertThresholds?.memory || 90,
-        connections: config.alertThresholds?.connections || 1000,
-        load: config.alertThresholds?.load || 90,
+        cpu: config.alertThresholds?.cpu || TELEMETRY_THRESHOLDS.CPU,
+        memory: config.alertThresholds?.memory || TELEMETRY_THRESHOLDS.MEMORY,
+        connections: config.alertThresholds?.connections || TELEMETRY_THRESHOLDS.CONNECTIONS,
+        load: config.alertThresholds?.load || TELEMETRY_THRESHOLDS.LOAD,
         customMetrics: config.alertThresholds?.customMetrics || {},
       },
       notificationChannels: config.notificationChannels || {},
-      snapshotInterval: config.snapshotInterval || 3600000, // 1 hour
+      snapshotInterval: config.snapshotInterval || 60 * 60 * 1000, // 1 hour
       tracingEnabled: config.tracingEnabled ?? true,
       tracingSampleRate: config.tracingSampleRate ?? 1.0,
     };
@@ -173,6 +190,30 @@ export class TelemetrySystem {
         data TEXT NOT NULL
       )
     `);
+
+    // Upload telemetry table (feature-guarded)
+    // @ts-ignore - feature() from bun:bundle
+    if (typeof feature === "function" ? feature("FEAT_UPLOAD_ANALYTICS", false) : true) {
+      this.db.exec(`
+        CREATE TABLE IF NOT EXISTS upload_telemetry (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          upload_id TEXT NOT NULL,
+          filename TEXT NOT NULL,
+          file_size INTEGER NOT NULL,
+          duration INTEGER NOT NULL,
+          status TEXT NOT NULL,
+          provider TEXT NOT NULL,
+          timestamp INTEGER NOT NULL,
+          error_message TEXT,
+          upload_speed REAL
+        )
+      `);
+
+      // Upload telemetry indexes
+      this.db.exec(`CREATE INDEX IF NOT EXISTS idx_upload_timestamp ON upload_telemetry(timestamp)`);
+      this.db.exec(`CREATE INDEX IF NOT EXISTS idx_upload_status ON upload_telemetry(status)`);
+      this.db.exec(`CREATE INDEX IF NOT EXISTS idx_upload_provider ON upload_telemetry(provider)`);
+    }
 
     // Indexes
     this.db.exec(`CREATE INDEX IF NOT EXISTS idx_telemetry_timestamp ON telemetry_alerts(timestamp)`);
@@ -266,7 +307,9 @@ export class TelemetrySystem {
     }
 
     // Check monitoring system metrics
-    const monitoringSummary = this.monitoring.getSummary();
+    const monitoringSummary = this.monitoring.getSummary() as any;
+    // Ensure activeConnections exists (default to 0 if not provided)
+    monitoringSummary.activeConnections = monitoringSummary.activeConnections || 0;
     const connectionLoad = (monitoringSummary.activeConnections / 1000) * 100; // Assume 1000 max
 
     if (monitoringSummary.activeConnections > this.config.alertThresholds.connections) {
@@ -818,12 +861,25 @@ export class TelemetrySystem {
     const [className, methodName] = methodKey.split('.');
     const stats = this.getMethodStats(className, methodName);
 
+    if (!stats) {
+      return {
+        methodKey,
+        count: 0,
+        min: 0,
+        max: 0,
+        avg: 0,
+        p50: 0,
+        p95: 0,
+        p99: 0,
+      };
+    }
+
     return {
       methodKey,
       count: stats.count,
-      min: stats.min,
-      max: stats.max,
-      avg: stats.avg,
+      min: (stats as any).min || stats.minDuration || 0,
+      max: (stats as any).max || stats.maxDuration || 0,
+      avg: (stats as any).avg || stats.avgDuration || 0,
       p50: stats.p50,
       p95: stats.p95,
       p99: stats.p99,
@@ -878,7 +934,10 @@ export class TelemetrySystem {
     totalSnapshots: number;
     lastSnapshot: number | null;
   } {
-    const stats = this.getTelemetryStats();
+    const stats = this.getTelemetryStats() as any;
+    // Ensure missing properties exist
+    stats.totalTraces = stats.totalTraces || stats.traces?.total || 0;
+    stats.totalSnapshots = stats.totalSnapshots || stats.snapshots?.total || 0;
     const latestSnapshot = this.getLatestSnapshot(process.env.ENVIRONMENT || "development");
 
     return {
@@ -897,6 +956,240 @@ export class TelemetrySystem {
    */
   close(): void {
     this.db.close();
+  }
+
+  /**
+   * Record upload completion (feature-guarded)
+   */
+  recordUpload(upload: UploadTelemetry): void {
+    // Compile-time elimination
+    try {
+      // @ts-ignore - feature() from bun:bundle
+      if (typeof feature === "function" && !feature("FEAT_UPLOAD_ANALYTICS", false)) {
+        return;
+      }
+    } catch {
+      // If feature() is not available, continue anyway
+    }
+
+    // Record to database
+    this.db.prepare(`
+      INSERT INTO upload_telemetry (
+        upload_id, filename, file_size, duration, status, provider, timestamp, error_message, upload_speed
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(
+      upload.uploadId,
+      upload.filename,
+      upload.fileSize,
+      upload.duration,
+      upload.status,
+      upload.provider,
+      upload.timestamp,
+      upload.errorMessage || null,
+      upload.uploadSpeed || null
+    );
+
+    // Alert on slow uploads (> 30 seconds)
+    if (upload.status === "success" && upload.duration > 30000) {
+      this.createAlert({
+        timestamp: Date.now(),
+        type: "custom",
+        severity: "warning",
+        source: "upload-service",
+        metric: "upload_duration",
+        value: upload.duration,
+        threshold: 30000,
+        unit: "ms",
+        message: `Upload ${upload.filename} took ${upload.duration}ms`,
+        environment: process.env.ENVIRONMENT || "development",
+        resolved: false,
+        notified: false,
+      });
+    }
+
+    // Alert on failed uploads
+    if (upload.status === "failure") {
+      this.createAlert({
+        timestamp: Date.now(),
+        type: "custom",
+        severity: "warning",
+        source: "upload-service",
+        metric: "upload_failure",
+        value: 1,
+        threshold: 1,
+        unit: "count",
+        message: `Upload ${upload.filename} failed: ${upload.errorMessage || "Unknown error"}`,
+        environment: process.env.ENVIRONMENT || "development",
+        resolved: false,
+        notified: false,
+      });
+    }
+  }
+
+  /**
+   * Get upload statistics
+   */
+  getUploadStats(): {
+    total: number;
+    success: number;
+    failure: number;
+    avgDuration: number;
+    totalBytes: number;
+    avgSpeed: number;
+    byProvider: Record<string, { count: number; totalBytes: number; avgDuration: number }>;
+  } {
+    // Compile-time elimination
+    try {
+      // @ts-ignore - feature() from bun:bundle
+      if (typeof feature === "function" && !feature("FEAT_UPLOAD_ANALYTICS", false)) {
+        return {
+          total: 0,
+          success: 0,
+          failure: 0,
+          avgDuration: 0,
+          totalBytes: 0,
+          avgSpeed: 0,
+          byProvider: {},
+        };
+      }
+    } catch {
+      // If feature() is not available, continue anyway
+    }
+
+    // Query and return stats
+    const stats = this.db.prepare(`
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success,
+        SUM(CASE WHEN status = 'failure' THEN 1 ELSE 0 END) as failure,
+        AVG(duration) as avgDuration,
+        SUM(file_size) as totalBytes,
+        AVG(upload_speed) as avgSpeed
+      FROM upload_telemetry
+    `).get() as any;
+
+    // Get stats by provider
+    const byProviderRows = this.db.prepare(`
+      SELECT
+        provider,
+        COUNT(*) as count,
+        SUM(file_size) as totalBytes,
+        AVG(duration) as avgDuration
+      FROM upload_telemetry
+      GROUP BY provider
+    `).all() as any[];
+
+    const byProvider: Record<string, { count: number; totalBytes: number; avgDuration: number }> = {};
+    for (const row of byProviderRows) {
+      byProvider[row.provider] = {
+        count: row.count,
+        totalBytes: row.totalBytes || 0,
+        avgDuration: row.avgDuration || 0,
+      };
+    }
+
+    return {
+      total: stats.total || 0,
+      success: stats.success || 0,
+      failure: stats.failure || 0,
+      avgDuration: stats.avgDuration || 0,
+      totalBytes: stats.totalBytes || 0,
+      avgSpeed: stats.avgSpeed || 0,
+      byProvider,
+    };
+  }
+
+  /**
+   * Get recent uploads
+   */
+  getRecentUploads(limit: number = 100): UploadTelemetry[] {
+    // Compile-time elimination
+    try {
+      // @ts-ignore - feature() from bun:bundle
+      if (typeof feature === "function" && !feature("FEAT_UPLOAD_ANALYTICS", false)) {
+        return [];
+      }
+    } catch {
+      // If feature() is not available, continue anyway
+    }
+
+    const rows = this.db
+      .prepare(`
+        SELECT * FROM upload_telemetry
+        ORDER BY timestamp DESC
+        LIMIT ?
+      `)
+      .all(limit) as any[];
+
+    return rows.map(row => ({
+      uploadId: row.upload_id,
+      filename: row.filename,
+      fileSize: row.file_size,
+      duration: row.duration,
+      status: row.status,
+      provider: row.provider,
+      timestamp: row.timestamp,
+      errorMessage: row.error_message,
+      uploadSpeed: row.upload_speed,
+    }));
+  }
+
+  /**
+   * Get upload statistics for a specific time period
+   */
+  getUploadStatsForPeriod(startTime: number, endTime: number): {
+    total: number;
+    success: number;
+    failure: number;
+    avgDuration: number;
+    totalBytes: number;
+  } {
+    // Compile-time elimination
+    try {
+      // @ts-ignore - feature() from bun:bundle
+      if (typeof feature === "function" && !feature("FEAT_UPLOAD_ANALYTICS", false)) {
+        return {
+          total: 0,
+          success: 0,
+          failure: 0,
+          avgDuration: 0,
+          totalBytes: 0,
+        };
+      }
+    } catch {
+      // If feature() is not available, continue anyway
+    }
+
+    const stats = this.db
+      .prepare(`
+        SELECT
+          COUNT(*) as total,
+          SUM(CASE WHEN status = 'success' THEN 1 ELSE 0 END) as success,
+          SUM(CASE WHEN status = 'failure' THEN 1 ELSE 0 END) as failure,
+          AVG(duration) as avgDuration,
+          SUM(file_size) as totalBytes
+        FROM upload_telemetry
+        WHERE timestamp >= ? AND timestamp <= ?
+      `)
+      .get(startTime, endTime) as any;
+
+    return {
+      total: stats.total || 0,
+      success: stats.success || 0,
+      failure: stats.failure || 0,
+      avgDuration: stats.avgDuration || 0,
+      totalBytes: stats.totalBytes || 0,
+    };
+  }
+
+  /**
+   * Cleanup old upload telemetry
+   */
+  cleanupUploadTelemetry(olderThanDays: number = 30): number {
+    const cutoff = Date.now() - olderThanDays * 24 * 60 * 60 * 1000;
+
+    const result = this.db.prepare("DELETE FROM upload_telemetry WHERE timestamp < ?").run(cutoff);
+    return result.changes;
   }
 }
 

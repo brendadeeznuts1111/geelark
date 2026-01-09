@@ -1,0 +1,2 @@
+Hello from file URL!
+This is a test file for Bun fetch.

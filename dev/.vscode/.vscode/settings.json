@@ -1,0 +1,162 @@
+{
+  // General Editor Settings
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.rulers": [80, 120],
+  "editor.wordWrap": "off",
+  "editor.minimap.enabled": true,
+  "editor.suggestSelection": "first",
+  "editor.linkedEditing": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+
+  // TypeScript & JavaScript Settings
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.quoteStyle": "single",
+  "typescript.suggest.completeFunctionCalls": true,
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "javascript.preferences.quoteStyle": "single",
+  "javascript.suggest.completeFunctionCalls": true,
+
+  // Bun-specific Settings
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.preferences.preferTypeOnlyAutoImports": true,
+  "javascript.preferences.preferTypeOnlyAutoImports": true,
+
+  // Terminal Settings
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.env.linux": {
+    "NODE_ENV": "development",
+    "BUN_ENV": "development"
+  },
+  "terminal.integrated.env.osx": {
+    "NODE_ENV": "development",
+    "BUN_ENV": "development"
+  },
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.fontFamily": "Menlo, Monaco, 'Courier New', monospace",
+
+  // Workspace Settings
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.build": true,
+    "**/.next": true,
+    "**/.out": true
+  },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/node_modules/**": true,
+    "**/dist/**": true
+  },
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "files.eol": "\n",
+
+  // Search Settings
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/.git": true,
+    "**/.build": true
+  },
+  "search.useIgnoreFiles": true,
+
+  // Testing Settings
+  "testing.automaticallyOpenPeekView": "never",
+  "testing.automaticallyOpenPeekViewDuringAutoRun": false,
+  "testing.followRunningTest": true,
+
+  // Debug Settings
+  "debug.internalConsoleOptions": "openOnSessionStart",
+  "debug.onTaskErrors": "showErrors",
+  "debug.showInlineBreakpointCandidates": false,
+
+  // Extension Settings
+  "eslint.enable": true,
+  "prettier.enable": true,
+  "prettier.requireConfig": true,
+  "prettier.useEditorConfig": true,
+  "prettier.withNodeModules": false,
+  "prettier.documentSelectors": [
+    "**/*.{js,jsx,ts,tsx,json,md,html,css,scss}"
+  ],
+
+  // Task Settings
+  "task.autoDetect": "off",
+  "task.problemMatchers.neverPrompt": true,
+  "task.slowProviderWarning": false,
+
+  // Git Settings
+  "git.enableSmartCommit": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableCommitSigning": false,
+  "git.ignoreLimitWarning": true,
+  "git.openRepositoryInParentFolders": "always",
+
+  // Security Settings
+  "security.workspace.trust.untrustedFiles": "open",
+  "security.workspace.trust.startupPrompt": "never",
+
+  // Feature Flag Development Settings
+  "editor.semanticHighlighting.enabled": true,
+  "typescript.tsserver.experimental.enableProjectDiagnostics": true,
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true,
+
+  // Workspace-specific Settings for Feature Flag Development
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.organizeImports": "explicit"
+    }
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    }
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.quickSuggestions": {
+      "strings": true
+    }
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+
+  // DevContainer-specific Settings
+  "terminal.integrated.sendKeybindingsToShell": true,
+  "remote.autoForwardPorts": true,
+  "remote.autoForwardPortsSource": "process",
+  "remote.downloadExtensionsLocally": true,
+  "remote.extensionKind": {
+    "ms-vscode-remote.remote-containers": "ui"
+  }
+}

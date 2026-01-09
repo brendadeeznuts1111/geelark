@@ -5,8 +5,8 @@
  */
 
 import { Database } from "bun:sqlite";
-import path from "node:path";
 import crypto from "crypto";
+import path from "node:path";
 
 const __dirname = import.meta.dir;
 const ROOT_DIR = path.resolve(__dirname, "../..");
@@ -48,7 +48,7 @@ export class MonitoringAuth {
   constructor(dbPath: string = AUTH_DB_PATH, secretKey?: string) {
     this.db = new Database(dbPath);
     this.db.exec("PRAGMA journal_mode = WAL");
-    this.secretKey = secretKey || process.env.MONITORING_AUTH_SECRET || crypto.randomBytes(32).toString("hex");
+    this.secretKey = secretKey || process.env.MONITORING_AUTH_SECRET || Bun.hash(Math.random().toString()).toString().slice(0, 64);
     this.initializeSchema();
     this.createDefaultAdmin();
   }
@@ -113,13 +113,16 @@ export class MonitoringAuth {
         VALUES (?, ?, ?, ?)
       `).run("admin", hashedPassword, "admin", Date.now());
 
+      // Calculate proper padding using Bun.stringWidth for Unicode/emoji support
+      const passwordPadding = 44 - (typeof Bun !== 'undefined' ? Bun.stringWidth(defaultPassword) : defaultPassword.length);
+
       console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║           🔐 Monitoring Authentication Setup                  ║
 ╠════════════════════════════════════════════════════════════╣
 ║  Default admin account created!                            ║
 ║  Username: admin                                            ║
-║  Password: ${defaultPassword.padEnd(44)}              ║
+║  Password: ${defaultPassword}${" ".repeat(Math.max(0, passwordPadding))} ║
 ╠════════════════════════════════════════════════════════════╣
 ║  ⚠️  IMPORTANT: Change this password after first login!     ║
 ║  Command: change-password <new-password>                    ║
@@ -216,7 +219,7 @@ export class MonitoringAuth {
     `).run(Date.now(), token);
 
     // Parse permissions
-    tokenRecord.permissions = JSON.parse(tokenRecord.permissions as string);
+    tokenRecord.permissions = JSON.parse(tokenRecord.permissions as unknown as string);
 
     return tokenRecord;
   }
@@ -225,7 +228,7 @@ export class MonitoringAuth {
    * Generate token
    */
   private generateToken(): string {
-    return crypto.randomBytes(32).toString("hex");
+    return Bun.hash(Math.random().toString() + Date.now()).slice(0, 64);
   }
 
   /**

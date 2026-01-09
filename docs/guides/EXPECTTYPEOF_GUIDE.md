@@ -13,6 +13,7 @@
 - [Advanced Patterns](#advanced-patterns)
 - [Common Patterns](#common-patterns)
 - [Pro Tips](#pro-tips)
+- [Pro Tips Guide](./expectTypeOf-pro-tips.md)
 
 ## 🚀 Basic Usage
 

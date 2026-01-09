@@ -28,7 +28,7 @@ Complete guide for deploying Dev HQ to various environments.
 ```bash
 # API Configuration
 GEELARK_API_KEY=your_api_key
-GEELARK_BASE_URL=https://api.geelark.com
+GEELARK_BASE_URL=https://open.geelark.com
 
 # Security
 ENCRYPTION_KEY=your_256_bit_key

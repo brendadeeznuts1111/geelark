@@ -1,0 +1,8 @@
+{
+  "appName": "My App",
+  "version": "1.0.0",
+  "features": [
+    "feature1",
+    "feature2"
+  ]
+}

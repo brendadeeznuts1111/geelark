@@ -149,7 +149,7 @@ export function getTLSFromEnv(): TLSOptions | null {
 /**
  * TLS configuration presets
  */
-export const tlsPresets = {
+export const TLS_PRESETS = {
   /**
    * Development - self-signed, no verification
    */

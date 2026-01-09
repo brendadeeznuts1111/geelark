@@ -12,7 +12,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "types": ["./src/types/bun.d.ts"],
+    "downlevelIteration": true,
+    "types": ["./src/types/bun.d.ts", "node"],
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

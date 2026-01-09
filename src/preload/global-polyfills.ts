@@ -68,7 +68,7 @@ if (!Date.prototype.format) {
 // Global utility for inspecting values
 if (!globalThis.inspect) {
   globalThis.inspect = (value: unknown, depth = 2): string => {
-    return Bun.inspect(value);
+    return String(Bun.inspect(value));
   };
 }
 

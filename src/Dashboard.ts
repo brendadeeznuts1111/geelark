@@ -1,85 +1,6 @@
-// Using Bun's built-in color support instead of chalk
-
-// Simple color utility using ANSI escape codes
-const colors = {
-  reset: "\x1b[0m",
-  bright: "\x1b[1m",
-  dim: "\x1b[2m",
-  red: "\x1b[31m",
-  green: "\x1b[32m",
-  yellow: "\x1b[33m",
-  blue: "\x1b[34m",
-  magenta: "\x1b[35m",
-  cyan: "\x1b[36m",
-  white: "\x1b[37m",
-  gray: "\x1b[90m",
-  hex: (hex: string) => {
-    // Simple hex to ANSI conversion (limited support)
-    const hexCode = hex.replace("#", "");
-    const r = parseInt(hexCode.substr(0, 2), 16);
-    const g = parseInt(hexCode.substr(2, 2), 16);
-    const b = parseInt(hexCode.substr(4, 2), 16);
-    return `\x1b[38;2;${r};${g};${b}m`;
-  }
-};
-
-// Function-based chalk replacement with dynamic color support
-const createColorFn = (colorCode: string) => (text: string) => `${colorCode}${text}${colors.reset}`;
-const createBoldColorFn = (colorCode: string) => (text: string) => `${colors.bright}${colorCode}${text}${colors.reset}`;
-
-// Color mapping for dynamic access
-const colorMap: Record<string, string> = {
-  cyan: colors.cyan,
-  red: colors.red,
-  yellow: colors.yellow,
-  white: colors.white,
-  green: colors.green,
-  blue: colors.blue,
-  gray: colors.gray,
-  magenta: colors.magenta,
-};
-
-// Create bold object with Proxy for dynamic property access
-const boldChalk = new Proxy({
-  cyan: createBoldColorFn(colors.cyan),
-  underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
-  red: createBoldColorFn(colors.red),
-  yellow: createBoldColorFn(colors.yellow),
-  white: createBoldColorFn(colors.white),
-  green: createBoldColorFn(colors.green),
-  blue: createBoldColorFn(colors.blue),
-  gray: createBoldColorFn(colors.gray),
-  magenta: createBoldColorFn(colors.magenta),
-}, {
-  get(target, prop: string) {
-    if (prop in target) {
-      return target[prop as keyof typeof target];
-    }
-    // Support dynamic color access
-    if (colorMap[prop]) {
-      return createBoldColorFn(colorMap[prop]);
-    }
-    // Fallback to white if color not found
-    return createBoldColorFn(colors.white);
-  }
-});
-
-const chalk = {
-  bold: boldChalk,
-  gray: createColorFn(colors.gray),
-  green: createColorFn(colors.green),
-  red: createColorFn(colors.red),
-  yellow: createColorFn(colors.yellow),
-  blue: createColorFn(colors.blue),
-  underline: (text: string) => `${colors.bright}\x1b[4m${text}${colors.reset}`,
-  hex: (hex: string) => createColorFn(colors.hex(hex)),
-  white: createColorFn(colors.white),
-  cyan: createColorFn(colors.cyan),
-  magenta: createColorFn(colors.magenta),
-};
+import { chalk } from "./utils/AnsiColorUtility";
 import { FeatureRegistry } from "./FeatureRegistry";
 import { Logger } from "./Logger";
-import { TerminalWidth } from "./utils/TerminalWidth";
 import { ALERT_CONFIGS, DASHBOARD_COMPONENTS } from "./config";
 import {
     AlertSeverity,
@@ -87,6 +8,7 @@ import {
     HealthScore,
     PerformanceMetrics
 } from "./types";
+import { BunFileStreamManager } from "./utils/BunFileStreamManager";
 
 export interface DashboardOptions {
   ascii?: boolean;
@@ -102,6 +24,7 @@ export class Dashboard {
     throughput: 0,
     errorRate: 0,
   };
+  private streamManager: BunFileStreamManager = new BunFileStreamManager();
 
   constructor(
     private featureRegistry: FeatureRegistry,
@@ -130,6 +53,7 @@ export class Dashboard {
     this.displayResilienceMonitor();
     this.displayNotificationPanel();
     this.displayPerformanceGraph();
+    this.displayBunFileStreams();
     this.displayIntegrationGrid();
     this.displayAlertStatus();
   }
@@ -183,7 +107,7 @@ export class Dashboard {
   private displayFeatureTierDisplay(): void {
     const isPremium = this.featureRegistry.isEnabled(FeatureFlag.FEAT_PREMIUM);
     const badge = isPremium ? "🏆 PREMIUM" : "🔓 FREE";
-    const color = isPremium ? chalk.yellow.bold : chalk.gray;
+    const color = isPremium ? chalk.yellow : chalk.gray;
 
     const line = `Feature Tier: ${badge}`;
     const paddedLine = this.padLine(line, 80);
@@ -404,6 +328,71 @@ export class Dashboard {
     console.log();
   }
 
+  // BunFile Stream Management Panel
+  private displayBunFileStreams(): void {
+    try {
+      const streams = this.streamManager.inspectStandardStreams();
+      const allStats = this.streamManager.getAllStats();
+
+      console.log(chalk.bold.underline("📁 BunFile Stream Management:"));
+
+      // Display stdin info
+      const stdinInfo = streams.stdin;
+      const stdinStats = allStats.get('stdin');
+      console.log(chalk.cyan("\n  📥 stdin:"));
+      console.log(chalk.gray(`    Type: ${stdinInfo.type}`));
+      if (stdinInfo.size !== undefined) {
+        console.log(chalk.gray(`    Size: ${stdinInfo.size} bytes`));
+      }
+      console.log(chalk.gray(`    Readable: ${stdinInfo.readable ? '✅' : '❌'}`));
+      console.log(chalk.gray(`    Writable: ${stdinInfo.writable ? '✅' : '❌'}`));
+      if (stdinStats) {
+        console.log(chalk.gray(`    Bytes Read: ${stdinStats.bytesRead.toLocaleString()}`));
+        console.log(chalk.gray(`    Read Ops: ${stdinStats.readOps}`));
+      }
+
+      // Display stdout info
+      const stdoutInfo = streams.stdout;
+      const stdoutStats = allStats.get('stdout');
+      console.log(chalk.cyan("\n  📤 stdout:"));
+      console.log(chalk.gray(`    Type: ${stdoutInfo.type}`));
+      if (stdoutInfo.size !== undefined) {
+        console.log(chalk.gray(`    Size: ${stdoutInfo.size} bytes`));
+      }
+      console.log(chalk.gray(`    Readable: ${stdoutInfo.readable ? '✅' : '❌'}`));
+      console.log(chalk.gray(`    Writable: ${stdoutInfo.writable ? '✅' : '❌'}`));
+      if (stdoutStats) {
+        console.log(chalk.gray(`    Bytes Written: ${stdoutStats.bytesWritten.toLocaleString()}`));
+        console.log(chalk.gray(`    Write Ops: ${stdoutStats.writeOps}`));
+      }
+
+      // Display stderr info
+      const stderrInfo = streams.stderr;
+      const stderrStats = allStats.get('stderr');
+      console.log(chalk.cyan("\n  ⚠️  stderr:"));
+      console.log(chalk.gray(`    Type: ${stderrInfo.type}`));
+      if (stderrInfo.size !== undefined) {
+        console.log(chalk.gray(`    Size: ${stderrInfo.size} bytes`));
+      }
+      console.log(chalk.gray(`    Readable: ${stderrInfo.readable ? '✅' : '❌'}`));
+      console.log(chalk.gray(`    Writable: ${stderrInfo.writable ? '✅' : '❌'}`));
+      if (stderrStats) {
+        console.log(chalk.gray(`    Bytes Written: ${stderrStats.bytesWritten.toLocaleString()}`));
+        console.log(chalk.gray(`    Write Ops: ${stderrStats.writeOps}`));
+      }
+
+      // Header size validation hint
+      if (stdinInfo.size !== undefined && stdinInfo.size > 16384) {
+        console.log(chalk.yellow("\n  ⚠️  Warning: stdin size exceeds default HTTP header limit (16KiB)"));
+        console.log(chalk.yellow("     Consider using --max-http-header-size flag"));
+      }
+
+      console.log();
+    } catch (error) {
+      console.log(chalk.red(`  ❌ Error inspecting streams: ${error instanceof Error ? error.message : String(error)}`));
+    }
+  }
+
   // Live updates
   startLiveUpdates(intervalMs: number = 5000): void {
     if (this.liveUpdateInterval) {
@@ -578,7 +567,7 @@ export class Dashboard {
       const batch = allFlags.slice(i, i + batchSize);
       await Promise.all(batch.map(async (flag) => {
         const enabled = this.featureRegistry.isEnabled(flag);
-        const config = this.featureRegistry.getFlagConfig(flag);
+        const config = this.featureRegistry.getConfig(flag);
         const status = enabled ? "✅" : "❌";
         const color = enabled ? chalk.green : chalk.red;
         console.log(
@@ -719,7 +708,7 @@ export class Dashboard {
 
     console.log(chalk.bold.white("\n📦 Feature Breakdown:"));
     enabledFlags.forEach((flag) => {
-      const config = this.featureRegistry.getFlagConfig(flag);
+      const config = this.featureRegistry.getConfig(flag);
       const impact = config?.buildTimeImpact || "Unknown";
       console.log(chalk.gray(`  • ${flag}: ${impact}`));
     });

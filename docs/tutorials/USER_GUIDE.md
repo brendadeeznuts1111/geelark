@@ -445,7 +445,7 @@ The system automatically monitors for security issues:
 ```bash
 # Environment variables
 GEELARK_API_KEY=your_api_key
-GEELARK_BASE_URL=https://api.geelark.com
+GEELARK_BASE_URL=https://open.geelark.com
 
 # Test connection
 bun run health integrations --service=geelark
@@ -566,7 +566,7 @@ bun run restore --input=backup-20231201.tar.gz
 ```bash
 # API Keys (required)
 GEELARK_API_KEY=your_secure_api_key
-GEELARK_BASE_URL=https://api.geelark.com
+GEELARK_BASE_URL=https://open.geelark.com
 
 # Database (if applicable)
 DATABASE_URL=postgresql://user:pass@localhost:5432/db

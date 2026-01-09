@@ -19,6 +19,7 @@ Complete documentation for the Dev HQ - Advanced Codebase Analysis & Automation 
 |----------|-------------|
 | [CLI_REFERENCE.md](api/CLI_REFERENCE.md) | Complete command-line interface reference |
 | [SERVER_API.md](api/SERVER_API.md) | HTTP/WebSocket server API documentation |
+| [GEELARK_API.md](api/GEELARK_API.md) | GeeLark cloud phone management API integration |
 | [flags-reference.md](api/flags-reference.md) | Feature flags reference documentation |
 
 ## Architecture & Design
@@ -96,7 +97,7 @@ Complete documentation for the Dev HQ - Advanced Codebase Analysis & Automation 
 ### Key Directories
 
 ```
-src/
+src/                 # Core source code
 ├── context/          # Bun runtime wrappers (Bun.main, Bun.env)
 ├── config/           # Configuration loading with Bun.file()
 ├── constants/        # Bun runtime constants and feature flags
@@ -104,24 +105,48 @@ src/
 ├── security/         # Security headers and TLS
 ├── decorators/       # HTTP route decorators
 ├── components/       # JSX components
-└── preload/          # Preload scripts for test setup
+├── preload/          # Preload scripts for test setup
+├── examples/         # Example implementations
+├── packages/         # Package templates
+├── schemas/          # JSON schemas
+└── templates/        # Project templates
 
-tests/
+dev/                 # Development infrastructure
+├── bin/              # CLI entry points
+├── scripts/          # Build and dev scripts
+├── tools/            # Development utilities
+├── dev-hq/           # Dev HQ core modules
+├── .vscode/          # VS Code configuration
+└── .devcontainer/    # Development container
+
+build/               # Build artifacts & configurations
+├── config/           # Build configurations
+├── dist/             # Compiled distribution
+└── outputs/          # Build outputs
+
+tests/               # Test suite
 ├── unit/             # Unit tests
 ├── integration/      # Integration tests
 ├── e2e/              # End-to-end tests
 └── performance/      # Performance benchmarks
 
-docs/
+bench/               # Benchmarks (performance tests)
+
+docs/                # Documentation (this directory)
 ├── api/              # API documentation
-├── architecture/     # Architecture and design docs
+├── architecture/     # Architecture design docs
 ├── runtime/          # Bun runtime and process docs
 ├── features/         # Feature flags and matrices
-├── cli/             # CLI development docs
-├── guides/          # Feature guides
-├── tutorials/       # Tutorial documents
-├── testing/         # Testing documentation
-└── errors/          # Error handling docs
+├── cli/              # CLI documentation
+├── guides/           # Feature guides
+├── tutorials/        # Tutorial documents
+├── testing/          # Testing documentation
+└── errors/           # Error handling docs
+
+.runtime/            # Runtime data
+├── .data/            # Database files
+├── .logs/            # Application logs
+└── session/          # Session data
 ```
 
 ### Common Commands

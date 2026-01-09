@@ -219,19 +219,23 @@ export class MonitoringSystem {
         UPDATE devices
         SET lastSeen = ?, requestCount = requestCount + 1, ip = ?
         WHERE fingerprint = ?
-      `).run(event.timestamp, event.ip, event.deviceFingerprint);
+      `).run(
+        event.timestamp,
+        event.ip || "",
+        event.deviceFingerprint || ""
+      );
     } else {
       this.db.prepare(`
         INSERT INTO devices (fingerprint, firstSeen, lastSeen, requestCount, userAgent, deviceType, environment, ip)
         VALUES (?, ?, ?, 1, ?, ?, ?, ?)
       `).run(
-        event.deviceFingerprint,
+        event.deviceFingerprint || "",
         event.timestamp,
         event.timestamp,
         event.userAgent || "",
         event.deviceType || "unknown",
-        event.environment,
-        event.ip
+        event.environment || "",
+        event.ip || ""
       );
     }
   }
@@ -242,16 +246,16 @@ export class MonitoringSystem {
   private updateIPStats(event: MonitoringEvent): void {
     const existing = this.db.prepare(`
       SELECT * FROM ip_stats WHERE ip = ? AND environment = ?
-    `).get(event.ip, event.environment);
+    `).get(event.ip, event.environment) as any;
 
     if (existing) {
-      const statusCodes = JSON.parse(existing.statusCodes as string);
-      statusCodes[event.statusCode] = (statusCodes[event.statusCode] || 0) + 1;
+      const statusCodes = JSON.parse(existing.statusCodes || "{}");
+      statusCodes[event.statusCode!] = (statusCodes[event.statusCode!] || 0) + 1;
 
       // Update average response time
       const newAvgResponseTime =
-        (existing.avgResponseTime * existing.requestCount + event.responseTime) /
-        (existing.requestCount + 1);
+        ((existing.avgResponseTime || 0) * (existing.requestCount || 0) + event.responseTime) /
+        ((existing.requestCount || 0) + 1);
 
       this.db.prepare(`
         UPDATE ip_stats

@@ -164,7 +164,7 @@ export function withSecurityHeaders(
 /**
  * Recommended CSP for modern applications
  */
-export const cspPresets = {
+export const CSP_PRESETS = {
   /**
    * Strict CSP for applications without inline scripts
    */
@@ -203,7 +203,7 @@ export const cspPresets = {
 /**
  * Common Permissions-Policy directives
  */
-export const permissionsPresets = {
+export const PERMISSIONS_PRESETS = {
   /**
    * Minimal permissions - deny everything by default
    */

@@ -8,6 +8,7 @@
  */
 
 // Using Bun's built-in CLI parsing instead of commander
+import { Command } from "commander";
 import { MemoryAnalyzer, PerformanceTracker } from "../core/benchmark.js";
 
 // @ts-ignore - heapStats is available at runtime via bun:jsc

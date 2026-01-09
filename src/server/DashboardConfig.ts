@@ -143,7 +143,7 @@ export class DashboardConfigSystem {
       config.isDefault ? 1 : 0
     );
 
-    return { ...config, id: result.lastInsertRowId as number };
+    return { ...config, id: result.lastInsertRowid as number };
   }
 
   /**

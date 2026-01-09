@@ -5,6 +5,19 @@ Dev HQ is an advanced codebase analysis and automation platform built with Bun, 
 
 ## 🏗️ Architecture Overview
 
+### Directory Structure
+The project follows a clean, hierarchical organization:
+- **`src/`** - Core TypeScript source code with organized modules
+- **`dev/`** - Development tools, CLI, configurations, and infrastructure
+- **`build/`** - Build configurations, outputs, and compiled artifacts
+- **`docs/`** - Complete documentation suite (27+ files)
+- **`tests/`** - Test suites (unit, integration, e2e, performance)
+- **`bench/`** - Benchmarks and performance tests
+- **`web/`** - Frontend assets and React dashboard
+- **`.runtime/`** - Runtime data (databases, logs, sessions, monitoring)
+- **`.env/`** - Environment configurations
+- **`scratch/`** - Temporary development files
+
 ### Core Components
 - **CLI Framework** - 15+ commands with multiple output formats
 - **HTTP/WebSocket Server** - Built-in server with automatic TLS
@@ -47,20 +60,20 @@ Dev HQ is an advanced codebase analysis and automation platform built with Bun, 
 ### For Individual Developers
 - **Code analysis** - Understand codebase structure and metrics
 - **Performance monitoring** - Track application health and speed
-- **Development tooling** - Streamlined build and test workflows
+- **Development tooling** - Streamlined build and test workflows from `dev/` tools
 - **Learning platform** - Explore Bun and TypeScript best practices
 
 ### For Teams
-- **Code quality** - Automated linting and testing
+- **Code quality** - Automated linting and testing from `tests/` and `bench/`
 - **CI/CD integration** - Seamless integration with existing pipelines
-- **Monitoring** - Centralized health and performance tracking
-- **Documentation** - Auto-generated insights and reports
+- **Monitoring** - Centralized health and performance tracking via `.runtime/`
+- **Documentation** - Auto-generated insights from `docs/` suite
 
 ### For Enterprises
 - **Security compliance** - Automated security scanning and reporting
-- **Performance optimization** - Bundle analysis and optimization tools
-- **Scalability planning** - Capacity planning and load testing
-- **Audit trails** - Comprehensive logging and monitoring
+- **Performance optimization** - Bundle analysis and optimization tools in `build/`
+- **Scalability planning** - Capacity planning and load testing from benchmarks
+- **Audit trails** - Comprehensive logging and monitoring in `.runtime/`
 
 ## 🎯 Roadmap Highlights
 
@@ -76,16 +89,25 @@ Dev HQ is an advanced codebase analysis and automation platform built with Bun, 
 - Global load balancing and CDN integration
 - Comprehensive compliance and audit frameworks
 
+## 📁 Getting Started
+
+1. **Explore Source Code**: Start in `src/` for the main codebase
+2. **Set Up Development**: Use tools in `dev/` for setup and automation
+3. **Review Documentation**: Check `docs/README.md` for complete documentation
+4. **Run Tests**: Use `tests/` and `bench/` for validation and performance
+5. **Check Examples**: Find implementation examples in `src/examples/`
+
 ## 🌟 Community Impact
 
 Dev HQ aims to:
-- **Accelerate development** with modern tooling
-- **Improve code quality** through automation
-- **Enhance security** with built-in scanning
+- **Accelerate development** with modern, organized tooling
+- **Improve code quality** through automation and testing infrastructure
+- **Enhance security** with built-in scanning and compliance tools
 - **Promote best practices** in modern JavaScript/TypeScript
 - **Support the Bun ecosystem** with production-ready tools
 
 ---
 
 *Dev HQ - Where performance meets productivity*
+**Organized. Scalable. Production-Ready.**
 

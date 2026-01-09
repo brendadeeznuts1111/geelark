@@ -4,22 +4,23 @@
 import type { Subprocess } from "bun";
 // @ts-ignore - bun:test types are available when running with Bun
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it } from "bun:test";
-import { DevHQAutomation } from "../../../dev-hq/core/automation";
+import { AutomationService } from "../../../dev-hq/core/automation";
 
 // Type augmentation for the methods we added
 declare module "../../../dev-hq/core/automation" {
-  interface DevHQAutomation {
+  interface AutomationService {
     listProcesses(): Array<{ label: string; pid: number; killed: boolean }>;
     getProcessStatus(label: string): { exists: boolean; label: string; pid?: number; killed?: boolean; status: string };
     killProcess(label: string): { success: boolean; pid?: number; reason?: string };
+    runCommand(label: string, command: string[], options?: any): Promise<any>;
   }
 }
 
 describe("🤖 Dev HQ Automation", () => {
-  let automation: DevHQAutomation;
+  let automation: AutomationService;
 
   beforeEach(() => {
-    automation = new DevHQAutomation();
+    automation = new AutomationService();
   });
 
   afterEach(() => {
@@ -33,7 +34,7 @@ describe("🤖 Dev HQ Automation", () => {
       expect(result.exitCode).toBe(0);
       expect(result.stdout).toContain("hello world");
       expect(result.stderr).toBe("");
-      expect(result.error).toBeUndefined();
+      expect(result.error).toBe(false);
     });
 
     it("should handle commands with arguments", async () => {
@@ -49,7 +50,7 @@ describe("🤖 Dev HQ Automation", () => {
 
       expect(result.exitCode).toBe(1);
       expect(result.stdout).toBe("");
-      expect(result.error).toBeUndefined();
+      expect(result.error).toBe(true);
     });
 
     it("should handle non-existent commands", async () => {
@@ -69,7 +70,8 @@ describe("🤖 Dev HQ Automation", () => {
       });
 
       expect(result.exitCode).toBe(0);
-      expect(result.stdout.trim()).toBe("/tmp");
+      const normalizedPath = result.stdout.trim().replace(/^\/private/, "");
+      expect(normalizedPath).toBe("/tmp");
     });
 
     it("should handle invalid working directory", async () => {
@@ -211,9 +213,12 @@ describe("🤖 Dev HQ Automation", () => {
     });
 
     it("should not kill running processes during cleanup", async () => {
-      const process = await automation.runCommand("running", ["sleep", "1"], {
+      const process = await automation.runCommand("running", ["sleep", "5"], {
         stream: true
       });
+
+      // Wait a bit to ensure the process is actually running
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       automation.cleanup();
 
@@ -292,7 +297,7 @@ describe("🤖 Dev HQ Automation", () => {
 
   describe("Type Safety", () => {
     it("should maintain proper TypeScript types", () => {
-      expectTypeOf(DevHQAutomation).toBeFunction();
+      expectTypeOf(AutomationService).toBeFunction();
       expectTypeOf(automation).toBeObject();
       expectTypeOf(automation.runCommand).toBeFunction();
       expectTypeOf(automation.killProcess).toBeFunction();
@@ -304,10 +309,14 @@ describe("🤖 Dev HQ Automation", () => {
       const result = await automation.runCommand("type-test", ["echo", "test"]);
 
       expectTypeOf(result).toEqualTypeOf<{
+        exitCode: number;
         stdout: string;
         stderr: string;
-        exitCode: number;
         error?: boolean;
+        pid?: number;
+        resourceUsage?: any;
+        executionTime?: number;
+        signalCode?: any;
       }>();
 
       expect(result.stdout).toBeString();

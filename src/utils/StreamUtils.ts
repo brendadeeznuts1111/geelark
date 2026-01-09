@@ -58,7 +58,7 @@ export class StreamUtils {
 
     // Fast path: default chunk size and no delay, use Blob.stream()
     if (delay === 0 && chunkSize === 64 * 1024) {
-      return new Blob([arr]).stream();
+      return new Blob([arr as BlobPart]).stream();
     }
 
     // Manual chunking for custom chunk sizes or throttling

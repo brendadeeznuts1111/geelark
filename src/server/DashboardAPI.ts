@@ -4,9 +4,9 @@
  * Provides API endpoints for feature flags, builds, metrics, and health
  */
 
-import { BunServe } from "./BunServe.js";
-import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { BunServe } from "./BunServe.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "../..");
@@ -31,8 +31,9 @@ export function setupDashboardAPI(server: BunServe): void {
   server.get("/api/flags/meta", async () => {
     const metaPath = path.join(ROOT_DIR, "meta.json");
     const metaFile = Bun.file(metaPath);
+    const metaContent = await metaFile.text();
 
-    return new Response(metaFile, {
+    return new Response(metaContent, {
       headers: {
         "Content-Type": "application/json",
         ...corsHeaders,
@@ -217,21 +218,12 @@ export function setupDashboardAPI(server: BunServe): void {
       const outDir = `./dist/${configName}`;
 
       // Execute the build command
-      const proc = Bun.spawn(
-        [
-          "bun",
-          "build",
-          "./src/index.ts",
-          `--outdir=${outDir}`,
-          `--features=${flagsStr}`,
-          "--minify",
-        ],
-        {
-          cwd: ROOT_DIR,
-          stdout: "pipe",
-          stderr: "pipe",
-        }
-      );
+      const command = `bun build ./src/index.ts --outdir=${outDir} --features=${flagsStr} --minify`;
+      const proc = Bun.spawn(command, {
+        cwd: ROOT_DIR,
+        stdout: "pipe",
+        stderr: "pipe",
+      } as any);
 
       // Wait for the process to complete
       const output = await proc.exited;

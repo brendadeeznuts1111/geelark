@@ -108,6 +108,11 @@ export class Logger {
     message: string,
     data?: any
   ): Promise<void> {
+    // Filter by configured log level (only log if level >= this.level)
+    if (this.getLevelValue(level) < this.getLevelValue(this.level)) {
+      return; // Skip logging below configured level
+    }
+
     const entry: LogEntry = {
       type,
       level,
@@ -210,18 +215,7 @@ export class Logger {
     await this.log(LogType.HEALTH_CHECK, LogLevel.INFO, message, data);
   }
 
-  // Additional methods for CLI compatibility
-  async debug(message: string, data?: any): Promise<void> {
-    await this.log(LogType.PERFORMANCE_METRIC, LogLevel.DEBUG, message, data);
-  }
-
-  async info(message: string, data?: any): Promise<void> {
-    await this.log(LogType.FEATURE_CHANGE, LogLevel.INFO, message, data);
-  }
-
-  async critical(message: string, data?: any): Promise<void> {
-    await this.log(LogType.SECURITY_EVENT, LogLevel.CRITICAL, message, data);
-  }
+  // Use specific type methods instead: featureChange(), error(), audit(), healthCheck(), etc.
 
   // Query methods
   getLogs(type?: LogType, level?: LogLevel, limit?: number): LogEntry[] {
@@ -389,5 +383,16 @@ export class Logger {
       default:
         return "\x1b[0m"; // reset
     }
+  }
+
+  private getLevelValue(level: LogLevel): number {
+    const levelOrder: Record<LogLevel, number> = {
+      [LogLevel.DEBUG]: 0,
+      [LogLevel.INFO]: 1,
+      [LogLevel.WARN]: 2,
+      [LogLevel.ERROR]: 3,
+      [LogLevel.CRITICAL]: 4,
+    };
+    return levelOrder[level] || 0;
   }
 }

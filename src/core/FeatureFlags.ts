@@ -44,7 +44,7 @@ export class FeatureFlags {
     if (feature("FEAT_MOCK_API")) {
       return "http://localhost:3000/mock";
     } else {
-      return "https://api.geelark.com/v1";
+      return "https://openapi.geelark.com/open/v1";
     }
   }
 

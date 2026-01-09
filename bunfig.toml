@@ -134,7 +134,7 @@ bun = true
 # -----------------------------------------------------------------------------
 [http]
 # User-Agent header for fetch/Bun.fetch
-# user-agent = "geelark/1.0.0"
+user-agent = "Geelark-Upload/1.0.0 (Bun)"
 
 # Connect timeout in milliseconds
 # connectTimeout = 10000
@@ -152,7 +152,13 @@ bun = true
 # keepAliveTimeout = 60000
 
 # DNS preconnection for faster requests
-# preconnect = ["https://api.example.com"]
+preconnect = [
+  "https://s3.amazonaws.com",
+  "https://*.amazonaws.com",
+  "https://*.r2.cloudflarestorage.com",
+  "https://*.digitaloceanspaces.com",
+  "https://*.storage.googleapis.com",
+]
 
 # -----------------------------------------------------------------------------
 # TLS/HTTPS Configuration
@@ -179,3 +185,81 @@ bun = true
 # [tsconfig.options]
 # strict = true
 # target = "ES2022"
+
+# -----------------------------------------------------------------------------
+# Upload System Configuration
+# -----------------------------------------------------------------------------
+# Note: bunfig.toml doesn't support custom [upload] sections
+# Upload configuration should be done via environment variables or CLI flags
+
+# Upload size limits (for reference)
+# maxSimpleSize = 5242880         # 5MB
+# maxMultipartSize = 5497558138880 # 5TB
+# chunkSize = 5242880             # 5MB
+
+# Upload timeouts (for reference)
+# timeout = 300000                 # 5 minutes
+# progressInterval = 500          # 500ms
+# maxConcurrent = 10              # 10 uploads
+
+# -----------------------------------------------------------------------------
+# Upload Build-Time Constants (Feature Flags)
+# -----------------------------------------------------------------------------
+[define]
+# Enable/disable upload features at build time
+"process.env.UPLOAD_ENABLED" = "\"true\""
+"process.env.UPLOAD_MAX_FILE_SIZE" = "\"5497558138880\""
+"process.env.UPLOAD_CHUNK_SIZE" = "\"5242880\""
+"process.env.UPLOAD_TIMEOUT" = "\"300000\""
+
+# S3/R2 Provider defaults
+"process.env.UPLOAD_PROVIDER" = "\"local\""
+"process.env.S3_REGION" = "\"us-east-1\""
+
+# -----------------------------------------------------------------------------
+# Feature Flags Configuration
+# -----------------------------------------------------------------------------
+# Note: Feature flags are enabled via CLI flags, not bunfig.toml
+# Enable features: bun run src/index.ts --feature=FEAT_CLOUD_UPLOAD
+# Build with features: bun build src/index.ts --feature=FEAT_CLOUD_UPLOAD --feature=FEAT_UPLOAD_PROGRESS
+#
+# Available features:
+#   - FEAT_CLOUD_UPLOAD: Enable S3/R2 cloud uploads
+#   - FEAT_UPLOAD_PROGRESS: Real-time progress tracking
+#   - FEAT_MULTIPART_UPLOAD: Large file multipart upload
+#   - FEAT_UPLOAD_ANALYTICS: Upload metrics and analytics
+#   - FEAT_CUSTOM_METADATA: Custom S3 metadata
+#
+# Usage in code:
+#   import { feature } from "bun:bundle";
+#   if (feature("FEAT_CLOUD_UPLOAD")) {
+#     // This code only included if feature is enabled
+#   }
+
+# -----------------------------------------------------------------------------
+# Upload Preload Configuration
+# -----------------------------------------------------------------------------
+# Note: Preload files should be specified via CLI flags or environment variables
+# bunfig.toml doesn't support the [preload] section format
+# Use: bun --preload ./src/server/UploadService.ts run src/index.ts
+
+# -----------------------------------------------------------------------------
+# Environment-Specific Configuration
+# -----------------------------------------------------------------------------
+# Note: These should be set via environment variables or CLI flags
+# bunfig.toml doesn't support nested [env.*] sections
+
+# Development: local uploads with verbose logging
+# provider = "local"
+# logLevel = "debug"
+# enableProfiling = "true"
+
+# Production: S3/R2 with optimized settings
+# provider = "s3"
+# logLevel = "info"
+# enableProfiling = "false"
+
+# Staging: R2 with debugging enabled
+# provider = "r2"
+# logLevel = "debug"
+# enableProfiling = "true"
